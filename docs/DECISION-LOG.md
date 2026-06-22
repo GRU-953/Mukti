@@ -91,6 +91,29 @@ Statuses: **Decided** · **Proposed** (awaiting maintainer sign-off) · **Open**
   100% first-pass correct. The clean-room Spike B converter scores 100%.
   ([`phase1/REUSE-VALIDATION.md`](phase1/REUSE-VALIDATION.md).)
 
+### D-0010 — Layered architecture with a lint-enforced pure engine
+- **Status:** Decided (Phase 2; pending Phase 3 review)
+- **Date:** 2026-06-22
+- **Owner:** Agent (technical)
+- **Decision:** Three layers — pure TS `engine` (zero Office.js, Node-gated by
+  the corpus harness), a thin Office.js `host` adapter, and the taskpane UI.
+  The engine→Office.js boundary is enforced by an ESLint rule that fails the
+  build. Frozen interface contracts live in `src/engine/contracts.ts` and
+  `src/host/contracts.ts`. ([`phase2/ARCHITECTURE.md`](phase2/ARCHITECTURE.md).)
+- **Why:** Inverts the prior entanglement of conversion with Office.js; makes the
+  engine testable without Word and the platform risk containable.
+
+### D-0011 — Revert is snapshot-based, not programmatic undo
+- **Status:** Decided (Phase 2; pending Spike C)
+- **Date:** 2026-06-22
+- **Owner:** Agent (technical)
+- **Decision:** "Revert Mukti changes" restores a pre-apply snapshot (text +
+  per-run formatting) stored in the document settings. Ctrl+Z is an honest
+  platform fallback only.
+- **Why:** Office.js at WordApi 1.3 exposes no undo/undo-grouping API, so a
+  snapshot restore is the only reliable mechanism; also avoids the prior
+  destructive reverse-conversion bug (do-not-repeat H6). Confirmed by Spike C.
+
 ---
 
 ## Open decisions (need maintainer input)
