@@ -52,6 +52,30 @@ Statuses: **Decided** · **Proposed** (awaiting maintainer sign-off) · **Open**
 - **Why:** A live, unencrypted code-signing key (and its plaintext password) were
   committed to every prior version. ([`phase0/DO-NOT-REPEAT.md`](phase0/DO-NOT-REPEAT.md) §C1.)
 
+### D-0007 — Idempotency rule: only transform text containing Bijoy source glyphs
+- **Status:** Decided
+- **Date:** 2026-06-22
+- **Owner:** Agent (technical), validated by Spike B
+- **Decision:** The conversion engine must treat any run that contains **no Bijoy
+  source glyphs** as a no-op (return it unchanged). Reordering must never run on
+  already-Unicode text.
+- **Why:** Spike B proved a blind regex reorder is correct on first pass but
+  corrupts on a second pass (e.g. দেশ → দশে) — the exact bug class that sank the
+  prior engine. Guarding on the presence of source glyphs makes
+  `convert(convert(x)) === convert(x)` and `convert(unicode) === unicode` hold
+  across the entire corpus. The harness tests this on every case.
+  ([`phase0/spikes/spike-B-reordering.md`](phase0/spikes/spike-B-reordering.md).)
+
+### D-0008 — Whitespace and formatting are preserved, never munged
+- **Status:** Decided
+- **Date:** 2026-06-22
+- **Owner:** Agent (technical), per do-not-repeat M-items
+- **Decision:** The engine preserves whitespace verbatim and does not "tidy"
+  spacing/newlines. (The reference oracle collapses runs of spaces; we do not.)
+- **Why:** Formatting fidelity is a core promise; the prior maps munged
+  whitespace. Encoded as POLICY override cases in the corpus
+  (`edge-space`, `edge-unicode-noop`).
+
 ---
 
 ## Open decisions (need maintainer input)

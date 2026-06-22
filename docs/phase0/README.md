@@ -6,12 +6,21 @@ of production code. It has three jobs:
 1. **Forensic root-cause of every prior "Mukti" version → a do-not-repeat list.**
    ✅ **Done.** See [`DO-NOT-REPEAT.md`](DO-NOT-REPEAT.md) and the detailed
    evidence in [`findings/`](findings/).
-2. **Build and freeze a gold-standard test corpus.** ⏳ Not started (next).
-3. **Spike the three "killer" risks** (per-run font access in Word, Bengali
-   cluster reordering correctness, undo fidelity). ⏳ Not started (next).
+2. **Build and freeze a gold-standard test corpus.** ✅ **Done.** 107 cases
+   (92 visible + 15 sealed held-out), frozen by
+   [`../../corpus/MANIFEST.json`](../../corpus/MANIFEST.json). Ground truth is
+   triple-checked against an independent oracle. See [`../../corpus/`](../../corpus/).
+3. **Spike the three "killer" risks.** See [`spikes/`](spikes/):
+   - **B — cluster reordering** (pure code): 🟢 **GREEN**. 100% char/word
+     accuracy on visible *and* held-out, idempotent, fuzz-clean.
+   - **A — per-run font access** (needs Word): 🟡 ready-to-run kit + partial
+     forensic de-risking.
+   - **C — undo/revert fidelity** (needs Word): 🟡 ready-to-run kit + partial
+     forensic de-risking.
 
 A *red* spike — one that proves something can't work as assumed — reshapes the
-plan before any production code is written.
+plan before any production code is written. Spike B surfaced (and the design now
+fixes) the exact idempotency bug that sank the prior engine.
 
 ## What we analysed
 
