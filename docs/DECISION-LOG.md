@@ -57,13 +57,17 @@ Statuses: **Decided** · **Proposed** (awaiting maintainer sign-off) · **Open**
 ## Open decisions (need maintainer input)
 
 ### D-0005 — Canonical Unicode output font
-- **Status:** Open
+- **Status:** Decided
+- **Date:** 2026-06-22
 - **Owner:** Maintainer (GRU953)
-- **Question:** Which single, openly-licensed (SIL OFL) Bangla font do we bundle
-  as the conversion output font? Leading candidates: **Noto Sans Bengali**
-  (neutral, widely available, the spec's example) and **SolaimanLipi** (very
-  familiar to Bangladeshi readers). Both are OFL and redistributable.
-- **Blocks:** Engine output font setting, bundled asset, manifest copy.
+- **Decision:** Bundle **Noto Sans Bengali** (SIL OFL) as the single canonical
+  Unicode output font. Its `OFL.txt`/NOTICE will be retained alongside the
+  bundled font file.
+- **Why:** Maintainer's choice. Widest device coverage, neutral/clean, actively
+  maintained by Google/SIL, and the example named in the project spec. The font
+  does not affect conversion accuracy (output Unicode codepoints are identical
+  regardless of rendering font); it can be changed later at the cost of
+  re-bundling and re-testing.
 
 ### D-0006 — Hosting domain
 - **Status:** Open (not blocking until Phase 2)
