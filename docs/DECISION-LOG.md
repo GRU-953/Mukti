@@ -76,6 +76,21 @@ Statuses: **Decided** · **Proposed** (awaiting maintainer sign-off) · **Open**
   whitespace. Encoded as POLICY override cases in the corpus
   (`edge-space`, `edge-unicode-noop`).
 
+### D-0009 — Reuse decision: adopt the prior map data, rewrite all processing
+- **Status:** Decided
+- **Date:** 2026-06-22
+- **Owner:** Agent (technical), validated by Phase 1 corpus measurement
+- **Decision:** Salvage the prior `BIJOY_TO_UNICODE_MAP` **data** (port to
+  schema-validated JSON, fix the broken dari entry, re-verify in Phase 4).
+  **Rewrite** the entire pipeline (mapping application, reorder, normalization)
+  in the TypeScript engine, carrying the Spike-B design rules. Keep the curated
+  ~138-name font list (drop fuzzy matching); validate it at the Office layer.
+- **Why:** Run as-is against the frozen corpus, the prior engine scores
+  96.96%/96.20% (visible) — below the gate — failing idempotency, NFC, dari,
+  URL protection, and whitespace preservation, while the map data itself is
+  100% first-pass correct. The clean-room Spike B converter scores 100%.
+  ([`phase1/REUSE-VALIDATION.md`](phase1/REUSE-VALIDATION.md).)
+
 ---
 
 ## Open decisions (need maintainer input)

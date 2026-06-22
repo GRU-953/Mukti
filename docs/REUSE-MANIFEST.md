@@ -1,11 +1,13 @@
 # Reuse Manifest
 
-> **Status: DRAFT / seed (Phase 0).** These are the *candidate* verdicts from the
-> forensic analysis. Per the project rules, the rebuild is **clean-room by
-> default**: nothing here is adopted until it has been re-verified in isolation
-> against the **frozen gold-standard corpus** in Phase 1. A candidate that does
-> not score is rewritten, not carried over. This file is updated with the final,
-> corpus-tested verdicts during Phase 1.
+> **Status: corpus-tested (Phase 1 done).** The conversion-engine verdicts below
+> were validated by running the prior code **as-is, in isolation** against the
+> frozen corpus — see [`phase1/REUSE-VALIDATION.md`](phase1/REUSE-VALIDATION.md)
+> for the measured numbers. Headline: the prior **map data is correct** (100%
+> first-pass on all core categories) but the prior **processing fails the gate**
+> (idempotency/NFC/dari/URL/whitespace) → adopt the data, rewrite the pipeline.
+> The clean-room Spike B converter already scores 100%, so the rewrite is proven.
+> (Office-layer candidates remain to be validated at the Office layer in Phase 4.)
 
 **Verdict key:**
 - **ADOPT** — bring across with minimal change (still re-verified against corpus).
