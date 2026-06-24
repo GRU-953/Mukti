@@ -60,7 +60,7 @@ type El = HTMLElement;
 
 function el(tag: string, attrs: Record<string, string> = {}, children: Array<El | string> = []): El {
   const node = document.createElement(tag);
-  for (const name of Object.keys(attrs)) node.setAttribute(name, attrs[name]);
+  for (const name of Object.keys(attrs)) node.setAttribute(name, attrs[name]!);
   for (const child of children) {
     node.append(typeof child === 'string' ? document.createTextNode(child) : child);
   }
@@ -358,6 +358,7 @@ function viewSample(plan: ConversionPlan): El {
   if (samples.length === 0) return region;
   const idx = Math.min(model.sampleIndex, samples.length - 1);
   const edit = samples[idx];
+  if (!edit) return region;
 
   // "before" is the raw Bijoy in its original font; "after" is Unicode in Noto.
   region.append(el('p', { class: 'sample-row' }, [

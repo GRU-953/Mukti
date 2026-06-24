@@ -424,7 +424,7 @@ export class WordHostAdapter implements WordHost {
       for (let i = 0; i < changedEdits.length; i++) {
         const edit = changedEdits[i];
         const resolved = paraResolvers[i];
-        if (!resolved.range) {
+        if (!edit || !resolved || !resolved.range) {
           skippedStale += 1; // could not re-locate → treat as stale, never force
           continue;
         }
@@ -462,7 +462,7 @@ export class WordHostAdapter implements WordHost {
       for (let i = 0; i < snapshot.runs.length; i++) {
         const run = snapshot.runs[i];
         const resolved = resolvers[i];
-        if (!resolved.range) continue;
+        if (!run || !resolved || !resolved.range) continue;
         const written = resolved.range.insertText(run.text, 'Replace');
         // Restore the ORIGINAL font (run.format.fontName), NOT the output font —
         // so stampFormat's final font.name set re-applies the saved source font.

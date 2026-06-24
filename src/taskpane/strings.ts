@@ -184,7 +184,7 @@ const BANGLA_DIGITS = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '
 export function formatNumber(value: number, lang: Lang): string {
   const ascii = String(value);
   if (lang === 'en') return ascii;
-  return ascii.replace(/[0-9]/g, (d) => BANGLA_DIGITS[Number(d)]);
+  return ascii.replace(/[0-9]/g, (d) => BANGLA_DIGITS[Number(d)]!);
 }
 
 type Vars = Readonly<Record<string, string | number>>;

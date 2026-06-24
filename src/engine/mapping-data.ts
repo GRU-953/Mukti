@@ -1,31 +1,19 @@
 /**
- * Loads and compiles the static Bijoy->Unicode mapping profile.
+ * Compiles the static Bijoy->Unicode mapping profile.
  *
  * The substitution table lives in `data/bijoy-sutonnymj.json` (schema:
  * `data/schema/mapping-table.schema.json`); reordering stays in code (Spike B).
- * The data is read once at module load via the filesystem so the engine carries
- * no bundler/JSON-import assumptions and stays a pure Node leaf module — no
- * Office.js, no DOM. (See ARCHITECTURE.md, D-0009, D-0013.)
+ * `npm run generate` turns that JSON into `mapping.generated.ts`, which we import
+ * here as a plain module — so the engine has NO `node:fs` and bundles cleanly for
+ * the Word task pane (browser) while still running under the Node corpus gate.
+ * The JSON remains the single schema-validated source of truth. (See
+ * ARCHITECTURE.md, D-0009, D-0013.)
  */
 
-import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
-import { dirname, join } from 'node:path';
-import type { MappingEntry, MappingProfile } from './contracts.js';
+import type { MappingEntry } from './contracts.js';
+import { profile } from './mapping.generated.js';
 
-/** Resolve `data/bijoy-sutonnymj.json` relative to this module, in src or dist. */
-function locateProfile(): string {
-  const here = dirname(fileURLToPath(import.meta.url));
-  // From `src/engine/` -> `../../data`; from `dist/engine/` -> `../../data`.
-  return join(here, '..', '..', 'data', 'bijoy-sutonnymj.json');
-}
-
-function loadProfile(): MappingProfile {
-  const raw = readFileSync(locateProfile(), 'utf8');
-  return JSON.parse(raw) as MappingProfile;
-}
-
-export const profile: MappingProfile = loadProfile();
+export { profile };
 
 /** Turn an entry's code-point array into the source string the engine matches. */
 function sourceString(entry: MappingEntry): string {

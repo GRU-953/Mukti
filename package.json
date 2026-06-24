@@ -3,14 +3,19 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Mukti conversion engine — Bijoy/SutonnyMJ Bangla to Unicode (pure TypeScript core).",
+  "description": "Mukti — convert legacy Bijoy/SutonnyMJ Bangla to Unicode in Microsoft Word.",
   "license": "MIT",
   "engines": {
     "node": ">=20"
   },
   "scripts": {
-    "build:engine": "tsc -p tsconfig.json",
-    "lint": "eslint . && tsc -p tsconfig.json --noEmit",
+    "generate": "node tools/gen-mapping.mjs",
+    "build:engine": "npm run generate && tsc -p tsconfig.json",
+    "build:web": "npm run generate && node tools/build-web.mjs",
+    "build:manifest": "node scripts/build-manifest.mjs",
+    "build": "npm run build:engine && npm run build:web && npm run build:manifest",
+    "typecheck": "npm run generate && tsc -p tsconfig.json --noEmit && tsc -p tsconfig.web.json --noEmit",
+    "lint": "npm run generate && eslint . && npm run typecheck",
     "test": "npm run build:engine && node tools/validate-data.mjs && node --test \"test/**/*.test.mjs\"",
     "validate:data": "node tools/validate-data.mjs",
     "corpus:visible": "node tools/corpus/harness.mjs --dir corpus/visible --converter dist/engine/index.js --threshold 0.99",
@@ -24,6 +29,7 @@
     "@typescript-eslint/eslint-plugin": "^8.18.0",
     "@typescript-eslint/parser": "^8.18.0",
     "ajv": "^8.17.1",
+    "esbuild": "^0.25.0",
     "eslint": "^9.17.0",
     "eslint-plugin-import": "^2.31.0",
     "typescript": "^5.7.2"
