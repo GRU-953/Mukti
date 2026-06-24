@@ -8,6 +8,12 @@
 > (idempotency/NFC/dari/URL/whitespace) → adopt the data, rewrite the pipeline.
 > The clean-room Spike B converter already scores 100%, so the rewrite is proven.
 > (Office-layer candidates remain to be validated at the Office layer in Phase 4.)
+>
+> **Provenance correction (Phase 3, D-0013):** "clean-room" means clean-room
+> *processing*. The salvaged **map data** is the maintainer's own prior
+> **MIT-licensed** Mukti map (© Aninda Sundar Howlader = GRU-953), retained with
+> MIT attribution — not third-party. The unlicensed external converter was only a
+> disposable cross-check oracle; no code or data from it ships.
 
 **Verdict key:**
 - **ADOPT** — bring across with minimal change (still re-verified against corpus).

@@ -14,7 +14,8 @@ import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import {
   characterAccuracy,
-  wordAccuracy,
+  charStats,
+  wordStats,
   isNFC,
   exact,
 } from './metrics.mjs';
@@ -47,7 +48,12 @@ export function loadCases(dir) {
 const sourceString = (c) => String.fromCodePoint(...(c.source || []));
 
 function blankAgg() {
-  return { n: 0, char: 0, word: 0, exact: 0, nfcFail: 0, idemFail: 0, noopFail: 0 };
+  // charDist/charLen and wordDist/wordLen accumulate raw edit distances and
+  // lengths so accuracy is a true CORPUS-level error rate, not a per-case mean.
+  return {
+    n: 0, exact: 0, nfcFail: 0, idemFail: 0, noopFail: 0,
+    charDist: 0, charLen: 0, wordDist: 0, wordLen: 0,
+  };
 }
 
 /**
@@ -80,7 +86,8 @@ export function runCorpus({ convert, dir, threshold = 0.99 }) {
     }
 
     const ca = characterAccuracy(expected, actual);
-    const wa = wordAccuracy(expected, actual);
+    const cs = charStats(expected, actual);
+    const ws = wordStats(expected, actual);
     const ex = exact(expected, actual);
     const nfcOk = isNFC(actual);
 
@@ -101,8 +108,10 @@ export function runCorpus({ convert, dir, threshold = 0.99 }) {
 
     const tally = (agg) => {
       agg.n++;
-      agg.char += ca;
-      agg.word += wa;
+      agg.charDist += cs.dist;
+      agg.charLen += cs.len;
+      agg.wordDist += ws.dist;
+      agg.wordLen += ws.len;
       agg.exact += ex ? 1 : 0;
       agg.nfcFail += nfcOk ? 0 : 1;
       agg.idemFail += idemOk ? 0 : 1;
@@ -130,10 +139,11 @@ export function runCorpus({ convert, dir, threshold = 0.99 }) {
     }
   }
 
+  // Corpus-level CER/WER: sum of edit distances over sum of lengths.
   const finalize = (agg) => ({
     n: agg.n,
-    charAccuracy: agg.n ? +(agg.char / agg.n).toFixed(4) : 1,
-    wordAccuracy: agg.n ? +(agg.word / agg.n).toFixed(4) : 1,
+    charAccuracy: agg.charLen ? +(1 - agg.charDist / agg.charLen).toFixed(4) : 1,
+    wordAccuracy: agg.wordLen ? +(1 - agg.wordDist / agg.wordLen).toFixed(4) : 1,
     exactRate: agg.n ? +(agg.exact / agg.n).toFixed(4) : 1,
     nfcFailures: agg.nfcFail,
     idempotencyFailures: agg.idemFail,

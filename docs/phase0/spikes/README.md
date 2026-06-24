@@ -6,8 +6,15 @@ building. A **red** spike (the answer is "no / not like that") reshapes the plan
 | # | Risk | Can it be tested in pure code? | Status |
 |---|---|---|---|
 | **B** | Bengali **cluster reordering** correctness + idempotency | ✅ Yes (Node) | 🟢 **GREEN** — [spike-B-reordering.md](spike-B-reordering.md) |
+| **D** | **Encoding seam** — does Word's `Range.text` return the code points our corpus assumes? | ❌ Needs real Word | 🔴 **Highest priority** — [spike-D-encoding.md](spike-D-encoding.md) |
 | **A** | Reading the font of each **run** within a paragraph (so mixed-font text isn't dropped) | ❌ Needs real Word | 🟡 Kit ready — [spike-A-per-run-font.md](spike-A-per-run-font.md) |
 | **C** | **Undo / revert** fidelity (reliable "Revert Mukti changes") | ❌ Needs real Word | 🟡 Kit ready — [spike-C-undo-revert.md](spike-C-undo-revert.md) |
+
+> **Hard gate (D-0016):** Spikes **A, C and D must be GREEN** (desktop *and*
+> Word‑on‑web) before Phase 4 build starts. Spike D is the existential one — it
+> checks the assumption every other piece is built on. A RED spike revises scope
+> before any production code (conservative fallback: selection‑only /
+> report‑don't‑convert).
 
 ## Why A and C are "kits" not results
 

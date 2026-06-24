@@ -1,7 +1,7 @@
 {
   "corpusVersion": "1",
-  "frozenAt": "2026-06-22",
-  "totalCases": 107,
+  "frozenAt": "2026-06-24",
+  "totalCases": 115,
   "files": {
     "visible/01-consonants.jsonl": {
       "sha256": "018958377796ebf939a098eb7c03586d92558a015b9f2dcba443675c88d9b951",
@@ -14,14 +14,14 @@
       "bytes": 2287
     },
     "visible/03-conjuncts.jsonl": {
-      "sha256": "a1a7f7ab0625eb79e6db100dd09e89e89722e7993a01f2933b5ef4bd2ec41993",
-      "cases": 5,
-      "bytes": 1180
+      "sha256": "9ef39facf914b2b1d23240d38cc9d2e32426a4e1a7385e154b2a1836455f148b",
+      "cases": 6,
+      "bytes": 1460
     },
     "visible/04-reordering.jsonl": {
-      "sha256": "4bc4dd5aaa532af37ab9cf4156701c3d6e51179a13a1cd92230ada9d766a4a58",
-      "cases": 8,
-      "bytes": 2049
+      "sha256": "fb4df66c7091a4059fca254a0d15c1f456042f17a4a4e07753736dbf613f3da9",
+      "cases": 11,
+      "bytes": 2900
     },
     "visible/05-digits-punctuation.jsonl": {
       "sha256": "fdbf85269e97f2d50244625dd2edb586e29e9c91b4feba069a902c2fc900256e",
@@ -34,9 +34,9 @@
       "bytes": 673
     },
     "visible/07-words.jsonl": {
-      "sha256": "e9abb4040e3cd3c777f47ebaccadbb7d0def7f6a3cc6f01c011f23d8fa2ee79f",
-      "cases": 10,
-      "bytes": 2977
+      "sha256": "b994c5055d005dede54de0572dd385eb6071bb9b6794429a4cc68a8f1d24ea8b",
+      "cases": 12,
+      "bytes": 3513
     },
     "visible/08-edge.jsonl": {
       "sha256": "e836ea031d45db3f9e5d1a4f98ee626fcb736a4f84adee50ce7c30f17b0811d7",
@@ -44,9 +44,9 @@
       "bytes": 701
     },
     "heldout/heldout.jsonl": {
-      "sha256": "eb8e8392efbe60f95b59695fcb97de4767fc7f5a4c338164a224e1cdfee2c183",
-      "cases": 15,
-      "bytes": 3757
+      "sha256": "4158ddb537c2f76f22d9394a62172c523ca0abec131ea414330dd73e99ba8ca7",
+      "cases": 17,
+      "bytes": 4371
     }
   },
   "note": "Frozen gold-standard corpus. Changing any data file changes its sha256 here; that is a deliberate re-freeze. heldout/ must not be read while building the converter."

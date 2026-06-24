@@ -12,7 +12,10 @@ Likelihood/Impact: L/M/H. Owner: who acts. Status updates as the project moves.
 | R5 | Headers/footers scope unclear at 1.3 | M | L | Open (spike) | Report as "pending/not scanned"; never silent |
 | R6 | Performance: too many context.sync() (prior did ~3/para) | M | M | Managed | Batch reads/writes; budget per sync; Phase-4 calibration spike |
 | R7 | Custom-domain dependency (maintainer must own a domain) | M | M | Open (D-0006) | Parameterized manifest; GitHub Pages dev; pick domain pre-launch |
-| R8 | Sideload "unknown developer" friction (no paid signing) | H | L | Accepted | Disclosed honestly in install guide |
+| R8 | Sideload friction blocks non-technical end users (adoption-killer) | H | H | Managed (D-0015) | Lead with Word-on-web "Upload My Add-in"; document M365 deploy; AppSource endgame; honest guide |
+| R19 | **Encoding seam**: Word's `Range.text` may not return the assumed CP1252 code points | M | H(existential) | Open — Spike D gate (D-0016) | Spike D before any build; byte-decode fallback if RED |
+| R20 | Revert snapshot (in the .docx) leaks original text when the file is shared | M | M | Managed | Disclosed in UI + privacy doc; "forget undo data" control |
+| R21 | Held-out corpus not truly independent (same author) | M | M | Accepted | Phrase gate "≥99% on corpus vN"; real-doc E2E checklist; external contributor later (D-0014) |
 | R9 | High/critical CVE in a shipped dependency | M | M | Managed | CVE gate blocks shipped+reachable; Dependabot; expiring allowlist |
 | R10 | Bundled font licence non-compliance | L | H | Managed | Noto Sans Bengali is SIL OFL; retain OFL/NOTICE; asset audit |
 | R11 | Manifest change forces all users to re-sideload | M | M | Managed | Custom domain minimizes; re-sideload notice process |

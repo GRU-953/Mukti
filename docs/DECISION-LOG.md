@@ -92,7 +92,7 @@ Statuses: **Decided** · **Proposed** (awaiting maintainer sign-off) · **Open**
   ([`phase1/REUSE-VALIDATION.md`](phase1/REUSE-VALIDATION.md).)
 
 ### D-0010 — Layered architecture with a lint-enforced pure engine
-- **Status:** Decided (Phase 2; pending Phase 3 review)
+- **Status:** Decided (Phase 2; confirmed + contracts refined in Phase 3)
 - **Date:** 2026-06-22
 - **Owner:** Agent (technical)
 - **Decision:** Three layers — pure TS `engine` (zero Office.js, Node-gated by
@@ -104,39 +104,87 @@ Statuses: **Decided** · **Proposed** (awaiting maintainer sign-off) · **Open**
   engine testable without Word and the platform risk containable.
 
 ### D-0011 — Revert is snapshot-based, not programmatic undo
-- **Status:** Decided (Phase 2; pending Spike C)
+- **Status:** Decided; revert mechanism **provisional pending Spike C**
 - **Date:** 2026-06-22
 - **Owner:** Agent (technical)
 - **Decision:** "Revert Mukti changes" restores a pre-apply snapshot (text +
-  per-run formatting) stored in the document settings. Ctrl+Z is an honest
-  platform fallback only.
+  per-run formatting) of the changed runs, stored as a **CustomXML part** in the
+  .docx (document settings are too small — Phase 3 review). Ctrl+Z is an honest
+  platform fallback only. Before reverting, the host checks the document still
+  matches the snapshot and warns if it was edited (avoids silent data loss).
 - **Why:** Office.js at WordApi 1.3 exposes no undo/undo-grouping API, so a
   snapshot restore is the only reliable mechanism; also avoids the prior
   destructive reverse-conversion bug (do-not-repeat H6). Confirmed by Spike C.
+
+### D-0005 — Canonical Unicode output font
+- **Status:** Decided · **Owner:** Maintainer (GRU953) · 2026-06-22
+- **Decision:** Bundle **Noto Sans Bengali** (SIL OFL) as the single canonical
+  output font; retain `OFL.txt`/NOTICE. **Self-hosted** (see D-0012), never loaded
+  from Google by name.
+- **Why:** Maintainer's choice; widest coverage, OFL, the spec's example. Does
+  not affect accuracy (output codepoints are font-independent); changeable later
+  at the cost of re-bundling + re-test.
+
+### D-0006 — v1.0 ships on a custom domain (hard rule)
+- **Status:** Decided (Phase 3); domain **name** still to be picked by maintainer
+- **Owner:** Maintainer (GRU953)
+- **Decision:** v1.0 publishes **only** on a custom domain (CNAME → GitHub Pages),
+  so hosting can move without forcing re-sideload. GitHub Pages URL is used for
+  development only. Launching on the raw `github.io` URL is **not** allowed
+  (it would force every user to re-install later).
+- **Open sub-item:** the maintainer picks/registers the domain name before
+  release (a screenshot-level DNS guide will be in `RUNBOOK.md`).
+
+### D-0012 — Strict CSP + self-hosted font (privacy)
+- **Status:** Decided (Phase 3) · **Owner:** Agent (technical)
+- **Decision:** Ship a real Content-Security-Policy: `script-src` limited to the
+  Microsoft Office.js CDN + `'self'`; `font-src 'self'` (no Google Fonts);
+  `connect-src 'none'` (no network calls). CI asserts the CSP exists. The Noto
+  font is bundled as self-hosted woff2.
+- **Why:** Phase 3 security review — the privacy claim needs enforcement, and
+  loading the font from Google by name would beacon to Google on every open.
+
+### D-0013 — Mapping-data provenance (clean, attributed)
+- **Status:** Decided (Phase 3) · **Owner:** Agent (technical)
+- **Decision:** Shipped `data/` is authored from the maintainer's own prior
+  **MIT** Mukti map (retained with MIT attribution) + cited Unicode/MS specs. The
+  unlicensed third-party converter is a disposable cross-check oracle only; no
+  code copied. "Clean-room" is corrected to "clean-room except the maintainer's
+  own MIT data".
+- **Why:** Phase 3 security review (oracle has no licence).
+
+### D-0014 — Accuracy is corpus-level CER; the gate is "≥99% on corpus vN"
+- **Status:** Decided (Phase 3) · **Owner:** Agent (technical)
+- **Decision:** The harness reports a **corpus-level** error rate (Σ edit-distance
+  / Σ length), not a per-case mean. The release claim is "≥99% on the frozen
+  corpus vN", **never** "99% accurate". The held-out set is small and
+  same-author; treated as a sanity check, not a statistical guarantee — stated
+  honestly in the known-limitations doc.
+- **Why:** Phase 3 architecture/red-team review (avoids the prior H2 over-claim).
+
+### D-0015 — Distribution path for non-technical end users
+- **Status:** Decided (Phase 3) · **Owner:** Agent (technical) + Maintainer
+- **Decision:** Lead the install guide with **Word-on-the-web → "Upload My
+  Add-in"** (the lowest-friction path); document **Microsoft 365 centralized
+  deployment** as the org route; name **AppSource** as the eventual endgame.
+  Sideload friction (R8) is re-rated **High** impact, not "accepted".
+- **Why:** Phase 3 product review — unsigned sideload is an adoption-killer for
+  non-technical users.
+
+### D-0016 — Spikes A, C and D are a hard pre-Phase-4 gate
+- **Status:** Decided (Phase 3) · **Owner:** Maintainer (runs) + Agent (gates)
+- **Decision:** The host contract is **provisional** until Spikes A (per-run
+  font), C (snapshot revert) and the new **D (encoding seam — does Word's
+  `Range.text` return the CP1252 code points our corpus assumes?)** are GREEN on
+  desktop and web. Phase 4 build does not start until then. If a spike is RED,
+  the conservative fallback (selection-only / report-don't-convert) applies and
+  scope is revised.
+- **Why:** Phase 3 red-team — the encoding assumption underpins everything and is
+  untested through Word.
 
 ---
 
 ## Open decisions (need maintainer input)
 
-### D-0005 — Canonical Unicode output font
-- **Status:** Decided
-- **Date:** 2026-06-22
-- **Owner:** Maintainer (GRU953)
-- **Decision:** Bundle **Noto Sans Bengali** (SIL OFL) as the single canonical
-  Unicode output font. Its `OFL.txt`/NOTICE will be retained alongside the
-  bundled font file.
-- **Why:** Maintainer's choice. Widest device coverage, neutral/clean, actively
-  maintained by Google/SIL, and the example named in the project spec. The font
-  does not affect conversion accuracy (output Unicode codepoints are identical
-  regardless of rendering font); it can be changed later at the cost of
-  re-bundling and re-testing.
-
-### D-0006 — Hosting domain
-- **Status:** Open (not blocking until Phase 2)
-- **Owner:** Maintainer (GRU953)
-- **Question:** The manifest needs a stable **custom domain** so hosting can move
-  without forcing every user to re-install. Options: register a domain (e.g.
-  `mukti.<something>`) or, as an interim, use the GitHub Pages URL and accept a
-  future re-sideload. Recommendation: secure a custom domain before first public
-  release; use GitHub Pages for development.
-- **Blocks:** Production manifest (Phase 2+).
+- **D-0006 sub-item:** pick/register the custom domain name before v1.0 release.
+- That is the only outstanding maintainer decision; everything else is decided.

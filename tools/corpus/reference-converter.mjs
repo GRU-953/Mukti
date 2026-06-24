@@ -63,6 +63,11 @@ const MAP = {
   'Ö': VIRAMA + 'র',           // ্র (ra-phala)
   '×': 'দ' + VIRAMA + 'ধ', // দ্ধ
   'œ': VIRAMA + 'ন',           // ্ন
+  'š': 'ন' + VIRAMA,           // ন্ (half na)
+  '¿': VIRAMA + 'ত' + VIRAMA + 'র', // ্ত্র
+  '÷': 'স' + VIRAMA + 'ট', // স্ট
+  'Ò': '"',                    // opening curly quote -> straight quote
+  'Ó': '"',                    // closing curly quote -> straight quote
 };
 
 const KEY_LENS = [...new Set(Object.keys(MAP).map((k) => k.length))].sort((a, b) => b - a);

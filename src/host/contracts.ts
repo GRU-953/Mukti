@@ -1,139 +1,137 @@
 /**
  * FROZEN INTERFACE — Mukti Word host adapter (the Office.js seam).
  *
- * This is the ONLY layer permitted to use Office.js. It turns the document into
- * plain text for the pure engine, and applies/reverts results. Type-only
- * contract; Phase 4 implements behind it. Changing it after Phase 3 sign-off is
- * a logged decision.
+ * PROVISIONAL pending Spikes A (per-run font), C (snapshot revert) and D
+ * (encoding seam). These confirm real-Word behaviour the contract assumes; a RED
+ * result revises this file before Phase 4 build. This is the ONLY layer allowed
+ * to use Office.js. Type-only; no implementation.
  *
- * Behavioural contract (from Phase 0 do-not-repeat + spikes):
- *  - Scope = body + tables (in scope); headers/footers PENDING (Spike A result);
- *    footnotes/text boxes/comments/fields/SmartArt OUT → reported as `unscanned`,
- *    never silently skipped (M6).
- *  - Reads font PER RUN, not per paragraph, so mixed-font paragraphs are not
- *    dropped (H5 / Spike A).
- *  - Preview precedes any mutation (H6).
- *  - Apply snapshots first; Revert restores from the snapshot (H6 / Spike C).
- *    No promise of byte-identical OOXML; Ctrl+Z count is Word-determined.
+ * Behavioural contract (Phase 0 do-not-repeat + Phase 3 review):
+ *  - Scope = body + tables (in scope). Headers/footers + footnotes/text boxes/
+ *    comments/fields/SmartArt are OUT → reported as `unscanned`, never silently
+ *    skipped (M6).
+ *  - Font is read per RUN. getTextRanges/split only segment on punctuation/space,
+ *    NOT on font boundaries, so a returned range with `fontName: null` (mixed
+ *    font) is recursed to finer ranges; anything still null is reported, not
+ *    converted (review: Office BLOCKER-1 / Spike A).
+ *  - PREVIEW PRODUCES A PLAN; APPLY CONSUMES THAT PLAN (review: arch BLOCKER-1).
+ *    Apply re-validates each run's current text against the plan's `before`
+ *    before writing, and aborts on mismatch (TOCTOU guard; review: red-team R3).
+ *  - Apply snapshots first (changed runs only) into a CustomXML part — NOT
+ *    document settings, which is too small (review: Office BLOCKER-2). Revert
+ *    re-writes the snapshot. No byte-identical OOXML promise; Ctrl+Z is a
+ *    platform fallback only. The snapshot lives in the .docx and travels if the
+ *    file is shared — disclosed to the user (review: security F1.3).
  *  - Unknown/Bangla-like-but-unlisted fonts surfaced loudly; never converted (H4).
- *  - Performance budgeted per context.sync(); reads/writes are batched (M3).
+ *  - Apply writes run-by-run, re-stamping each run's saved formatting (H5/M5).
  */
 
 import type { FontClass } from '../engine/contracts';
 
-// ──────────────────────────────────────────────────────────────────────────
-// Where things are in the document
-// ──────────────────────────────────────────────────────────────────────────
+// ── Location ───────────────────────────────────────────────────────────────
 
-export type RegionContainer = 'body' | 'table' | 'header' | 'footer';
+/** In-scope containers for the MVP. (Headers/footers are reported as unscanned
+ *  until Spike A confirms them.) */
+export type RegionContainer = 'body' | 'table';
 
-/** A run of homogeneous-font text that the host located. Ranges are NOT
- *  persisted across syncs — the host re-locates at apply time (feasibility §7). */
-export interface RunRef {
-  readonly id: string;               // stable within one scan
+/** A typed, re-findable locator (ranges are not persistable across syncs, so we
+ *  re-locate at apply time and re-validate — review: Office MAJOR-3). */
+export interface RunLocator {
   readonly container: RegionContainer;
-  readonly fontName: string | null;  // null when Word reports no single font
-  readonly text: string;
-  /** opaque locator the host uses to re-find this run at apply time */
-  readonly locator: unknown;
+  readonly paragraphIndex: number;
+  /** Ordinal of this run's text within the paragraph (disambiguates repeats). */
+  readonly ordinal: number;
+  /** The exact text expected at this locator, used to detect edits before write. */
+  readonly anchorText: string;
 }
 
-/** Region types that are deliberately out of MVP scope and reported, not converted. */
+/** Formatting carried so apply/revert can preserve it (review: arch BLOCKER-2). */
+export interface RunFormat {
+  readonly fontName: string | null; // null = Word reports no single font (mixed)
+  readonly bold?: boolean;
+  readonly italic?: boolean;
+  readonly size?: number;
+  readonly color?: string;
+}
+
+/** A homogeneous-font run located during scan. */
+export interface RunRef {
+  readonly id: string;
+  readonly locator: RunLocator;
+  readonly text: string;
+  readonly format: RunFormat;
+}
+
 export type UnscannedKind =
   | 'footnote' | 'endnote' | 'textbox' | 'comment' | 'field' | 'smartart'
-  | 'header-footer-pending';
+  | 'header-footer-pending' | 'mixed-font-unresolved';
 
 export interface UnscannedRegion {
   readonly kind: UnscannedKind;
-  readonly count: number;            // how many such regions exist
+  readonly count: number;
 }
 
-// ──────────────────────────────────────────────────────────────────────────
-// Scan
-// ──────────────────────────────────────────────────────────────────────────
+// ── Scan ─────────────────────────────────────────────────────────────────────
 
 export interface ScanReport {
-  /** Runs whose font is a KNOWN Bijoy font → eligible for conversion. */
-  readonly convertible: ReadonlyArray<RunRef>;
-  /** Runs in a Bangla-looking but UNSUPPORTED font → warn, do not convert. */
-  readonly unsupported: ReadonlyArray<RunRef>;
-  /** Distinct unsupported font names, for the loud warning. */
+  readonly convertible: ReadonlyArray<RunRef>;   // known Bijoy font
+  readonly unsupported: ReadonlyArray<RunRef>;   // Bangla-like, not on the list
   readonly unsupportedFonts: ReadonlyArray<string>;
-  /** Out-of-scope region types present in the document (transparency). */
   readonly unscanned: ReadonlyArray<UnscannedRegion>;
-  /** Per-font tally for the conversion report. */
   readonly fontTally: ReadonlyArray<{ fontName: string; class: FontClass; runs: number }>;
-  /** context.sync() calls used by the scan (perf budget telemetry, local only). */
-  readonly syncCount: number;
 }
 
-// ──────────────────────────────────────────────────────────────────────────
-// Preview (no mutation)
-// ──────────────────────────────────────────────────────────────────────────
+// ── Plan (preview → apply) ────────────────────────────────────────────────────
 
-export interface PreviewItem {
+/** One planned edit: the engine output for a located run, with its formatting. */
+export interface PlannedEdit {
   readonly runId: string;
-  readonly before: string;
+  readonly locator: RunLocator;
+  readonly before: string;     // original text (re-validated at apply time)
   readonly after: string;      // engine output (NFC)
+  readonly format: RunFormat;  // re-stamped after the text replace
   readonly changed: boolean;
 }
 
-export interface Preview {
-  readonly items: ReadonlyArray<PreviewItem>;
+/** The frozen plan: what preview showed is exactly what apply writes. */
+export interface ConversionPlan {
+  readonly outputFont: string;          // D-0005: Noto Sans Bengali
+  readonly dataVersion: string;         // engine mapping-data version (for report)
+  readonly edits: ReadonlyArray<PlannedEdit>;
   readonly totalRuns: number;
   readonly changedRuns: number;
 }
 
-// ──────────────────────────────────────────────────────────────────────────
-// Apply + Revert
-// ──────────────────────────────────────────────────────────────────────────
+// ── Apply + Revert ─────────────────────────────────────────────────────────
 
 export interface ApplyResult {
   readonly changedRuns: number;
-  /** Output font applied to converted runs (D-0005: Noto Sans Bengali). */
-  readonly outputFont: string;
-  /** Id of the snapshot stored for "Revert Mukti changes". */
   readonly snapshotId: string;
-  readonly syncCount: number;
+  /** Edits skipped because the document changed under us (TOCTOU); reported, not forced. */
+  readonly skippedStale: number;
 }
 
-/** Stored (in document settings) so Revert works even after task pane reload. */
+/** Stored as a CustomXML part in the .docx (id only kept in settings). */
 export interface RevertSnapshot {
   readonly snapshotId: string;
-  readonly createdAt: string;        // ISO date
-  readonly runs: ReadonlyArray<{
-    readonly locator: unknown;
-    readonly text: string;
-    readonly fontName: string | null;
-    readonly bold?: boolean;
-    readonly italic?: boolean;
-    readonly size?: number;
-    readonly color?: string;
-  }>;
+  readonly createdAt: string;
+  readonly runs: ReadonlyArray<{ locator: RunLocator; text: string; format: RunFormat }>;
 }
 
-// ──────────────────────────────────────────────────────────────────────────
-// The host adapter
-// ──────────────────────────────────────────────────────────────────────────
+// ── The host adapter ─────────────────────────────────────────────────────────
 
 export interface WordHost {
-  /** WordApi requirement set the build targets (D-0002 = "1.3"). */
-  readonly minRequirementSet: string;
-  /** True iff the running Word supports the required set; UI shows a clear message if not. */
+  readonly minRequirementSet: string;       // D-0002 = "1.3"
   isSupported(): boolean;
 
-  /** Locate convertible/unsupported runs across body + tables; report unscanned. */
   scanDocument(): Promise<ScanReport>;
-
-  /** Build a before/after preview from a scan, using the pure engine. No mutation. */
-  buildPreview(scan: ScanReport): Promise<Preview>;
-
-  /** Apply conversion: snapshot, then replace text + set output font, batched. */
-  applyConversion(scan: ScanReport): Promise<ApplyResult>;
-
-  /** Restore the document from the named snapshot (the reliable revert). */
+  /** Build the frozen plan (runs the pure engine). No mutation. */
+  buildPlan(scan: ScanReport): Promise<ConversionPlan>;
+  /** Apply the plan: snapshot changed runs, re-validate each `before`, write run-by-run. */
+  applyPlan(plan: ConversionPlan): Promise<ApplyResult>;
+  /** Reliable revert: re-write the snapshot. */
   revert(snapshotId: string): Promise<void>;
-
-  /** The most recent snapshot id, if any (so the UI can offer Revert after reload). */
+  /** True if the document still matches the snapshot (warn before reverting — review: a11y R1). */
+  documentMatchesSnapshot(snapshotId: string): Promise<boolean>;
   latestSnapshotId(): Promise<string | null>;
 }

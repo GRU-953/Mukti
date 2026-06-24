@@ -78,8 +78,8 @@ S2a → E0 (nothing to convert), not in Preview.
 │ মুক্তি  Mukti                 [ ভাষা: বাংলা ▾ ] │  header
 ├─────────────────────────────────────────────┤
 │                                               │
-│   বিজয়/সুটনি লেখা ইউনিকোডে রূপান্তর করুন।        │  H1 (heading)
-│   Convert Bijoy/Sutonny text to Unicode.      │  (shown only in EN mode)
+│   বিজয়/সুটনিএমজে লেখা ইউনিকোডে রূপান্তর করুন।        │  H1 (heading)
+│   Convert Bijoy/SutonnyMJ text to Unicode.      │  (shown only in EN mode)
 │                                               │
 │   এই কাজটি পুরো নথিতে চলবে। পরিবর্তন প্রয়োগের      │  helper text
 │   আগে আপনি প্রিভিউ দেখতে পাবেন।                 │
@@ -138,7 +138,7 @@ Getting ready…" inline note until the engine signals ready, then enables (focu
 │     Left as-is (Unicode/English): 90 runs     │
 │                                               │
 │  ┌── নমুনা — আগে → পরে ──────────────────────┐ │  before/after sample
-│  │ আগে (বিজয়):   Avwg evsjvh় wjLg&         │ │  "before" = raw bytes
+│  │ আগে (বিজয়):   Avwg evsjvq wjwL           │ │  "before" = raw bytes
 │  │ Before (Bijoy)                           │ │  rendered in the doc's
 │  │ ─────────────────────────────────────── │ │  original Bijoy font
 │  │ পরে (ইউনিকোড): আমি বাংলায় লিখি          │ │  "after" = Unicode in
@@ -236,11 +236,11 @@ and ASCII digits in English mode; the keys below show representative values.
 | Key | বাংলা (default) | English |
 | --- | --- | --- |
 | `app.name` | মুক্তি | Mukti |
-| `app.tagline` | বিজয়/সুটনি লেখা ইউনিকোডে রূপান্তর | Convert Bijoy/Sutonny to Unicode |
+| `app.tagline` | বিজয়/সুটনিএমজে লেখা ইউনিকোডে রূপান্তর | Convert Bijoy/SutonnyMJ to Unicode |
 | `lang.toggle.label` | ভাষা | Language |
 | `lang.option.bn` | বাংলা | Bangla |
 | `lang.option.en` | ইংরেজি | English |
-| `idle.heading` | বিজয়/সুটনি লেখা ইউনিকোডে রূপান্তর করুন | Convert Bijoy/Sutonny text to Unicode |
+| `idle.heading` | বিজয়/সুটনিএমজে লেখা ইউনিকোডে রূপান্তর করুন | Convert Bijoy/SutonnyMJ text to Unicode |
 | `idle.helper` | এই কাজটি পুরো নথিতে চলবে। পরিবর্তন প্রয়োগের আগে আপনি প্রিভিউ দেখতে পাবেন। | This runs on the whole document. You will see a preview before any change is applied. |
 | `idle.reassure` | পরিবর্তন প্রয়োগের আগে কিছুই বদলাবে না। | Nothing changes until you apply. |
 | `btn.convert` | নথি রূপান্তর করুন | Convert document |

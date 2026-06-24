@@ -7,10 +7,15 @@
  * these signatures; changing this file after Phase 3 sign-off is a logged
  * decision.
  *
- * Design rules baked into the contract (from Phase 0/1):
+ * Design rules baked into the contract (from Phase 0/1/3):
  *  - Output is always NFC (Unicode Normalization Form C).
- *  - Idempotent: convert(convert(x)) === convert(x); convert(unicode) === unicode.
- *    Achieved by only transforming runs that contain Bijoy SOURCE glyphs (D-0007).
+ *  - Idempotent: convert(convert(x)) === convert(x). And convert(x) === x for any
+ *    x that contains NO Bijoy source glyphs (D-0007) — so already-Unicode Bengali
+ *    is a no-op. NOTE the boundary: the engine ASSUMES its input is Bijoy. It
+ *    cannot distinguish Bijoy bytes from genuine Latin text (e.g. "Order"), because
+ *    Bijoy reuses ASCII slots — so feeding it plain English yields garbage BY
+ *    DESIGN. Deciding what is Bijoy is the HOST's font-detection job; the engine
+ *    only ever receives runs in a known Bijoy font (review: arch/linguistics B5).
  *  - Whitespace is preserved verbatim; no formatting/space munging (D-0008).
  *  - URLs / emails inside a run pass through untouched.
  *  - Unknown fonts are NOT the engine's concern to "guess" — the host decides
@@ -94,9 +99,9 @@ export interface MappingEntry {
 export interface MappingProfile {
   readonly id: string;            // e.g. "bijoy-sutonnymj"
   readonly version: string;       // data version, surfaced in the report
-  readonly preMap: ReadonlyArray<MappingEntry>;
+  readonly preMap?: ReadonlyArray<MappingEntry>;   // optional (matches data schema)
   readonly map: ReadonlyArray<MappingEntry>;
-  readonly postMap: ReadonlyArray<MappingEntry>;
+  readonly postMap?: ReadonlyArray<MappingEntry>;  // optional (matches data schema)
   /** Reorder is algorithmic (Spike B), not data; this flags which passes apply. */
   readonly reorder: {
     readonly preBaseVowels: boolean;

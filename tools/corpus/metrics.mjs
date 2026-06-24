@@ -49,6 +49,24 @@ export function wordAccuracy(expected, actual) {
   return Math.max(0, 1 - dist / e.length);
 }
 
+/**
+ * Raw character stats for CORPUS-LEVEL aggregation: {dist, len} where len is the
+ * expected code-point count. Aggregate CER = sum(dist)/sum(len), so each case is
+ * weighted by its length (a 48-char sentence counts more than a 1-char case).
+ */
+export function charStats(expected, actual) {
+  const e = codepoints(nfc(expected));
+  const a = codepoints(nfc(actual));
+  return { dist: levenshtein(e, a), len: e.length };
+}
+
+/** Raw word stats for corpus-level aggregation: {dist, len} over tokens. */
+export function wordStats(expected, actual) {
+  const e = nfc(expected).trim().split(/\s+/).filter(Boolean);
+  const a = nfc(actual).trim().split(/\s+/).filter(Boolean);
+  return { dist: levenshtein(e, a), len: e.length };
+}
+
 /** True iff the string is already in NFC. */
 export function isNFC(s) {
   return s === nfc(s);
