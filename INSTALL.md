@@ -171,3 +171,21 @@ program code when it starts, which is why it is **online-first**, not "offline".
    original text reliably (it does not rely on a fragile Ctrl+Z guess).
 
 That's it — your document is now in Unicode Bangla.
+
+---
+
+## Try it with a sample (30 seconds)
+
+If you don't have a Bijoy document to hand, you can make a tiny test one:
+
+1. Open a blank Word document.
+2. Set the font to **SutonnyMJ** (type the name into the font box on the Home
+   tab). If you don't have SutonnyMJ installed, any Bijoy-family font will do for
+   a quick look — the conversion is the same.
+3. Type exactly: `Avwg evsjvq wjwL` — in a Bijoy font this shows as Bangla.
+4. Select that line, open **Mukti**, and **Scan → Preview → Apply**.
+
+**You should get:** `আমি বাংলায় লিখি` (Bangla for "I write in Bangla"), shown in
+Noto Sans Bengali. If you click **Revert Mukti changes**, the original line comes
+back. That's the whole tool in one go.
+
