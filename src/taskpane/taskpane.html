@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="bn">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mukti</title>
+
+    <!--
+      Content-Security-Policy — per docs/phase2/SECURITY.md (D-0012).
+      connect-src 'none' so document content has no channel to leave the device;
+      font-src 'self' so the bundled Noto font is never fetched from Google;
+      script-src allows ONLY Microsoft's Office.js CDN (cannot be SRI-pinned).
+    -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none';
+               script-src 'self' https://appsforoffice.microsoft.com;
+               style-src 'self' 'unsafe-inline';
+               font-src 'self';
+               img-src 'self' data:;
+               connect-src 'none';"
+    />
+
+    <link rel="stylesheet" href="./taskpane.css" />
+
+    <!--
+      Office.js — loaded from Microsoft's CDN (the one host allowed by the CSP).
+      It is NOT bundled; Microsoft mutates these bytes behind the static URL.
+    -->
+    <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+  </head>
+
+  <body>
+    <!--
+      One dedicated visually-hidden live region for status announcements
+      (review: a11y — do NOT make the whole body aria-live). Errors use the
+      assertive region (role="alert"); routine state changes use the polite one.
+    -->
+    <div id="a11y-status" class="visually-hidden" aria-live="polite" role="status"></div>
+    <div id="a11y-alert" class="visually-hidden" aria-live="assertive" role="alert"></div>
+
+    <header id="header" class="chrome-header"></header>
+
+    <!-- The state-specific region. NOT aria-live (announcements go to the regions above). -->
+    <main id="body" class="chrome-body" role="main"></main>
+
+    <footer id="footer" class="chrome-footer"></footer>
+
+    <script type="module" src="./taskpane.js"></script>
+  </body>
+</html>

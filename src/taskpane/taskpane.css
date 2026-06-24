@@ -1,0 +1,346 @@
+/*
+ * Mukti taskpane styles.
+ *
+ * Builds to docs/phase2/UI-UX.md §5 (WCAG 2.1 AA) and §6 (token contract):
+ *  - text ≥ 4.5:1, non-text/borders/focus ring ≥ 3:1;
+ *  - status never conveyed by colour alone (icon + text + shape in the markup);
+ *  - visible focus ring on every control, not removed by reset;
+ *  - single-column reflow, relative units, vertical scroll only;
+ *  - prefers-reduced-motion respected (no spinners; static stepped progress).
+ *
+ * Colours are deliberate, contrast-checked neutrals/accent. They follow a light
+ * theme; Word may be dark, so a prefers-color-scheme: dark block re-states the
+ * tokens at AA in dark too (§6: verify ratios in BOTH themes).
+ */
+
+/*
+ * Bundled output font — Noto Sans Bengali (SIL OFL), D-0005 / D-0012.
+ * SELF-HOSTED: the .woff2 is added under ./assets/ during PACKAGING (build step),
+ * NOT committed and NEVER fetched from fonts.googleapis.com (would beacon Google).
+ * font-src 'self' in the CSP enforces this.
+ */
+@font-face {
+  font-family: 'Noto Sans Bengali';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  /* Asset path is relative to the published taskpane; populated at packaging time. */
+  src: url('./assets/NotoSansBengali.woff2') format('woff2');
+}
+
+:root {
+  /* Token contract (§6). Light theme. */
+  --surface-base: #ffffff;
+  --surface-raised: #f3f3f3;
+  --text-primary: #1b1b1b;   /* ~16:1 on white */
+  --text-secondary: #444444; /* ~9.7:1 on white — treated as normal text */
+  --accent-primary: #0b5394; /* button fill; #fff text on it ~7.3:1 */
+  --text-on-accent: #ffffff;
+  --border-control: #6b6b6b; /* ~4.6:1 on white (≥3:1) */
+  --focus-ring: #0b5394;     /* high-contrast focus indicator */
+  --status-warning: #8a4b00; /* text/border; ~5.5:1 on white */
+  --status-info: #444444;
+  --status-success: #1b6b2f; /* ~4.8:1 on white */
+  --status-error: #a4262c;   /* ~5.3:1 on white */
+
+  --space: 0.75rem;
+  --radius: 6px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --surface-base: #1f1f1f;
+    --surface-raised: #2a2a2a;
+    --text-primary: #f5f5f5;   /* ~15:1 on #1f1f1f */
+    --text-secondary: #cfcfcf; /* ~9:1 */
+    --accent-primary: #4ea0e6; /* #1f1f1f text on it for contrast */
+    --text-on-accent: #10222f;
+    --border-control: #a0a0a0;
+    --focus-ring: #8ec5ff;
+    --status-warning: #ffb74d;
+    --status-info: #cfcfcf;
+    --status-success: #6fd18a;
+    --status-error: #ff8a8a;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  /* English UI uses the host/system UI font; Bangla parts fall back to Noto. */
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-size: 100%; /* relative; honours Word/OS text size */
+  line-height: 1.5;
+  color: var(--text-primary);
+  background: var(--surface-base);
+  min-width: 0;
+  overflow-x: hidden; /* never scroll horizontally (§5 reflow) */
+}
+
+/* Bangla text rendered in Noto Sans Bengali (full conjunct repertoire — no tofu). */
+[lang='bn'] {
+  font-family: 'Noto Sans Bengali', 'Segoe UI', system-ui, sans-serif;
+}
+
+/* Layout: single column, vertical scroll only. */
+.chrome-header,
+.chrome-body,
+.chrome-footer {
+  padding: var(--space);
+}
+
+.chrome-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space);
+  border-bottom: 1px solid var(--border-control);
+  flex-wrap: wrap;
+}
+
+.chrome-body {
+  min-height: 8rem;
+}
+
+.chrome-footer {
+  border-top: 1px solid var(--border-control);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+/* ── Header: brand + language toggle ── */
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+.wordmark {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+.wordmark-latin {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.lang-toggle {
+  display: inline-flex;
+  border: 1px solid var(--border-control);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.lang-btn {
+  border: 0;
+  background: var(--surface-base);
+  color: var(--text-primary);
+  padding: 0.35rem 0.7rem;
+  min-height: 1.75rem; /* ≥24px hit target (§5 2.5.8) */
+  cursor: pointer;
+  font: inherit;
+}
+.lang-btn[aria-pressed='true'] {
+  background: var(--accent-primary);
+  color: var(--text-on-accent);
+}
+
+/* ── Headings & text ── */
+.state-heading {
+  font-size: 1.15rem;
+  margin: 0 0 var(--space);
+}
+.helper,
+.reassure,
+.note {
+  color: var(--text-secondary);
+  margin: 0 0 var(--space);
+}
+.note {
+  font-size: 0.9rem;
+}
+
+/* ── Buttons ── */
+.btn {
+  display: inline-block;
+  font: inherit;
+  border-radius: var(--radius);
+  padding: 0.55rem 0.9rem;
+  min-height: 2.25rem; /* comfortable target; primary larger */
+  cursor: pointer;
+  margin: 0.25rem 0;
+}
+.btn-primary {
+  background: var(--accent-primary);
+  color: var(--text-on-accent);
+  border: 1px solid var(--accent-primary);
+  font-weight: 600;
+  display: block;
+  width: 100%;
+  padding: 0.7rem 1rem;
+}
+.btn-secondary {
+  background: var(--surface-base);
+  color: var(--text-primary);
+  border: 1px solid var(--border-control);
+}
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space);
+  margin-top: var(--space);
+}
+.actions .btn-primary {
+  width: auto;
+  flex: 1 1 auto;
+}
+
+/* ── Visible focus indicator (≥3:1; never removed) ── */
+:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+/* Fallback for engines without :focus-visible. */
+:focus {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* ── Counts list (icon + text in markup; we add no colour-only meaning) ── */
+.counts {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--space);
+}
+.counts li {
+  margin: 0.2rem 0;
+}
+.count-convertible {
+  color: var(--status-success);
+}
+
+/* ── Before/after sample ── */
+.sample {
+  border: 1px solid var(--border-control);
+  border-radius: var(--radius);
+  padding: var(--space);
+  margin: 0 0 var(--space);
+}
+.sample-heading {
+  font-size: 1rem;
+  margin: 0 0 0.5rem;
+}
+.sample-row {
+  margin: 0.25rem 0;
+  word-break: break-word;
+}
+.sample-label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+.sample-after {
+  font-family: 'Noto Sans Bengali', sans-serif;
+}
+
+/* ── Reports (warning / not-scanned): expandable, persistent, not hover-only ── */
+.report {
+  border: 1px solid var(--border-control);
+  border-radius: var(--radius);
+  padding: 0.5rem var(--space);
+  margin: 0 0 var(--space);
+}
+.report > summary {
+  cursor: pointer;
+  min-height: 1.75rem;
+  font-weight: 600;
+}
+.report-warning {
+  border-color: var(--status-warning);
+}
+.report-warning > summary {
+  color: var(--status-warning);
+}
+.report-info > summary {
+  color: var(--status-info);
+}
+.report .meaning {
+  font-weight: 600;
+}
+
+/* ── Progress (determinate or busy). Reduced motion → static stepped bar. ── */
+.progress {
+  height: 0.6rem;
+  border: 1px solid var(--border-control);
+  border-radius: var(--radius);
+  background: repeating-linear-gradient(
+    90deg,
+    var(--accent-primary) 0,
+    var(--accent-primary) 0.6rem,
+    var(--surface-raised) 0.6rem,
+    var(--surface-raised) 1.2rem
+  );
+  margin: 0 0 var(--space);
+}
+
+/* ── Revert confirm dialog ── */
+.confirm {
+  border: 2px solid var(--status-warning);
+  border-radius: var(--radius);
+  padding: var(--space);
+  margin-top: var(--space);
+  background: var(--surface-raised);
+}
+.confirm h2 {
+  margin-top: 0;
+  font-size: 1.05rem;
+}
+
+/* ── About / footer ── */
+.about > summary {
+  cursor: pointer;
+  min-height: 1.75rem;
+}
+.privacy-line {
+  margin: 0.4rem 0 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.85rem;
+}
+.error .state-heading {
+  color: var(--status-error);
+}
+
+/* ── Visually-hidden (for the live regions) ── */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* No spinners / pulsing; any transition is short and disabled under reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mukti commands</title>
+
+    <!--
+      Same strict CSP as the taskpane (docs/phase2/SECURITY.md). This is the
+      ribbon FunctionFile — a hidden page Word loads to register command handlers.
+    -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none';
+               script-src 'self' https://appsforoffice.microsoft.com;
+               connect-src 'none';"
+    />
+
+    <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+    <script type="module" src="./commands.js"></script>
+  </head>
+  <body>
+    <!-- No visible UI: the ribbon button opens the taskpane via the manifest action. -->
+  </body>
+</html>

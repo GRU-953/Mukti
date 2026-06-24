@@ -1,0 +1,586 @@
+{
+  "id": "bijoy-sutonnymj",
+  "version": "1.0.0",
+  "description": "Bijoy/SutonnyMJ legacy glyph -> Unicode Bengali substitution map. Source values are CP1252/SutonnyMJ byte slots as Unicode code points; targets are the Unicode component(s) in glyph order (reordering is applied algorithmically by the engine, not by this data).",
+  "license": "Authored from the maintainer's own MIT-licensed Mukti map (c) Aninda Sundar Howlader (GRU-953) plus cited Unicode/Microsoft OpenType specs. See docs/phase0/findings/06-mapping-research.md and D-0013.",
+  "map": [
+    {
+      "source": [
+        48
+      ],
+      "target": "০"
+    },
+    {
+      "source": [
+        49
+      ],
+      "target": "১"
+    },
+    {
+      "source": [
+        50
+      ],
+      "target": "২"
+    },
+    {
+      "source": [
+        51
+      ],
+      "target": "৩"
+    },
+    {
+      "source": [
+        52
+      ],
+      "target": "৪"
+    },
+    {
+      "source": [
+        53
+      ],
+      "target": "৫"
+    },
+    {
+      "source": [
+        54
+      ],
+      "target": "৬"
+    },
+    {
+      "source": [
+        55
+      ],
+      "target": "৭"
+    },
+    {
+      "source": [
+        56
+      ],
+      "target": "৮"
+    },
+    {
+      "source": [
+        57
+      ],
+      "target": "৯"
+    },
+    {
+      "source": [
+        65,
+        118
+      ],
+      "target": "আ",
+      "note": "two-char key, matched before single A"
+    },
+    {
+      "source": [
+        65
+      ],
+      "target": "অ"
+    },
+    {
+      "source": [
+        66
+      ],
+      "target": "ই"
+    },
+    {
+      "source": [
+        67
+      ],
+      "target": "ঈ"
+    },
+    {
+      "source": [
+        68
+      ],
+      "target": "উ"
+    },
+    {
+      "source": [
+        69
+      ],
+      "target": "ঊ"
+    },
+    {
+      "source": [
+        70
+      ],
+      "target": "ঋ"
+    },
+    {
+      "source": [
+        71
+      ],
+      "target": "এ"
+    },
+    {
+      "source": [
+        72
+      ],
+      "target": "ঐ"
+    },
+    {
+      "source": [
+        73
+      ],
+      "target": "ও"
+    },
+    {
+      "source": [
+        74
+      ],
+      "target": "ঔ"
+    },
+    {
+      "source": [
+        75
+      ],
+      "target": "ক"
+    },
+    {
+      "source": [
+        76
+      ],
+      "target": "খ"
+    },
+    {
+      "source": [
+        77
+      ],
+      "target": "গ"
+    },
+    {
+      "source": [
+        78
+      ],
+      "target": "ঘ"
+    },
+    {
+      "source": [
+        79
+      ],
+      "target": "ঙ"
+    },
+    {
+      "source": [
+        80
+      ],
+      "target": "চ"
+    },
+    {
+      "source": [
+        81
+      ],
+      "target": "ছ"
+    },
+    {
+      "source": [
+        82
+      ],
+      "target": "জ"
+    },
+    {
+      "source": [
+        83
+      ],
+      "target": "ঝ"
+    },
+    {
+      "source": [
+        84
+      ],
+      "target": "ঞ"
+    },
+    {
+      "source": [
+        85
+      ],
+      "target": "ট"
+    },
+    {
+      "source": [
+        86
+      ],
+      "target": "ঠ"
+    },
+    {
+      "source": [
+        87
+      ],
+      "target": "ড"
+    },
+    {
+      "source": [
+        88
+      ],
+      "target": "ঢ"
+    },
+    {
+      "source": [
+        89
+      ],
+      "target": "ণ"
+    },
+    {
+      "source": [
+        90
+      ],
+      "target": "ত"
+    },
+    {
+      "source": [
+        95
+      ],
+      "target": "থ"
+    },
+    {
+      "source": [
+        96
+      ],
+      "target": "দ"
+    },
+    {
+      "source": [
+        97
+      ],
+      "target": "ধ"
+    },
+    {
+      "source": [
+        98
+      ],
+      "target": "ন"
+    },
+    {
+      "source": [
+        99
+      ],
+      "target": "প"
+    },
+    {
+      "source": [
+        100
+      ],
+      "target": "ফ"
+    },
+    {
+      "source": [
+        101
+      ],
+      "target": "ব"
+    },
+    {
+      "source": [
+        102
+      ],
+      "target": "ভ"
+    },
+    {
+      "source": [
+        103
+      ],
+      "target": "ম"
+    },
+    {
+      "source": [
+        104
+      ],
+      "target": "য"
+    },
+    {
+      "source": [
+        105
+      ],
+      "target": "র"
+    },
+    {
+      "source": [
+        106
+      ],
+      "target": "ল"
+    },
+    {
+      "source": [
+        107
+      ],
+      "target": "শ"
+    },
+    {
+      "source": [
+        108
+      ],
+      "target": "ষ"
+    },
+    {
+      "source": [
+        109
+      ],
+      "target": "স"
+    },
+    {
+      "source": [
+        110
+      ],
+      "target": "হ"
+    },
+    {
+      "source": [
+        111
+      ],
+      "target": "ড়",
+      "note": "nukta consonant (NFC-decomposed base + U+09BC)"
+    },
+    {
+      "source": [
+        112
+      ],
+      "target": "ঢ়",
+      "note": "nukta consonant"
+    },
+    {
+      "source": [
+        113
+      ],
+      "target": "য়",
+      "note": "nukta consonant"
+    },
+    {
+      "source": [
+        118
+      ],
+      "target": "া"
+    },
+    {
+      "source": [
+        119
+      ],
+      "target": "ি"
+    },
+    {
+      "source": [
+        120
+      ],
+      "target": "ী"
+    },
+    {
+      "source": [
+        121
+      ],
+      "target": "ু"
+    },
+    {
+      "source": [
+        122
+      ],
+      "target": "ু"
+    },
+    {
+      "source": [
+        126
+      ],
+      "target": "ূ"
+    },
+    {
+      "source": [
+        8222
+      ],
+      "target": "ৃ"
+    },
+    {
+      "source": [
+        8225
+      ],
+      "target": "ে"
+    },
+    {
+      "source": [
+        8224
+      ],
+      "target": "ে"
+    },
+    {
+      "source": [
+        710
+      ],
+      "target": "ৈ"
+    },
+    {
+      "source": [
+        8240
+      ],
+      "target": "ৈ"
+    },
+    {
+      "source": [
+        352
+      ],
+      "target": "ৗ"
+    },
+    {
+      "source": [
+        115
+      ],
+      "target": "ং"
+    },
+    {
+      "source": [
+        116
+      ],
+      "target": "ঃ"
+    },
+    {
+      "source": [
+        117
+      ],
+      "target": "ঁ"
+    },
+    {
+      "source": [
+        114
+      ],
+      "target": "ৎ"
+    },
+    {
+      "source": [
+        124
+      ],
+      "target": "।"
+    },
+    {
+      "source": [
+        38
+      ],
+      "target": "্"
+    },
+    {
+      "source": [
+        166
+      ],
+      "target": "্ব"
+    },
+    {
+      "source": [
+        168
+      ],
+      "target": "্য",
+      "note": "ya-phala"
+    },
+    {
+      "source": [
+        169
+      ],
+      "target": "র্",
+      "note": "reph marker — reordered by the engine"
+    },
+    {
+      "source": [
+        175
+      ],
+      "target": "স্"
+    },
+    {
+      "source": [
+        94
+      ],
+      "target": "্ব"
+    },
+    {
+      "source": [
+        179
+      ],
+      "target": "ক্ত"
+    },
+    {
+      "source": [
+        181
+      ],
+      "target": "ক্র"
+    },
+    {
+      "source": [
+        182
+      ],
+      "target": "ক্ষ"
+    },
+    {
+      "source": [
+        255
+      ],
+      "target": "ক্ষ"
+    },
+    {
+      "source": [
+        185
+      ],
+      "target": "জ্ঞ"
+    },
+    {
+      "source": [
+        189
+      ],
+      "target": "ঙ্গ"
+    },
+    {
+      "source": [
+        206
+      ],
+      "target": "ত্র"
+    },
+    {
+      "source": [
+        214
+      ],
+      "target": "্র",
+      "note": "ra-phala"
+    },
+    {
+      "source": [
+        215
+      ],
+      "target": "দ্ধ"
+    },
+    {
+      "source": [
+        339
+      ],
+      "target": "্ন"
+    },
+    {
+      "source": [
+        353
+      ],
+      "target": "ন্"
+    },
+    {
+      "source": [
+        191
+      ],
+      "target": "্ত্র"
+    },
+    {
+      "source": [
+        247
+      ],
+      "target": "স্ট"
+    },
+    {
+      "source": [
+        210
+      ],
+      "target": "\"",
+      "note": "opening curly quote -> straight quote"
+    },
+    {
+      "source": [
+        211
+      ],
+      "target": "\"",
+      "note": "closing curly quote -> straight quote"
+    }
+  ],
+  "reorder": {
+    "preBaseVowels": true,
+    "reph": true
+  }
+}
