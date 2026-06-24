@@ -4,12 +4,13 @@
 **Bijoy / SutonnyMJ** Bangla text into proper **Unicode** Bangla — with one
 click, a preview before anything changes, and a reliable way to undo.
 
-> **Status: MVP built and verified; pre-release.** The conversion engine, the
-> Word integration, the bilingual task pane and the build pipeline are all in
-> place. The engine scores **100%** on a frozen 115-case test set (character and
-> word accuracy, idempotency, NFC, fuzz). What remains before the **v1.0**
-> release is validation *inside real Word* (three short maintainer-run test kits)
-> and the release steps — see [`docs/RELEASE-CHECKLIST.md`](docs/RELEASE-CHECKLIST.md).
+> **Status: public beta (v0.1.0).** The conversion engine, the Word integration,
+> the bilingual task pane and the build pipeline are all in place and the engine
+> scores **100%** on a frozen 129-case test set (character and word accuracy,
+> idempotency, NFC, fuzz). Before it's promoted to a final **v1.0** it needs
+> validation *inside real Word* (three short test kits) and a custom-domain host —
+> see [`docs/RELEASE-CHECKLIST.md`](docs/RELEASE-CHECKLIST.md). It is published
+> honestly as a beta until then.
 
 ## What it does (MVP)
 
@@ -68,6 +69,7 @@ Build & check: `npm ci`, then `npm run build` (engine + add-in + manifest),
 | [`CONTINUITY.md`](CONTINUITY.md) · [`MIGRATION.md`](MIGRATION.md) | Keeping the project alive · onboarding a future developer |
 | [`docs/DECISION-LOG.md`](docs/DECISION-LOG.md) | Every significant decision and why |
 | [`docs/GLOSSARY.md`](docs/GLOSSARY.md) | Plain-language glossary of every term |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md) · [`SECURITY.md`](SECURITY.md) · [`CHANGELOG.md`](CHANGELOG.md) | How to contribute · security policy · release history |
 | [`docs/phase0/`](docs/phase0/) … [`docs/phase3/`](docs/phase3/) | The full trail: de-risking, design, adversarial review |
 
 ## Licence
