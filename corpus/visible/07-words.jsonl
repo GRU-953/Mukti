@@ -14,3 +14,4 @@
 {"id": "word-lojja", "category": "words", "features": ["virama"], "source": [106, 190, 118], "sourceKeys": "j¾v", "expected": "লজ্জা", "description": "lojja (shame) — ja+virama+ja conjunct", "ref": "maintainer-verified"}
 {"id": "word-mokka", "category": "words", "features": ["virama"], "source": [103, 176, 118], "sourceKeys": "g°v", "expected": "মক্কা", "description": "mokka (Mecca) — ka+virama+ka conjunct", "ref": "maintainer-verified"}
 {"id": "word-shobdo", "category": "words", "features": ["virama"], "source": [107, 227], "sourceKeys": "kã", "expected": "শব্দ", "description": "shobdo (word/sound) — ba+virama+da conjunct", "ref": "maintainer-verified"}
+{"id": "conj-allah", "category": "words", "features": ["virama"], "source": [65, 118, 106, 173, 118, 110], "sourceKeys": "Avj­vn", "expected": "আল্লাহ", "description": "allah: la+virama+la via ্ল phala", "ref": "maintainer-verified"}

@@ -1004,6 +1004,160 @@
       ],
       "target": "ূ",
       "note": "uu-kar — SutonnyMJ alternate slot (U+201A)"
+    },
+    {
+      "source": [
+        161
+      ],
+      "target": "্ব",
+      "note": "ba-phala / half-ba (joins preceding consonant)"
+    },
+    {
+      "source": [
+        163
+      ],
+      "target": "্ভ্র",
+      "note": "bha+ra phala (joins preceding consonant)"
+    },
+    {
+      "source": [
+        164
+      ],
+      "target": "ম্",
+      "note": "ম + virama (leading half-ma form)"
+    },
+    {
+      "source": [
+        167
+      ],
+      "target": "্ম",
+      "note": "ma-phala / half-ma (alt slot)"
+    },
+    {
+      "source": [
+        170
+      ],
+      "target": "্র",
+      "note": "ra-phala (alt slot)"
+    },
+    {
+      "source": [
+        171
+      ],
+      "target": "্র",
+      "note": "ra-phala (alt slot)"
+    },
+    {
+      "source": [
+        172
+      ],
+      "target": "্ল",
+      "note": "la-phala / half-la (joins preceding consonant)"
+    },
+    {
+      "source": [
+        173
+      ],
+      "target": "্ল",
+      "note": "la-phala / half-la (alt slot)"
+    },
+    {
+      "source": [
+        174
+      ],
+      "target": "ষ্",
+      "note": "ষ + virama (leading half-ssa form)"
+    },
+    {
+      "source": [
+        178
+      ],
+      "target": "ক্ষ্ণ",
+      "note": "ক্ষ্ণ triple conjunct (kkhno)"
+    },
+    {
+      "source": [
+        236
+      ],
+      "target": "ল্ড",
+      "note": "ল্ড conjunct (lda)"
+    },
+    {
+      "source": [
+        338
+      ],
+      "target": "্ক্র",
+      "note": "ka+ra phala (kra cluster start, joins preceding consonant)"
+    },
+    {
+      "source": [
+        376
+      ],
+      "target": "্ব",
+      "note": "ba-phala / half-ba (alt slot)"
+    },
+    {
+      "source": [
+        732
+      ],
+      "target": "দ্",
+      "note": "দ + virama (leading half-da form)"
+    },
+    {
+      "source": [
+        8212
+      ],
+      "target": "্ত",
+      "note": "ta-phala / half-ta (joins preceding consonant)"
+    },
+    {
+      "source": [
+        8216
+      ],
+      "target": "্তু",
+      "note": "ta + virama + u-kar (tu cluster, joins preceding consonant)"
+    },
+    {
+      "source": [
+        8217
+      ],
+      "target": "্থ",
+      "note": "tha-phala / half-tha (joins preceding consonant)"
+    },
+    {
+      "source": [
+        8221
+      ],
+      "target": "চ্",
+      "note": "চ + virama (leading half-ca form)"
+    },
+    {
+      "source": [
+        8226
+      ],
+      "target": "ঙ্",
+      "note": "ঙ + virama (leading half-nga form)"
+    },
+    {
+      "source": [
+        8249
+      ],
+      "target": "্ক",
+      "note": "ka-phala / half-ka (joins preceding consonant)"
+    },
+    {
+      "source": [
+        8250
+      ],
+      "target": "ন্",
+      "note": "ন + virama (leading half-na form, alt slot)"
+    },
+    {
+      "source": [
+        8482
+      ],
+      "target": "দ্",
+      "note": "দ + virama (leading half-da form, alt slot)"
     }
   ],
   "reorder": {

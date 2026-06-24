@@ -11,14 +11,14 @@ legacy **Bijoy / SutonnyMJ** Bangla text to **Unicode**.
 ### Added
 - **Conversion engine** (pure TypeScript, zero Office.js): longest-match glyph
   mapping + Bengali cluster reordering (pre-base vowels, reph), guaranteed NFC
-  output, idempotency guard, URL/email passthrough. **155** mapping entries.
+  output, idempotency guard, URL/email passthrough. **177** mapping entries.
 - **Word integration**: scan (body + tables) → preview → apply → reliable
   snapshot-based **"Revert Mukti changes"**, with a TOCTOU guard and per-run font
   reading; out-of-scope regions are reported, never silently skipped.
 - **Bilingual task pane** (Bangla default, English toggle), keyboard-operable,
   WCAG 2.1 AA, with a real before/after preview and loud unsupported-font handling.
 - **Bundled output font**: Noto Sans Bengali (SIL OFL), self-hosted.
-- **Frozen gold-standard corpus** (129 cases, visible + sealed held-out) and a
+- **Frozen gold-standard corpus** (141 cases, visible + sealed held-out) and a
   Node test harness; the engine scores **100%** character and word accuracy,
   idempotent, NFC-stable, fuzz-clean.
 - Reproducible build (pinned toolchain, `npm ci`), CI (lint + engine-purity rule
