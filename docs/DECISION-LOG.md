@@ -171,16 +171,19 @@ Statuses: **Decided** · **Proposed** (awaiting maintainer sign-off) · **Open**
 - **Why:** Phase 3 product review — unsigned sideload is an adoption-killer for
   non-technical users.
 
-### D-0016 — Spikes A, C and D are a hard pre-Phase-4 gate
+### D-0016 — Spikes A, C and D gate the v1.0 release (and inform the build)
 - **Status:** Decided (Phase 3) · **Owner:** Maintainer (runs) + Agent (gates)
-- **Decision:** The host contract is **provisional** until Spikes A (per-run
-  font), C (snapshot revert) and the new **D (encoding seam — does Word's
-  `Range.text` return the CP1252 code points our corpus assumes?)** are GREEN on
-  desktop and web. Phase 4 build does not start until then. If a spike is RED,
-  the conservative fallback (selection-only / report-don't-convert) applies and
-  scope is revised.
+- **Decision:** Spikes A (per-run font), C (snapshot revert) and the new **D
+  (encoding seam — does Word's `Range.text` return the CP1252 code points the
+  corpus assumes?)** must be **GREEN before the v1.0 release**. Per the
+  maintainer's choice (answer "3a"), the **Phase 4 build proceeds in parallel**
+  rather than waiting. The host contract is marked *provisional* and the engine's
+  glyph map is keyed to the high-confidence CP1252 assumption. **Spike D is
+  strongly recommended early** — a RED result means input-layer rework, so it is
+  the cheapest 15 minutes the maintainer can spend. RED on any spike triggers the
+  conservative fallback (selection-only / report-don't-convert) and a scope revision.
 - **Why:** Phase 3 red-team — the encoding assumption underpins everything and is
-  untested through Word.
+  untested through Word; balanced against the maintainer's "build now" choice.
 
 ---
 
