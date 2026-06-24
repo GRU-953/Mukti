@@ -184,6 +184,21 @@ Statuses: **Decided** · **Proposed** (awaiting maintainer sign-off) · **Open**
   conservative fallback (selection-only / report-don't-convert) and a scope revision.
 - **Why:** Phase 3 red-team — the encoding assumption underpins everything and is
   untested through Word; balanced against the maintainer's "build now" choice.
+- **Update (Phase 6 research):** authoritative-source research now rates the
+  encoding seam (D) **high confidence** it holds, and A & C sound — see
+  `docs/phase0/spikes/spike-D-evidence.md` and `spike-AC-evidence.md`. The in-Word
+  kits remain the final confirmation.
+
+### D-0017 — Revert snapshot uses the Common API to stay at WordApi 1.3
+- **Status:** Decided (Phase 6 research) · **Owner:** Agent (technical)
+- **Decision:** Store the revert snapshot via the **Common API**
+  `Office.context.document.customXmlParts` / `.settings` (available alongside
+  WordApi 1.3), **not** the Word-specific `Word.Document.customXmlParts/.settings`,
+  which are **WordApi 1.4**. This keeps the declared minimum at 1.3 (D-0002). If
+  the Common API proves insufficient in the in-Word Spike C, the fallback is to
+  raise the manifest to WordApi 1.4 (a logged change).
+- **Why:** Spike A/C evidence found the Word-specific storage APIs are 1.4; using
+  the Common API preserves the "lowest set that works" principle.
 
 ---
 

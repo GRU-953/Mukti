@@ -111,7 +111,9 @@ export interface ApplyResult {
   readonly skippedStale: number;
 }
 
-/** Stored as a CustomXML part in the .docx (id only kept in settings). */
+/** Stored as a CustomXML part in the .docx (id only kept in settings). Use the
+ *  Common API `Office.context.document.customXmlParts`/`.settings` (works at
+ *  WordApi 1.3) — the Word-specific `Word.Document.customXmlParts` is 1.4 (D-0017). */
 export interface RevertSnapshot {
   readonly snapshotId: string;
   readonly createdAt: string;

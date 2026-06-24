@@ -6,15 +6,21 @@ building. A **red** spike (the answer is "no / not like that") reshapes the plan
 | # | Risk | Can it be tested in pure code? | Status |
 |---|---|---|---|
 | **B** | Bengali **cluster reordering** correctness + idempotency | ✅ Yes (Node) | 🟢 **GREEN** — [spike-B-reordering.md](spike-B-reordering.md) |
-| **D** | **Encoding seam** — does Word's `Range.text` return the code points our corpus assumes? | ❌ Needs real Word | 🔴 **Highest priority** — [spike-D-encoding.md](spike-D-encoding.md) |
-| **A** | Reading the font of each **run** within a paragraph (so mixed-font text isn't dropped) | ❌ Needs real Word | 🟡 Kit ready — [spike-A-per-run-font.md](spike-A-per-run-font.md) |
-| **C** | **Undo / revert** fidelity (reliable "Revert Mukti changes") | ❌ Needs real Word | 🟡 Kit ready — [spike-C-undo-revert.md](spike-C-undo-revert.md) |
+| **D** | **Encoding seam** — does Word's `Range.text` return the code points our corpus assumes? | ❌ Needs real Word | 🟡 **High confidence** (research) — kit: [spike-D-encoding.md](spike-D-encoding.md); evidence: [spike-D-evidence.md](spike-D-evidence.md) |
+| **A** | Reading the font of each **run** within a paragraph (so mixed-font text isn't dropped) | ❌ Needs real Word | 🟡 Kit + evidence — [spike-A-per-run-font.md](spike-A-per-run-font.md), [spike-AC-evidence.md](spike-AC-evidence.md) |
+| **C** | **Undo / revert** fidelity (reliable "Revert Mukti changes") | ❌ Needs real Word | 🟡 Kit + evidence — [spike-C-undo-revert.md](spike-C-undo-revert.md), [spike-AC-evidence.md](spike-AC-evidence.md) |
 
-> **Hard gate (D-0016):** Spikes **A, C and D must be GREEN** (desktop *and*
-> Word‑on‑web) before Phase 4 build starts. Spike D is the existential one — it
-> checks the assumption every other piece is built on. A RED spike revises scope
-> before any production code (conservative fallback: selection‑only /
+> **Gate (D-0016):** Spikes **A, C and D must be GREEN** (desktop *and*
+> Word‑on‑web) before the v1.0 **release**. Per the maintainer's choice the build
+> proceeded in parallel. Authoritative research now rates all three **high
+> confidence** (see the evidence docs); the in‑Word kits are the final
+> confirmation. A RED result triggers the conservative fallback (selection‑only /
 > report‑don't‑convert).
+>
+> **Correction from the A/C evidence:** `Word.Document.customXmlParts` / `.settings`
+> (where the revert snapshot lives) are **WordApi 1.4**, not 1.3. To stay at the
+> declared 1.3 the host uses the **Common API** `Office.context.document` surface
+> for snapshot storage (or the manifest is raised to 1.4). See D‑0017.
 
 ## Why A and C are "kits" not results
 

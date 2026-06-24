@@ -56,6 +56,10 @@ the harness tests it on every case).
   of the full SutonnyMJ glyph map is mundane Phase-4 data work**, not a
   reordering risk. The *reorder logic* is general and was validated on held-out
   words it was not written against.
-- This is a spike artifact, not the production engine. The production engine will
-  be pure TypeScript with the full map, schema-validated data, and the same
-  harness gating it.
+- This is a spike artifact, not the production engine. The production engine
+  (`src/engine`, data-driven from `data/bijoy-sutonnymj.json`) is now built and is
+  the authority: it passes the **full** corpus (visible + held-out) at 100% via
+  `npm run corpus:gate`. As the corpus grew (Phase 3/6), the reference converter's
+  intentionally-small clean-room map no longer covers every case — that is
+  expected; it served its purpose (proving the reorder algorithm), and the gate
+  now runs against the production engine, not this artifact.
