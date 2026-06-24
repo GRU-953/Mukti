@@ -426,7 +426,7 @@ function viewNotScanned(scan: ScanReport): El {
     if (!labelKey) continue;
     list.append(el('li', {}, [
       frag(t(labelKey, lang), lang),
-      document.createTextNode(' — ' + formatNumber(region.count, lang)),
+      ' — ' + formatNumber(region.count, lang),
     ]));
   }
   details.append(list);
