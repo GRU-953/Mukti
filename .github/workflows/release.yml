@@ -57,7 +57,7 @@ jobs:
         run: gh release upload "${{ github.ref_name }}" dist/manifest.xml dist/SHA256SUMS --clobber
 
       - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: dist
 
