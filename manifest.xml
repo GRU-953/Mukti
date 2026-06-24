@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Mukti — Microsoft Word add-in manifest.
+
+  Built to docs/phase2/MANIFEST-DESIGN.md:
+    - Word only (<Host Name="Document"/>);
+    - declares WordApi MinVersion 1.3 (D-0002), the lowest set that works;
+    - fresh add-in Id 41a04cce-6e7b-45e6-926c-91da857aa888;
+    - ALL URLs derive from the token __MUKTI_BASE_URL__, which the build replaces
+      (scripts/build-manifest.mjs). The committed file keeps the token so a missing
+      MUKTI_BASE_URL fails the build rather than shipping localhost (do-not-repeat M2).
+    - Single ribbon button on Home → opens the taskpane (ShowTaskpane), SupportsPinning.
+-->
+<OfficeApp
+  xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
+  xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides"
+  xsi:type="TaskPaneApp">
+
+  <Id>41a04cce-6e7b-45e6-926c-91da857aa888</Id>
+  <Version>0.1.0</Version>
+  <ProviderName>GRU953</ProviderName>
+  <DefaultLocale>en-US</DefaultLocale>
+  <DisplayName DefaultValue="Mukti" />
+  <Description DefaultValue="Convert legacy Bijoy/SutonnyMJ Bangla text to Unicode, with a preview before any change and a reliable revert. Online-first: code loads from Microsoft's CDN and the project's hosting at launch." />
+  <IconUrl DefaultValue="__MUKTI_BASE_URL__/assets/icon-32.png" />
+  <HighResolutionIconUrl DefaultValue="__MUKTI_BASE_URL__/assets/icon-64.png" />
+  <SupportUrl DefaultValue="https://github.com/gru-953/mukti" />
+
+  <!-- Production domain (build-injected) so hosting can move without re-sideloading. -->
+  <AppDomains>
+    <AppDomain>__MUKTI_BASE_URL__</AppDomain>
+  </AppDomains>
+
+  <!-- Word only. -->
+  <Hosts>
+    <Host Name="Document" />
+  </Hosts>
+
+  <!-- Lowest requirement set that works (D-0002): WordApi 1.3. -->
+  <Requirements>
+    <Sets DefaultMinVersion="1.3">
+      <Set Name="WordApi" MinVersion="1.3" />
+    </Sets>
+  </Requirements>
+
+  <DefaultSettings>
+    <SourceLocation DefaultValue="__MUKTI_BASE_URL__/taskpane.html" />
+  </DefaultSettings>
+
+  <!-- Required to read and rewrite document text/formatting. -->
+  <Permissions>ReadWriteDocument</Permissions>
+
+  <VersionOverrides xmlns="http://schemas.microsoft.com/office/taskpaneappversionoverrides" xsi:type="VersionOverridesV1_0">
+    <Hosts>
+      <Host xsi:type="Document">
+        <DesktopFormFactor>
+          <!-- The ribbon FunctionFile (command registration page). -->
+          <FunctionFile resid="Commands.Url" />
+
+          <ExtensionPoint xsi:type="PrimaryCommandSurface">
+            <OfficeTab id="TabHome">
+              <Group id="Mukti.Group">
+                <Label resid="Mukti.Group.Label" />
+                <Icon>
+                  <bt:Image size="16" resid="Mukti.Icon.16" />
+                  <bt:Image size="32" resid="Mukti.Icon.32" />
+                  <bt:Image size="80" resid="Mukti.Icon.80" />
+                </Icon>
+                <Control xsi:type="Button" id="Mukti.OpenTaskpane">
+                  <Label resid="Mukti.Button.Label" />
+                  <Supertip>
+                    <Title resid="Mukti.Button.Label" />
+                    <Description resid="Mukti.Button.Tooltip" />
+                  </Supertip>
+                  <Icon>
+                    <bt:Image size="16" resid="Mukti.Icon.16" />
+                    <bt:Image size="32" resid="Mukti.Icon.32" />
+                    <bt:Image size="80" resid="Mukti.Icon.80" />
+                  </Icon>
+                  <Action xsi:type="ShowTaskpane">
+                    <TaskpaneId>Mukti.Taskpane</TaskpaneId>
+                    <SourceLocation resid="Taskpane.Url" />
+                    <SupportsPinning>true</SupportsPinning>
+                  </Action>
+                </Control>
+              </Group>
+            </OfficeTab>
+          </ExtensionPoint>
+        </DesktopFormFactor>
+      </Host>
+    </Hosts>
+
+    <Resources>
+      <bt:Images>
+        <bt:Image id="Mukti.Icon.16" DefaultValue="__MUKTI_BASE_URL__/assets/icon-16.png" />
+        <bt:Image id="Mukti.Icon.32" DefaultValue="__MUKTI_BASE_URL__/assets/icon-32.png" />
+        <bt:Image id="Mukti.Icon.80" DefaultValue="__MUKTI_BASE_URL__/assets/icon-80.png" />
+      </bt:Images>
+      <bt:Urls>
+        <bt:Url id="Taskpane.Url" DefaultValue="__MUKTI_BASE_URL__/taskpane.html" />
+        <bt:Url id="Commands.Url" DefaultValue="__MUKTI_BASE_URL__/commands.html" />
+      </bt:Urls>
+      <bt:ShortStrings>
+        <bt:String id="Mukti.Group.Label" DefaultValue="Mukti" />
+        <bt:String id="Mukti.Button.Label" DefaultValue="Mukti" />
+      </bt:ShortStrings>
+      <bt:LongStrings>
+        <bt:String id="Mukti.Button.Tooltip" DefaultValue="Open Mukti to convert Bijoy/SutonnyMJ text to Unicode." />
+      </bt:LongStrings>
+    </Resources>
+  </VersionOverrides>
+</OfficeApp>

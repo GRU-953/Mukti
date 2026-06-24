@@ -1,0 +1,1013 @@
+{
+  "id": "bijoy-sutonnymj",
+  "version": "1.0.0",
+  "description": "Bijoy/SutonnyMJ legacy glyph -> Unicode Bengali substitution map. Source values are CP1252/SutonnyMJ byte slots as Unicode code points; targets are the Unicode component(s) in glyph order (reordering is applied algorithmically by the engine, not by this data).",
+  "license": "Authored from the maintainer's own MIT-licensed Mukti map (c) Aninda Sundar Howlader (GRU-953) plus cited Unicode/Microsoft OpenType specs. See docs/phase0/findings/06-mapping-research.md and D-0013.",
+  "map": [
+    {
+      "source": [
+        48
+      ],
+      "target": "০"
+    },
+    {
+      "source": [
+        49
+      ],
+      "target": "১"
+    },
+    {
+      "source": [
+        50
+      ],
+      "target": "২"
+    },
+    {
+      "source": [
+        51
+      ],
+      "target": "৩"
+    },
+    {
+      "source": [
+        52
+      ],
+      "target": "৪"
+    },
+    {
+      "source": [
+        53
+      ],
+      "target": "৫"
+    },
+    {
+      "source": [
+        54
+      ],
+      "target": "৬"
+    },
+    {
+      "source": [
+        55
+      ],
+      "target": "৭"
+    },
+    {
+      "source": [
+        56
+      ],
+      "target": "৮"
+    },
+    {
+      "source": [
+        57
+      ],
+      "target": "৯"
+    },
+    {
+      "source": [
+        65,
+        118
+      ],
+      "target": "আ",
+      "note": "two-char key, matched before single A"
+    },
+    {
+      "source": [
+        65
+      ],
+      "target": "অ"
+    },
+    {
+      "source": [
+        66
+      ],
+      "target": "ই"
+    },
+    {
+      "source": [
+        67
+      ],
+      "target": "ঈ"
+    },
+    {
+      "source": [
+        68
+      ],
+      "target": "উ"
+    },
+    {
+      "source": [
+        69
+      ],
+      "target": "ঊ"
+    },
+    {
+      "source": [
+        70
+      ],
+      "target": "ঋ"
+    },
+    {
+      "source": [
+        71
+      ],
+      "target": "এ"
+    },
+    {
+      "source": [
+        72
+      ],
+      "target": "ঐ"
+    },
+    {
+      "source": [
+        73
+      ],
+      "target": "ও"
+    },
+    {
+      "source": [
+        74
+      ],
+      "target": "ঔ"
+    },
+    {
+      "source": [
+        75
+      ],
+      "target": "ক"
+    },
+    {
+      "source": [
+        76
+      ],
+      "target": "খ"
+    },
+    {
+      "source": [
+        77
+      ],
+      "target": "গ"
+    },
+    {
+      "source": [
+        78
+      ],
+      "target": "ঘ"
+    },
+    {
+      "source": [
+        79
+      ],
+      "target": "ঙ"
+    },
+    {
+      "source": [
+        80
+      ],
+      "target": "চ"
+    },
+    {
+      "source": [
+        81
+      ],
+      "target": "ছ"
+    },
+    {
+      "source": [
+        82
+      ],
+      "target": "জ"
+    },
+    {
+      "source": [
+        83
+      ],
+      "target": "ঝ"
+    },
+    {
+      "source": [
+        84
+      ],
+      "target": "ঞ"
+    },
+    {
+      "source": [
+        85
+      ],
+      "target": "ট"
+    },
+    {
+      "source": [
+        86
+      ],
+      "target": "ঠ"
+    },
+    {
+      "source": [
+        87
+      ],
+      "target": "ড"
+    },
+    {
+      "source": [
+        88
+      ],
+      "target": "ঢ"
+    },
+    {
+      "source": [
+        89
+      ],
+      "target": "ণ"
+    },
+    {
+      "source": [
+        90
+      ],
+      "target": "ত"
+    },
+    {
+      "source": [
+        95
+      ],
+      "target": "থ"
+    },
+    {
+      "source": [
+        96
+      ],
+      "target": "দ"
+    },
+    {
+      "source": [
+        97
+      ],
+      "target": "ধ"
+    },
+    {
+      "source": [
+        98
+      ],
+      "target": "ন"
+    },
+    {
+      "source": [
+        99
+      ],
+      "target": "প"
+    },
+    {
+      "source": [
+        100
+      ],
+      "target": "ফ"
+    },
+    {
+      "source": [
+        101
+      ],
+      "target": "ব"
+    },
+    {
+      "source": [
+        102
+      ],
+      "target": "ভ"
+    },
+    {
+      "source": [
+        103
+      ],
+      "target": "ম"
+    },
+    {
+      "source": [
+        104
+      ],
+      "target": "য"
+    },
+    {
+      "source": [
+        105
+      ],
+      "target": "র"
+    },
+    {
+      "source": [
+        106
+      ],
+      "target": "ল"
+    },
+    {
+      "source": [
+        107
+      ],
+      "target": "শ"
+    },
+    {
+      "source": [
+        108
+      ],
+      "target": "ষ"
+    },
+    {
+      "source": [
+        109
+      ],
+      "target": "স"
+    },
+    {
+      "source": [
+        110
+      ],
+      "target": "হ"
+    },
+    {
+      "source": [
+        111
+      ],
+      "target": "ড়",
+      "note": "nukta consonant (NFC-decomposed base + U+09BC)"
+    },
+    {
+      "source": [
+        112
+      ],
+      "target": "ঢ়",
+      "note": "nukta consonant"
+    },
+    {
+      "source": [
+        113
+      ],
+      "target": "য়",
+      "note": "nukta consonant"
+    },
+    {
+      "source": [
+        118
+      ],
+      "target": "া"
+    },
+    {
+      "source": [
+        119
+      ],
+      "target": "ি"
+    },
+    {
+      "source": [
+        120
+      ],
+      "target": "ী"
+    },
+    {
+      "source": [
+        121
+      ],
+      "target": "ু"
+    },
+    {
+      "source": [
+        122
+      ],
+      "target": "ু"
+    },
+    {
+      "source": [
+        126
+      ],
+      "target": "ূ"
+    },
+    {
+      "source": [
+        8222
+      ],
+      "target": "ৃ"
+    },
+    {
+      "source": [
+        8225
+      ],
+      "target": "ে"
+    },
+    {
+      "source": [
+        8224
+      ],
+      "target": "ে"
+    },
+    {
+      "source": [
+        710
+      ],
+      "target": "ৈ"
+    },
+    {
+      "source": [
+        8240
+      ],
+      "target": "ৈ"
+    },
+    {
+      "source": [
+        352
+      ],
+      "target": "ৗ"
+    },
+    {
+      "source": [
+        115
+      ],
+      "target": "ং"
+    },
+    {
+      "source": [
+        116
+      ],
+      "target": "ঃ"
+    },
+    {
+      "source": [
+        117
+      ],
+      "target": "ঁ"
+    },
+    {
+      "source": [
+        114
+      ],
+      "target": "ৎ"
+    },
+    {
+      "source": [
+        124
+      ],
+      "target": "।"
+    },
+    {
+      "source": [
+        38
+      ],
+      "target": "্"
+    },
+    {
+      "source": [
+        166
+      ],
+      "target": "্ব"
+    },
+    {
+      "source": [
+        168
+      ],
+      "target": "্য",
+      "note": "ya-phala"
+    },
+    {
+      "source": [
+        169
+      ],
+      "target": "র্",
+      "note": "reph marker — reordered by the engine"
+    },
+    {
+      "source": [
+        175
+      ],
+      "target": "স্"
+    },
+    {
+      "source": [
+        94
+      ],
+      "target": "্ব"
+    },
+    {
+      "source": [
+        179
+      ],
+      "target": "ক্ত"
+    },
+    {
+      "source": [
+        181
+      ],
+      "target": "ক্র"
+    },
+    {
+      "source": [
+        182
+      ],
+      "target": "ক্ষ"
+    },
+    {
+      "source": [
+        255
+      ],
+      "target": "ক্ষ"
+    },
+    {
+      "source": [
+        185
+      ],
+      "target": "জ্ঞ"
+    },
+    {
+      "source": [
+        189
+      ],
+      "target": "ঙ্গ"
+    },
+    {
+      "source": [
+        206
+      ],
+      "target": "ত্র"
+    },
+    {
+      "source": [
+        214
+      ],
+      "target": "্র",
+      "note": "ra-phala"
+    },
+    {
+      "source": [
+        215
+      ],
+      "target": "দ্ধ"
+    },
+    {
+      "source": [
+        339
+      ],
+      "target": "্ন"
+    },
+    {
+      "source": [
+        353
+      ],
+      "target": "ন্"
+    },
+    {
+      "source": [
+        191
+      ],
+      "target": "্ত্র"
+    },
+    {
+      "source": [
+        247
+      ],
+      "target": "স্ট"
+    },
+    {
+      "source": [
+        210
+      ],
+      "target": "\"",
+      "note": "opening curly quote -> straight quote"
+    },
+    {
+      "source": [
+        211
+      ],
+      "target": "\"",
+      "note": "closing curly quote -> straight quote"
+    },
+    {
+      "source": [
+        176
+      ],
+      "target": "ক্ক",
+      "note": "ক্ক conjunct (kka)"
+    },
+    {
+      "source": [
+        177
+      ],
+      "target": "ক্ট",
+      "note": "ক্ট conjunct (kta-retroflex)"
+    },
+    {
+      "source": [
+        180
+      ],
+      "target": "ক্ম",
+      "note": "ক্ম conjunct (kma)"
+    },
+    {
+      "source": [
+        183
+      ],
+      "target": "ক্স",
+      "note": "ক্স conjunct (ksa)"
+    },
+    {
+      "source": [
+        184
+      ],
+      "target": "গু",
+      "note": "গু (gu) pre-formed glyph"
+    },
+    {
+      "source": [
+        186
+      ],
+      "target": "গ্দ",
+      "note": "গ্দ conjunct (gda)"
+    },
+    {
+      "source": [
+        187
+      ],
+      "target": "গ্ধ",
+      "note": "গ্ধ conjunct (gdha)"
+    },
+    {
+      "source": [
+        188
+      ],
+      "target": "ঙ্ক",
+      "note": "ঙ্ক conjunct (ngka)"
+    },
+    {
+      "source": [
+        190
+      ],
+      "target": "জ্জ",
+      "note": "জ্জ conjunct (jja)"
+    },
+    {
+      "source": [
+        192
+      ],
+      "target": "জ্ঝ",
+      "note": "জ্ঝ conjunct (jjha)"
+    },
+    {
+      "source": [
+        193
+      ],
+      "target": "জ্ঞ",
+      "note": "জ্ঞ conjunct (gyan), alternate slot"
+    },
+    {
+      "source": [
+        194
+      ],
+      "target": "ঞ্চ",
+      "note": "ঞ্চ conjunct (nca)"
+    },
+    {
+      "source": [
+        195
+      ],
+      "target": "ঞ্ছ",
+      "note": "ঞ্ছ conjunct (ncha)"
+    },
+    {
+      "source": [
+        196
+      ],
+      "target": "ঞ্জ",
+      "note": "ঞ্জ conjunct (nja)"
+    },
+    {
+      "source": [
+        197
+      ],
+      "target": "ঞ্ঝ",
+      "note": "ঞ্ঝ conjunct (njha)"
+    },
+    {
+      "source": [
+        198
+      ],
+      "target": "ট্ট",
+      "note": "ট্ট conjunct (tta-retroflex)"
+    },
+    {
+      "source": [
+        199
+      ],
+      "target": "ড্ড",
+      "note": "ড্ড conjunct (dda-retroflex)"
+    },
+    {
+      "source": [
+        200
+      ],
+      "target": "ণ্ট",
+      "note": "ণ্ট conjunct (nta-retroflex)"
+    },
+    {
+      "source": [
+        201
+      ],
+      "target": "ণ্ঠ",
+      "note": "ণ্ঠ conjunct (ntha-retroflex)"
+    },
+    {
+      "source": [
+        202
+      ],
+      "target": "ণ্ড",
+      "note": "ণ্ড conjunct (nda-retroflex)"
+    },
+    {
+      "source": [
+        203
+      ],
+      "target": "ত্ত",
+      "note": "ত্ত conjunct (tta)"
+    },
+    {
+      "source": [
+        204
+      ],
+      "target": "ত্থ",
+      "note": "ত্থ conjunct (ttha)"
+    },
+    {
+      "source": [
+        207
+      ],
+      "target": "দ্দ",
+      "note": "দ্দ conjunct (ddo)"
+    },
+    {
+      "source": [
+        216
+      ],
+      "target": "দ্ব",
+      "note": "দ্ব conjunct (dba)"
+    },
+    {
+      "source": [
+        217
+      ],
+      "target": "দ্ম",
+      "note": "দ্ম conjunct (dma)"
+    },
+    {
+      "source": [
+        218
+      ],
+      "target": "ন্ঠ",
+      "note": "ন্ঠ conjunct (ntha)"
+    },
+    {
+      "source": [
+        219
+      ],
+      "target": "ন্ড",
+      "note": "ন্ড conjunct (nda)"
+    },
+    {
+      "source": [
+        220
+      ],
+      "target": "ন্ধ",
+      "note": "ন্ধ conjunct (ndha)"
+    },
+    {
+      "source": [
+        221
+      ],
+      "target": "ন্স",
+      "note": "ন্স conjunct (nsa)"
+    },
+    {
+      "source": [
+        222
+      ],
+      "target": "প্ট",
+      "note": "প্ট conjunct (pta-retroflex)"
+    },
+    {
+      "source": [
+        223
+      ],
+      "target": "প্ত",
+      "note": "প্ত conjunct (pta)"
+    },
+    {
+      "source": [
+        224
+      ],
+      "target": "প্প",
+      "note": "প্প conjunct (ppa)"
+    },
+    {
+      "source": [
+        225
+      ],
+      "target": "প্স",
+      "note": "প্স conjunct (psa)"
+    },
+    {
+      "source": [
+        226
+      ],
+      "target": "ব্জ",
+      "note": "ব্জ conjunct (bja)"
+    },
+    {
+      "source": [
+        227
+      ],
+      "target": "ব্দ",
+      "note": "ব্দ conjunct (bda)"
+    },
+    {
+      "source": [
+        228
+      ],
+      "target": "ব্ধ",
+      "note": "ব্ধ conjunct (bdha)"
+    },
+    {
+      "source": [
+        229
+      ],
+      "target": "ভ্র",
+      "note": "ভ্র conjunct (bhra)"
+    },
+    {
+      "source": [
+        231
+      ],
+      "target": "ম্ফ",
+      "note": "ম্ফ conjunct (mpha)"
+    },
+    {
+      "source": [
+        233
+      ],
+      "target": "ল্ক",
+      "note": "ল্ক conjunct (lka)"
+    },
+    {
+      "source": [
+        234
+      ],
+      "target": "ল্গ",
+      "note": "ল্গ conjunct (lga)"
+    },
+    {
+      "source": [
+        235
+      ],
+      "target": "ল্ট",
+      "note": "ল্ট conjunct (lta)"
+    },
+    {
+      "source": [
+        237
+      ],
+      "target": "ল্প",
+      "note": "ল্প conjunct (lpa)"
+    },
+    {
+      "source": [
+        238
+      ],
+      "target": "ল্ফ",
+      "note": "ল্ফ conjunct (lpha)"
+    },
+    {
+      "source": [
+        239
+      ],
+      "target": "শু",
+      "note": "শু (shu) pre-formed glyph"
+    },
+    {
+      "source": [
+        240
+      ],
+      "target": "শ্চ",
+      "note": "শ্চ conjunct (shcha)"
+    },
+    {
+      "source": [
+        241
+      ],
+      "target": "শ্ছ",
+      "note": "শ্ছ conjunct (shchha)"
+    },
+    {
+      "source": [
+        242
+      ],
+      "target": "ষ্ণ",
+      "note": "ষ্ণ conjunct (ssna)"
+    },
+    {
+      "source": [
+        243
+      ],
+      "target": "ষ্ট",
+      "note": "ষ্ট conjunct (ssta)"
+    },
+    {
+      "source": [
+        244
+      ],
+      "target": "ষ্ঠ",
+      "note": "ষ্ঠ conjunct (sstha)"
+    },
+    {
+      "source": [
+        245
+      ],
+      "target": "ষ্ফ",
+      "note": "ষ্ফ conjunct (sspha)"
+    },
+    {
+      "source": [
+        246
+      ],
+      "target": "স্খ",
+      "note": "স্খ conjunct (skha)"
+    },
+    {
+      "source": [
+        249
+      ],
+      "target": "স্ফ",
+      "note": "স্ফ conjunct (spha)"
+    },
+    {
+      "source": [
+        251
+      ],
+      "target": "হু",
+      "note": "হু (hu) pre-formed glyph"
+    },
+    {
+      "source": [
+        252
+      ],
+      "target": "হৃ",
+      "note": "হৃ (hri) pre-formed glyph"
+    },
+    {
+      "source": [
+        253
+      ],
+      "target": "হ্ন",
+      "note": "হ্ন conjunct (hna)"
+    },
+    {
+      "source": [
+        254
+      ],
+      "target": "হ্ম",
+      "note": "হ্ম conjunct (hma)"
+    },
+    {
+      "source": [
+        162
+      ],
+      "target": "্ভ",
+      "note": "bha-phala / half-bha (joins preceding consonant)"
+    },
+    {
+      "source": [
+        165
+      ],
+      "target": "্ম",
+      "note": "ma-phala / half-ma (joins preceding consonant)"
+    },
+    {
+      "source": [
+        8211
+      ],
+      "target": "ু",
+      "note": "u-kar — SutonnyMJ alternate slot (U+2013)"
+    },
+    {
+      "source": [
+        402
+      ],
+      "target": "ূ",
+      "note": "uu-kar — SutonnyMJ alternate slot (U+0192)"
+    },
+    {
+      "source": [
+        8218
+      ],
+      "target": "ূ",
+      "note": "uu-kar — SutonnyMJ alternate slot (U+201A)"
+    }
+  ],
+  "reorder": {
+    "preBaseVowels": true,
+    "reph": true
+  }
+}

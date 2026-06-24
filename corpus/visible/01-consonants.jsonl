@@ -1,0 +1,48 @@
+{"id": "vowel-a", "category": "vowels", "features": [], "source": [65], "sourceKeys": "A", "expected": "অ", "description": "independent vowel a", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "vowel-aa", "category": "vowels", "features": [], "source": [65, 118], "sourceKeys": "Av", "expected": "আ", "description": "independent vowel aa", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "vowel-i", "category": "vowels", "features": [], "source": [66], "sourceKeys": "B", "expected": "ই", "description": "independent vowel i", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "vowel-ii", "category": "vowels", "features": [], "source": [67], "sourceKeys": "C", "expected": "ঈ", "description": "independent vowel ii", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "vowel-u", "category": "vowels", "features": [], "source": [68], "sourceKeys": "D", "expected": "উ", "description": "independent vowel u", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "vowel-uu", "category": "vowels", "features": [], "source": [69], "sourceKeys": "E", "expected": "ঊ", "description": "independent vowel uu", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "vowel-ri", "category": "vowels", "features": [], "source": [70], "sourceKeys": "F", "expected": "ঋ", "description": "independent vowel vocalic r", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "vowel-e", "category": "vowels", "features": [], "source": [71], "sourceKeys": "G", "expected": "এ", "description": "independent vowel e", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "vowel-oi", "category": "vowels", "features": [], "source": [72], "sourceKeys": "H", "expected": "ঐ", "description": "independent vowel ai", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "vowel-o", "category": "vowels", "features": [], "source": [73], "sourceKeys": "I", "expected": "ও", "description": "independent vowel o", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "vowel-ou", "category": "vowels", "features": [], "source": [74], "sourceKeys": "J", "expected": "ঔ", "description": "independent vowel au", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "cons-ka", "category": "consonants", "features": [], "source": [75], "sourceKeys": "K", "expected": "ক", "description": "consonant ka", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "cons-kha", "category": "consonants", "features": [], "source": [76], "sourceKeys": "L", "expected": "খ", "description": "consonant kha", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "cons-ga", "category": "consonants", "features": [], "source": [77], "sourceKeys": "M", "expected": "গ", "description": "consonant ga", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "cons-gha", "category": "consonants", "features": [], "source": [78], "sourceKeys": "N", "expected": "ঘ", "description": "consonant gha", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "cons-uma", "category": "consonants", "features": [], "source": [79], "sourceKeys": "O", "expected": "ঙ", "description": "consonant nga", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "cons-ca", "category": "consonants", "features": [], "source": [80], "sourceKeys": "P", "expected": "চ", "description": "consonant ca", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "cons-cha", "category": "consonants", "features": [], "source": [81], "sourceKeys": "Q", "expected": "ছ", "description": "consonant cha", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "cons-ja", "category": "consonants", "features": [], "source": [82], "sourceKeys": "R", "expected": "জ", "description": "consonant ja", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "cons-jha", "category": "consonants", "features": [], "source": [83], "sourceKeys": "S", "expected": "ঝ", "description": "consonant jha", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "cons-nya", "category": "consonants", "features": [], "source": [84], "sourceKeys": "T", "expected": "ঞ", "description": "consonant nya", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "cons-tta", "category": "consonants", "features": [], "source": [85], "sourceKeys": "U", "expected": "ট", "description": "consonant tta", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "cons-ttha", "category": "consonants", "features": [], "source": [86], "sourceKeys": "V", "expected": "ঠ", "description": "consonant ttha", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "cons-dda", "category": "consonants", "features": [], "source": [87], "sourceKeys": "W", "expected": "ড", "description": "consonant dda", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "cons-ddha", "category": "consonants", "features": [], "source": [88], "sourceKeys": "X", "expected": "ঢ", "description": "consonant ddha", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "cons-nna", "category": "consonants", "features": [], "source": [89], "sourceKeys": "Y", "expected": "ণ", "description": "consonant nna", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "cons-ta", "category": "consonants", "features": [], "source": [90], "sourceKeys": "Z", "expected": "ত", "description": "consonant ta", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "cons-tha", "category": "consonants", "features": [], "source": [95], "sourceKeys": "_", "expected": "থ", "description": "consonant tha", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "cons-da", "category": "consonants", "features": [], "source": [96], "sourceKeys": "`", "expected": "দ", "description": "consonant da", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "cons-dha", "category": "consonants", "features": [], "source": [97], "sourceKeys": "a", "expected": "ধ", "description": "consonant dha", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "cons-na", "category": "consonants", "features": [], "source": [98], "sourceKeys": "b", "expected": "ন", "description": "consonant na", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "cons-pa", "category": "consonants", "features": [], "source": [99], "sourceKeys": "c", "expected": "প", "description": "consonant pa", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "cons-pha", "category": "consonants", "features": [], "source": [100], "sourceKeys": "d", "expected": "ফ", "description": "consonant pha", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "cons-ba", "category": "consonants", "features": [], "source": [101], "sourceKeys": "e", "expected": "ব", "description": "consonant ba", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "cons-bha", "category": "consonants", "features": [], "source": [102], "sourceKeys": "f", "expected": "ভ", "description": "consonant bha", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "cons-ma", "category": "consonants", "features": [], "source": [103], "sourceKeys": "g", "expected": "ম", "description": "consonant ma", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "cons-ya", "category": "consonants", "features": [], "source": [104], "sourceKeys": "h", "expected": "য", "description": "consonant ya", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "cons-ra", "category": "consonants", "features": [], "source": [105], "sourceKeys": "i", "expected": "র", "description": "consonant ra", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "cons-la", "category": "consonants", "features": [], "source": [106], "sourceKeys": "j", "expected": "ল", "description": "consonant la", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "cons-sha", "category": "consonants", "features": [], "source": [107], "sourceKeys": "k", "expected": "শ", "description": "consonant sha", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "cons-ssa", "category": "consonants", "features": [], "source": [108], "sourceKeys": "l", "expected": "ষ", "description": "consonant ssa", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "cons-sa", "category": "consonants", "features": [], "source": [109], "sourceKeys": "m", "expected": "স", "description": "consonant sa", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "cons-ha", "category": "consonants", "features": [], "source": [110], "sourceKeys": "n", "expected": "হ", "description": "consonant ha", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "cons-rra", "category": "consonants", "features": ["nukta"], "source": [111], "sourceKeys": "o", "expected": "ড়", "description": "rra = dda+nukta (NFC decomposed)", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "cons-rha", "category": "consonants", "features": ["nukta"], "source": [112], "sourceKeys": "p", "expected": "ঢ়", "description": "rha = ddha+nukta (NFC decomposed)", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "cons-yya", "category": "consonants", "features": ["nukta"], "source": [113], "sourceKeys": "q", "expected": "য়", "description": "yya = ya+nukta (NFC decomposed)", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "sign-anusvara", "category": "consonants", "features": ["anusvara"], "source": [75, 115], "sourceKeys": "Ks", "expected": "কং", "description": "anusvara", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "sign-visarga", "category": "consonants", "features": ["visarga"], "source": [75, 116], "sourceKeys": "Kt", "expected": "কঃ", "description": "visarga", "ref": "docs/phase0/findings/06-mapping-research.md"}

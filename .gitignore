@@ -1,0 +1,43 @@
+# === Secrets — NEVER commit (see docs/phase0/DO-NOT-REPEAT.md §C1) ===
+*.key
+*.pem
+*.p12
+*.pfx
+*.cer
+*.crt
+certs/
+signing/
+.env
+.env.*
+secrets/
+
+# === Dependencies ===
+node_modules/
+
+# === Build output / artifacts (publish via Releases, not git) ===
+dist/
+dist-pkg/
+build/
+out/
+*.dmg
+*.zip
+*.tgz
+*.exe
+*.nupkg
+
+# === Tooling caches ===
+__pycache__/
+*.pyc
+.cache/
+coverage/
+*.log
+.DS_Store
+Thumbs.db
+
+# === Editor ===
+.vscode/
+.idea/
+*.swp
+
+# Generated from data/ by tools/gen-mapping.mjs
+src/engine/mapping.generated.ts

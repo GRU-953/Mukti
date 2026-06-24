@@ -1,0 +1,13 @@
+{
+  "comment": "Browser type-check for the task pane / commands / host (Office.js). The engine's own tsconfig.json stays Node-targeted; this checks the code that runs inside Word.",
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": [],
+    "noEmit": true,
+    "rootDir": "src"
+  },
+  "include": ["src/**/*.ts"]
+}

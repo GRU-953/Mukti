@@ -1,0 +1,72 @@
+name: release
+
+# Publishes the add-in when a version tag (e.g. v1.0.0) is pushed:
+# re-runs the full gate, builds, deploys dist/ to GitHub Pages, and attaches the
+# manifest + SHA256SUMS to the GitHub Release. Dormant until the maintainer does
+# the one-time GitHub setup (RUNBOOK.md §2) and sets the MUKTI_BASE_URL variable.
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write # attach assets to the Release
+  pages: write # deploy to GitHub Pages
+  id-token: write # OIDC for Pages (no stored secret)
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+      - run: npm ci
+
+      # Enforce D-0006: ship on the custom domain, never the raw github.io / localhost.
+      - name: Require production base URL
+        run: |
+          if [ -z "${{ vars.MUKTI_BASE_URL }}" ]; then
+            echo "::error::Set the MUKTI_BASE_URL repository variable to your custom domain before releasing (see RUNBOOK.md section 3)."
+            exit 1
+          fi
+
+      - run: npm run lint
+      - run: npm test
+      - run: npm run corpus:gate # >=99% gate must pass before any release
+
+      - name: Build the add-in
+        env:
+          MUKTI_BASE_URL: ${{ vars.MUKTI_BASE_URL }}
+        run: npm run build
+
+      - name: Generate checksums
+        run: |
+          ( cd dist && find . -type f ! -name SHA256SUMS -exec sha256sum {} \; | sort > SHA256SUMS )
+          cat dist/SHA256SUMS
+
+      - name: Attach manifest + checksums to the Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "${{ github.ref_name }}" dist/manifest.xml dist/SHA256SUMS --clobber
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4
