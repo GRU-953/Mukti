@@ -19,6 +19,11 @@
         <div class="status-box">@_status</div>
     }
 
+    @if (!string.IsNullOrEmpty(_warning))
+    {
+        <div class="warning-box">@_warning</div>
+    }
+
     @if (_previewItems.Count > 0)
     {
         <div class="preview-header">@(_isEnglish ? "Changes to apply:" : "পরিবর্তনের তালিকা:")</div>
@@ -95,6 +100,9 @@
                 _status = _previewItems.Count > 0
                     ? (_isEnglish ? $"Found {_previewItems.Count} run(s)." : $"{_previewItems.Count}টি রান পাওয়া গেছে।")
                     : (_isEnglish ? "Nothing to convert." : "রূপান্তরের কিছু নেই।");
+                if (scanResult.Warnings != null && scanResult.Warnings.Count > 0)
+                    _warning = (_isEnglish ? "Unsupported fonts skipped: " : "অজানা ফন্ট বাদ দেওয়া হয়েছে: ")
+                        + string.Join(", ", scanResult.Warnings);
             } else {
                 _status = _isEnglish ? $"{host}: scanning not yet supported." : $"{host}: স্ক্যান এখনো সমর্থিত নয়।";
             }
