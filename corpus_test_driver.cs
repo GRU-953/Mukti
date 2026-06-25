@@ -23,8 +23,12 @@ class CorpusDriver
 
     static bool IsOk(char c) =>
         (c >= 'ঀ' && c <= '৿') || c < 128 ||
-        c == ‘”’ || c == ‘”’ || c == ‘—‘ ||
-        c == ‘–‘ || c == ‘’’ || c == ‘’’ || c == ‘…’ || c == ‘―’;
+        c == ' ' || c == '।' || c == '॥' ||
+        (c >= 'Ͱ' && c <= 'Ͽ') ||
+        (c >= '' && c <= '') ||
+        c == '☐' || c == '☑' || c == '☒' ||
+        c == '“' || c == '”' || c == '—' ||
+        c == '–' || c == '‘' || c == '’' || c == '…' || c == '―';
 
     static List<string> XmlRuns(string xml, Regex runPat, Regex fontPat, Regex textPat)
     {
