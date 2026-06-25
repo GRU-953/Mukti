@@ -6,7 +6,7 @@ building. A **red** spike (the answer is "no / not like that") reshapes the plan
 | # | Risk | Can it be tested in pure code? | Status |
 |---|---|---|---|
 | **B** | Bengali **cluster reordering** correctness + idempotency | ✅ Yes (Node) | 🟢 **GREEN** — [spike-B-reordering.md](spike-B-reordering.md) |
-| **D** | **Encoding seam** — does Word's `Range.text` return the code points our corpus assumes? | ❌ Needs real Word | 🟡 **High confidence** (research) — kit: [spike-D-encoding.md](spike-D-encoding.md); evidence: [spike-D-evidence.md](spike-D-evidence.md) |
+| **D** | **Encoding seam** — does Word's `Range.text` return the code points our corpus assumes? | ❌ Needs real Word | 🟢 **GREEN — confirmed in Word** (on the web): e-kar returned as U+2021; `Avwg`/`evsjv` matched the corpus byte-for-byte. [evidence](spike-D-evidence.md) |
 | **A** | Reading the font of each **run** within a paragraph (so mixed-font text isn't dropped) | ❌ Needs real Word | 🟡 Kit + evidence — [spike-A-per-run-font.md](spike-A-per-run-font.md), [spike-AC-evidence.md](spike-AC-evidence.md) |
 | **C** | **Undo / revert** fidelity (reliable "Revert Mukti changes") | ❌ Needs real Word | 🟡 Kit + evidence — [spike-C-undo-revert.md](spike-C-undo-revert.md), [spike-AC-evidence.md](spike-AC-evidence.md) |
 

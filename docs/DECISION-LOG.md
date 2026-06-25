@@ -184,10 +184,15 @@ Statuses: **Decided** · **Proposed** (awaiting maintainer sign-off) · **Open**
   conservative fallback (selection-only / report-don't-convert) and a scope revision.
 - **Why:** Phase 3 red-team — the encoding assumption underpins everything and is
   untested through Word; balanced against the maintainer's "build now" choice.
-- **Update (Phase 6 research):** authoritative-source research now rates the
-  encoding seam (D) **high confidence** it holds, and A & C sound — see
-  `docs/phase0/spikes/spike-D-evidence.md` and `spike-AC-evidence.md`. The in-Word
-  kits remain the final confirmation.
+- **Update (Phase 6 research):** authoritative-source research rated the encoding
+  seam (D) **high confidence**, and A & C sound — see
+  `docs/phase0/spikes/spike-D-evidence.md` and `spike-AC-evidence.md`.
+- **Update (2026-06-25): Spike D CONFIRMED in Word (on the web).** `Range.text`
+  returned the exact CP1252 code points the corpus assumes (e-kar = U+2021, no C1
+  bytes), matching the corpus byte-for-byte; the engine produced correct Bengali.
+  The existential risk is **resolved**. Spikes A (per-word fonts) and C (undo
+  fidelity) remain to be run in Word before v1.0; both are lower-risk and
+  research-backed.
 
 ### D-0017 — Revert snapshot uses the Common API to stay at WordApi 1.3
 - **Status:** Decided (Phase 6 research) · **Owner:** Agent (technical)

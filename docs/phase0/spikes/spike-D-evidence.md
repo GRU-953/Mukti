@@ -1,5 +1,17 @@
 # Spike D — encoding-seam evidence (web research)
 
+> ## ✅ CONFIRMED IN WORD (2026-06-25)
+> Run via Script Lab in **Word on the web**. Selecting `Avwg evsjv‡` (SutonnyMJ)
+> and reading `Range.text` returned code points
+> `U+0041 U+0076 U+0077 U+0067 U+0020 U+0065 U+0076 U+0073 U+006A U+0076 U+2021` —
+> the e-kar `‡` came through as **U+2021**, ASCII as ASCII, **no C1 bytes**.
+> These match the corpus `source` arrays byte-for-byte (`word-ami`, `word-bangla`,
+> `kar-e`), and the engine converts the sample to `আমি বাংলা`. The high-confidence
+> research below is now **empirically confirmed**; the assumption holds. (Confirmed
+> on Word-on-web; desktop is expected identical, as this is a document-storage
+> property, not host rendering — a desktop re-run is a nice-to-have, not a gate.)
+
+
 **Question.** When a Word document holds text typed in a legacy 8-bit Bengali
 font (SutonnyMJ/Bijoy) and an Office.js add-in reads `Range.text`, does it hand
 us the **Windows-1252 / CP1252 interpretation** of the font's bytes — i.e. the
