@@ -64,6 +64,7 @@ Build & check: `npm ci`, then `npm run build` (engine + add-in + manifest),
 |---|---|
 | [`INSTALL.md`](INSTALL.md) | Plain-English install guide (3 methods) |
 | [`docs/KNOWN-LIMITATIONS.md`](docs/KNOWN-LIMITATIONS.md) | Honest list of what it does and doesn't do |
+| [`ROADMAP.md`](ROADMAP.md) | Upgrade plan: path to v1.0, the v1.1 fast-follow, and v2+ |
 | [`RUNBOOK.md`](RUNBOOK.md) | Maintainer's step-by-step operating guide |
 | [`docs/RELEASE-CHECKLIST.md`](docs/RELEASE-CHECKLIST.md) | The manual gate before a release |
 | [`CONTINUITY.md`](CONTINUITY.md) · [`MIGRATION.md`](MIGRATION.md) | Keeping the project alive · onboarding a future developer |
