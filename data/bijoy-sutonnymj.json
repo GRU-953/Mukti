@@ -1,6 +1,6 @@
 {
   "id": "bijoy-sutonnymj",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Bijoy/SutonnyMJ legacy glyph -> Unicode Bengali substitution map. Source values are CP1252/SutonnyMJ byte slots as Unicode code points; targets are the Unicode component(s) in glyph order (reordering is applied algorithmically by the engine, not by this data).",
   "license": "Authored from the maintainer's own MIT-licensed Mukti map (c) Aninda Sundar Howlader (GRU-953) plus cited Unicode/Microsoft OpenType specs. See docs/phase0/findings/06-mapping-research.md and D-0013.",
   "map": [
@@ -1160,44 +1160,81 @@
       "note": "দ + virama (leading half-da form, alt slot)"
     },
     {
-      "source": [39],
+      "source": [
+        39
+      ],
       "target": "থ",
       "note": "CP 39 straight apostrophe → tha; corpus-confirmed: অবস্থা (Ae¯'v)"
     },
     {
-      "source": [205],
+      "source": [
+        205
+      ],
       "target": "ত",
       "note": "CP 205 (Í) → ta; corpus-confirmed: বিস্তারিত (we¯ÍvwiZ)"
     },
     {
-      "source": [208],
+      "source": [
+        208
+      ],
       "target": "ণ্ড",
       "note": "CP 208 (Ð) → ṇḍa conjunct; corpus-confirmed: কর্মকাণ্ড (Kg©KvÐ)"
     },
     {
-      "source": [212],
+      "source": [
+        212
+      ],
       "target": "ষ্ঠ",
       "note": "CP 212 (Ô) → ṣṭha conjunct; corpus-confirmed: প্রতিষ্ঠান (ÖwZÔvb)"
     },
     {
-      "source": [213],
+      "source": [
+        213
+      ],
       "target": "",
       "note": "CP 213 (Õ) → empty; blank glyph slot in SutonnyMJ, corpus-confirmed: সদস্যের (m`‡m¨Õi)"
     },
     {
-      "source": [230],
+      "source": [
+        230
+      ],
       "target": "ু",
       "note": "CP 230 (æ) → u-kaar vowel sign; corpus-confirmed: গ্রুপ (MÖæc)"
     },
     {
-      "source": [248],
+      "source": [
+        248
+      ],
       "target": "্ল",
       "note": "CP 248 (ø) → virama+la; corpus-confirmed: বিশ্লেষণ (we‡kølY)"
     },
     {
-      "source": [250],
+      "source": [
+        250
+      ],
       "target": "প",
       "note": "CP 250 (ú) → pa; corpus-confirmed: সম্পদ (m¤ú`)"
+    },
+    {
+      "source": [
+        209
+      ],
+      "target": "―",
+      "note": "CP 209 (U+00D1 Ntilde) -> horizontal bar U+2015; em-dash (U+2014) taken by source[8212]->্ত; corpus-confirmed"
+    },
+    {
+      "source": [
+        356
+      ],
+      "target": "ৎ",
+      "note": "CP 356 (U+0164 T-caron) -> khanda-ta U+09CE; corpus-confirmed: DŤmM (PRA Handout docs)"
+    },
+    {
+      "source": [
+        464
+      ],
+      "target": "ক্ষ",
+      "note": "CP 464 (U+01D0 i-caron) -> ksha conjunct; corpus-confirmed: msiǐY sangrakshan (BRAC training docs)"
     }
   ],
   "reorder": {

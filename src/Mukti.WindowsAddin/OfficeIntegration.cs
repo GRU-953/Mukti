@@ -101,6 +101,28 @@ public class OfficeIntegration
                 foreach (dynamic para in doc.Paragraphs)
                     ScanRange(para.Range, snap, paraIdx++);
 
+                // Word tables
+                try
+                {
+                    foreach (dynamic table in doc.Tables)
+                    {
+                        try
+                        {
+                            foreach (dynamic row in table.Rows)
+                            {
+                                try
+                                {
+                                    foreach (dynamic cell in row.Cells)
+                                        try { ScanRange(cell.Range, snap, paraIdx++); } catch { }
+                                }
+                                catch { }
+                            }
+                        }
+                        catch { }
+                    }
+                }
+                catch { }
+
                 // U-004: Headers and footers
                 try
                 {
@@ -163,12 +185,33 @@ public class OfficeIntegration
         var snap = new ConversionSnapshot { AppType = "Excel" };
         try
         {
-            dynamic cells = selectionOnly
-                ? _app.Selection.Cells
-                : _app.ActiveSheet.UsedRange.Cells;
-            int idx = 0;
-            foreach (dynamic cell in cells)
-                ScanExcelCell(cell, snap, ref idx);
+            if (selectionOnly)
+            {
+                int idx = 0;
+                foreach (dynamic cell in _app.Selection.Cells)
+                    ScanExcelCell(cell, snap, ref idx);
+            }
+            else
+            {
+                int idx = 0;
+                try
+                {
+                    foreach (dynamic sheet in _app.ActiveWorkbook.Worksheets)
+                    {
+                        try
+                        {
+                            foreach (dynamic cell in sheet.UsedRange.Cells)
+                                ScanExcelCell(cell, snap, ref idx);
+                        }
+                        catch { }
+                    }
+                }
+                catch
+                {
+                    foreach (dynamic cell in _app.ActiveSheet.UsedRange.Cells)
+                        ScanExcelCell(cell, snap, ref idx);
+                }
+            }
         }
         catch (Exception ex)
         {
@@ -341,30 +384,82 @@ public class OfficeIntegration
         // U-004: Footnotes and endnotes
         try { foreach (dynamic fn in doc.Footnotes) try { ApplyRange(fn.Range); } catch { } } catch { }
         try { foreach (dynamic en in doc.Endnotes) try { ApplyRange(en.Range); } catch { } } catch { }
+
+        // Word tables
+        try
+        {
+            foreach (dynamic table in doc.Tables)
+            {
+                try
+                {
+                    foreach (dynamic row in table.Rows)
+                    {
+                        try
+                        {
+                            foreach (dynamic cell in row.Cells)
+                                try { ApplyRange(cell.Range); } catch { }
+                        }
+                        catch { }
+                    }
+                }
+                catch { }
+            }
+        }
+        catch { }
     }
 
     private void ApplyExcel()
     {
-        var sheet = _app.ActiveSheet;
-        foreach (dynamic cell in sheet.UsedRange.Cells)
+        try
         {
-            try
+            foreach (dynamic sheet in _app.ActiveWorkbook.Worksheets)
             {
-                // U-005: skip formula cells
-                bool hasFormula = false;
-                try { hasFormula = (bool)cell.HasFormula; } catch { }
-                if (hasFormula) continue;
+                try
+                {
+                    foreach (dynamic cell in sheet.UsedRange.Cells)
+                    {
+                        try
+                        {
+                            bool hasFormula = false;
+                            try { hasFormula = (bool)cell.HasFormula; } catch { }
+                            if (hasFormula) continue;
 
-                string text = (string)cell.Text;
-                string fontName = (string)cell.Font.Name;
-                var cls = _fontRegistry.Classify(fontName);
-                if (cls.Class != FontClass.Bijoy) continue;
-                var converted = _converter.Convert(text);
-                if (converted == text) continue;
-                cell.Value = converted;
-                cell.Font.Name = "Noto Sans Bengali";
+                            string text = (string)cell.Text;
+                            string fontName = (string)cell.Font.Name;
+                            var cls = _fontRegistry.Classify(fontName);
+                            if (cls.Class != FontClass.Bijoy) continue;
+                            var converted = _converter.Convert(text);
+                            if (converted == text) continue;
+                            cell.Value = converted;
+                            cell.Font.Name = "Noto Sans Bengali";
+                        }
+                        catch { }
+                    }
+                }
+                catch { }
             }
-            catch { }
+        }
+        catch
+        {
+            var sheet = _app.ActiveSheet;
+            foreach (dynamic cell in sheet.UsedRange.Cells)
+            {
+                try
+                {
+                    bool hasFormula = false;
+                    try { hasFormula = (bool)cell.HasFormula; } catch { }
+                    if (hasFormula) continue;
+                    string text = (string)cell.Text;
+                    string fontName = (string)cell.Font.Name;
+                    var cls = _fontRegistry.Classify(fontName);
+                    if (cls.Class != FontClass.Bijoy) continue;
+                    var converted = _converter.Convert(text);
+                    if (converted == text) continue;
+                    cell.Value = converted;
+                    cell.Font.Name = "Noto Sans Bengali";
+                }
+                catch { }
+            }
         }
     }
 
@@ -490,11 +585,32 @@ public class OfficeIntegration
         // U-004: Footnotes and endnotes
         try { foreach (dynamic fn in doc.Footnotes) try { RevertRange(fn.Range); } catch { } } catch { }
         try { foreach (dynamic en in doc.Endnotes) try { RevertRange(en.Range); } catch { } } catch { }
+
+        // Word tables
+        try
+        {
+            foreach (dynamic table in doc.Tables)
+            {
+                try
+                {
+                    foreach (dynamic row in table.Rows)
+                    {
+                        try
+                        {
+                            foreach (dynamic cell in row.Cells)
+                                try { RevertRange(cell.Range); } catch { }
+                        }
+                        catch { }
+                    }
+                }
+                catch { }
+            }
+        }
+        catch { }
     }
 
     private void RevertExcel(ConversionSnapshot snapshot)
     {
-        var sheet = _app.ActiveSheet;
         var lookup = new Dictionary<string, (string orig, string font)>();
         foreach (var item in snapshot.Items)
         {
@@ -502,18 +618,31 @@ public class OfficeIntegration
                 lookup[item.Converted.Trim()] = (item.Original, item.FontName);
         }
 
-        foreach (dynamic cell in sheet.UsedRange.Cells)
+        void RevertSheet(dynamic sheet)
         {
-            try
+            foreach (dynamic cell in sheet.UsedRange.Cells)
             {
-                string text = ((string)cell.Text).Trim();
-                if (lookup.TryGetValue(text, out var original))
+                try
                 {
-                    cell.Value = original.orig;
-                    cell.Font.Name = original.font;
+                    string text = ((string)cell.Text).Trim();
+                    if (lookup.TryGetValue(text, out var original))
+                    {
+                        cell.Value = original.orig;
+                        cell.Font.Name = original.font;
+                    }
                 }
+                catch { }
             }
-            catch { }
+        }
+
+        try
+        {
+            foreach (dynamic sheet in _app.ActiveWorkbook.Worksheets)
+                try { RevertSheet(sheet); } catch { }
+        }
+        catch
+        {
+            try { RevertSheet(_app.ActiveSheet); } catch { }
         }
     }
 

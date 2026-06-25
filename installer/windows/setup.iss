@@ -1,5 +1,5 @@
 #define AppName "Mukti"
-#define AppVersion "2.0.1"
+#define AppVersion "2.0.2"
 #define AppPublisher "Mukti Open Source"
 #define AppURL "https://github.com/GRU-953/Mukti"
 #define AppGuid "F4E71C21-9B7A-4C3E-8D22-8F91A235C4B1"

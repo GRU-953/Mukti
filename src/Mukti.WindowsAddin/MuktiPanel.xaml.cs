@@ -20,6 +20,7 @@ public partial class MuktiPanel : System.Windows.Controls.UserControl
         _app = app;
         _integration = app != null ? new OfficeIntegration(app) : null;
         lstPreview.ItemsSource = _previewItems;
+        CheckForUpdateAsync();
     }
 
     public void SetLanguage(bool english)
@@ -55,6 +56,18 @@ public partial class MuktiPanel : System.Windows.Controls.UserControl
             txtFooter.Text = "আপনার নথির বিষয়বস্তু কখনও ডিভাইসের বাইরে যায় না।";
             if (colBefore != null) colBefore.Header = "আগে";
             if (colAfter != null) colAfter.Header = "পরে";
+        }
+
+        if (panelUpdateBanner.Visibility == Visibility.Visible)
+        {
+            var match = System.Text.RegularExpressions.Regex.Match(txtUpdateBanner.Text, @"[\d.]+");
+            if (match.Success)
+            {
+                var ver = match.Value;
+                txtUpdateBanner.Text = _isEnglish
+                    ? $"New version {ver} available — click to download"
+                    : $"নতুন সংস্করণ {ver} পাওয়া গেছে — ডাউনলোড করতে ক্লিক করুন";
+            }
         }
     }
 
@@ -238,6 +251,38 @@ public partial class MuktiPanel : System.Windows.Controls.UserControl
             ShowStatus((_isEnglish ? "Error reverting: " : "ফেরানোয় ত্রুটি: ") + ex.Message);
             btnUndo.IsEnabled = true;
         }
+    }
+
+    private void BtnUpdate_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("https://github.com/GRU-953/Mukti/releases/latest") { UseShellExecute = true }); }
+        catch { }
+    }
+
+    private async void CheckForUpdateAsync()
+    {
+        const string currentVersion = "2.0.2";
+        try
+        {
+            using var client = new System.Net.Http.HttpClient();
+            client.DefaultRequestHeaders.Add("User-Agent", "Mukti-Addin");
+            client.Timeout = TimeSpan.FromSeconds(5);
+            var json = await client.GetStringAsync("https://api.github.com/repos/GRU-953/Mukti/releases/latest");
+            var tagMatch = System.Text.RegularExpressions.Regex.Match(json, @"""tag_name""\s*:\s*""v?([\d.]+)""");
+            if (!tagMatch.Success) return;
+            var latestVer = tagMatch.Groups[1].Value;
+            if (new Version(latestVer) > new Version(currentVersion))
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    txtUpdateBanner.Text = (_isEnglish
+                        ? $"New version {latestVer} available — click to download"
+                        : $"নতুন সংস্করণ {latestVer} পাওয়া গেছে — ডাউনলোড করতে ক্লিক করুন");
+                    panelUpdateBanner.Visibility = Visibility.Visible;
+                });
+            }
+        }
+        catch { }
     }
 }
 

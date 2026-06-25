@@ -126,7 +126,40 @@ window.muktiOffice = {
                                 });
                             });
                             return Promise.all(hfOps).then(function () {
-                                resolve({ runs: results, warnings: warnings });
+                                // Word tables
+                                var tableOps = [];
+                                try {
+                                    var tables = body.tables;
+                                    tables.load('items');
+                                    tableOps.push(ctx.sync().then(function () {
+                                        return Promise.all(tables.items.map(function (table, ti) {
+                                            table.rows.load('items');
+                                            return ctx.sync().then(function () {
+                                                return Promise.all(table.rows.items.map(function (row, ri) {
+                                                    row.cells.load('items');
+                                                    return ctx.sync().then(function () {
+                                                        return Promise.all(row.cells.items.map(function (cell, ci) {
+                                                            var cellParas = cell.body.paragraphs;
+                                                            cellParas.load('items');
+                                                            return ctx.sync().then(function () {
+                                                                return Promise.all(cellParas.items.map(function (para, pi) {
+                                                                    var ranges = para.getTextRanges([' ', '\n', '\t'], false);
+                                                                    ranges.load('items');
+                                                                    return ctx.sync().then(function () {
+                                                                        return scanRangeItems(ranges.items, 400000 + ti * 10000 + ri * 100 + ci);
+                                                                    });
+                                                                }));
+                                                            });
+                                                        }));
+                                                    });
+                                                }));
+                                            });
+                                        }));
+                                    }).catch(function () {}));
+                                } catch (e) {}
+                                return Promise.all(tableOps).then(function () {
+                                    resolve({ runs: results, warnings: warnings });
+                                });
                             });
                         }).catch(function () {
                             resolve({ runs: results, warnings: warnings });
@@ -160,7 +193,25 @@ window.muktiOffice = {
                         }));
                     });
                     return Promise.all(ops).then(function () { return ctx.sync(); });
-                }).then(function () { resolve(true); });
+                }).then(function () {
+                    // Apply to table cells (paraIndex >= 400000): use body search
+                    var tableRuns = convertedRuns.filter(function (r) { return r.paraIndex >= 400000; });
+                    if (tableRuns.length === 0) { resolve(true); return; }
+                    var searchOps = tableRuns.map(function (item) {
+                        var orig = item.original.trim();
+                        if (!orig) return Promise.resolve();
+                        var results = ctx.document.body.search(orig, { matchCase: true });
+                        results.load('items');
+                        return ctx.sync().then(function () {
+                            results.items.forEach(function (r) {
+                                r.insertText(item.converted, 'Replace');
+                                r.font.name = outputFont;
+                            });
+                            return ctx.sync();
+                        }).catch(function () {});
+                    });
+                    return Promise.all(searchOps).then(function () { resolve(true); });
+                });
             }).catch(function (e) { reject(e.message || String(e)); });
         });
     },
@@ -188,7 +239,24 @@ window.muktiOffice = {
                         }));
                     });
                     return Promise.all(ops).then(function () { return ctx.sync(); });
-                }).then(function () { resolve(true); });
+                }).then(function () {
+                    var tableItems = snapshot.filter(function (r) { return r.paraIndex >= 400000; });
+                    if (tableItems.length === 0) { resolve(true); return; }
+                    var searchOps = tableItems.map(function (item) {
+                        var conv = item.converted.trim();
+                        if (!conv) return Promise.resolve();
+                        var results = ctx.document.body.search(conv, { matchCase: true });
+                        results.load('items');
+                        return ctx.sync().then(function () {
+                            results.items.forEach(function (r) {
+                                r.insertText(item.original, 'Replace');
+                                r.font.name = item.fontName;
+                            });
+                            return ctx.sync();
+                        }).catch(function () {});
+                    });
+                    return Promise.all(searchOps).then(function () { resolve(true); });
+                });
             }).catch(function (e) { reject(e.message || String(e)); });
         });
     },
@@ -208,53 +276,79 @@ window.muktiOffice = {
         return new Promise(function (resolve, reject) {
             if (typeof Excel === 'undefined') { reject('Excel API not available'); return; }
             Excel.run(function (ctx) {
-                var range = selectionOnly
-                    ? ctx.workbook.getSelectedRange()
-                    : ctx.workbook.worksheets.getActiveWorksheet().getUsedRange();
-                range.load(['values', 'formulas', 'rowCount', 'columnCount']);
-                return ctx.sync().then(function () {
-                    var results = [];
-                    var warnings = [];
-                    var warnedFonts = {};
-                    var formulaCount = 0;
-                    var cellsToLoad = [];
+                if (selectionOnly) {
+                    var range = ctx.workbook.getSelectedRange();
+                    range.load(['values', 'formulas', 'rowCount', 'columnCount']);
+                    return ctx.sync().then(function () {
+                        return window.muktiOffice._processExcelRange(ctx, range, 0, knownBijoyFonts, bengaliMarkers);
+                    }).then(function (sheetResult) {
+                        resolve({ runs: sheetResult.results, warnings: sheetResult.warnings, formulaSkippedCount: sheetResult.formulaCount });
+                    });
+                } else {
+                    var worksheets = ctx.workbook.worksheets;
+                    worksheets.load('items');
+                    return ctx.sync().then(function () {
+                        var allResults = [], allWarnings = [], totalFormulas = 0;
+                        var warnedFonts = {};
+                        var sheetOps = worksheets.items.map(function (ws, si) {
+                            var usedRange;
+                            try { usedRange = ws.getUsedRange(); } catch (e) { return Promise.resolve(); }
+                            usedRange.load(['values', 'formulas', 'rowCount', 'columnCount']);
+                            return ctx.sync().then(function () {
+                                return window.muktiOffice._processExcelRange(ctx, usedRange, si, knownBijoyFonts, bengaliMarkers, warnedFonts);
+                            }).then(function (sheetResult) {
+                                allResults = allResults.concat(sheetResult.results);
+                                totalFormulas += sheetResult.formulaCount;
+                                sheetResult.warnings.forEach(function (w) {
+                                    if (allWarnings.indexOf(w) < 0) allWarnings.push(w);
+                                });
+                            }).catch(function () {});
+                        });
+                        return Promise.all(sheetOps).then(function () {
+                            resolve({ runs: allResults, warnings: allWarnings, formulaSkippedCount: totalFormulas });
+                        });
+                    });
+                }
+            }).catch(function (e) { reject(e.message || String(e)); });
+        });
+    },
 
-                    for (var r = 0; r < range.rowCount; r++) {
-                        for (var c = 0; c < range.columnCount; c++) {
-                            // U-005: detect formula cells
-                            var formula = range.formulas[r][c];
-                            var isFormula = typeof formula === 'string' && formula.charAt(0) === '=';
-                            if (isFormula) { formulaCount++; continue; }
-
-                            var val = range.values[r][c];
-                            if (val && typeof val === 'string' && val.trim()) {
-                                var cell = range.getCell(r, c);
-                                cell.format.font.load('name');
-                                cellsToLoad.push({ cell: cell, row: r, col: c, text: String(val) });
-                            }
+    _processExcelRange: function (ctx, range, sheetIndex, knownBijoyFonts, bengaliMarkers, warnedFonts) {
+        warnedFonts = warnedFonts || {};
+        var results = [], warnings = [], formulaCount = 0;
+        var cellsToLoad = [];
+        try {
+            for (var r = 0; r < range.rowCount; r++) {
+                for (var c = 0; c < range.columnCount; c++) {
+                    var formula = range.formulas[r][c];
+                    var isFormula = typeof formula === 'string' && formula.charAt(0) === '=';
+                    if (isFormula) { formulaCount++; continue; }
+                    var val = range.values[r][c];
+                    if (val && typeof val === 'string' && val.trim()) {
+                        var cell = range.getCell(r, c);
+                        cell.format.font.load('name');
+                        cellsToLoad.push({ cell: cell, row: r, col: c, text: String(val), sheetIndex: sheetIndex });
+                    }
+                }
+            }
+        } catch (e) {}
+        return ctx.sync().then(function () {
+            cellsToLoad.forEach(function (item) {
+                var rawFont = item.cell.format.font.name || '';
+                var fontName = rawFont.trim().toLowerCase();
+                if (knownBijoyFonts.indexOf(fontName) >= 0) {
+                    results.push({ text: item.text, fontName: rawFont, paraIndex: item.row, runIndex: item.col, sheetIndex: item.sheetIndex });
+                } else if (!warnedFonts[fontName]) {
+                    for (var m = 0; m < bengaliMarkers.length; m++) {
+                        if (fontName.indexOf(bengaliMarkers[m]) >= 0) {
+                            warnedFonts[fontName] = true;
+                            warnings.push(rawFont);
+                            break;
                         }
                     }
-
-                    return ctx.sync().then(function () {
-                        cellsToLoad.forEach(function (item) {
-                            var rawFont = item.cell.format.font.name || '';
-                            var fontName = rawFont.trim().toLowerCase();
-                            if (knownBijoyFonts.indexOf(fontName) >= 0) {
-                                results.push({ text: item.text, fontName: rawFont, paraIndex: item.row, runIndex: item.col });
-                            } else if (!warnedFonts[fontName]) {
-                                for (var m = 0; m < bengaliMarkers.length; m++) {
-                                    if (fontName.indexOf(bengaliMarkers[m]) >= 0) {
-                                        warnedFonts[fontName] = true;
-                                        warnings.push(rawFont);
-                                        break;
-                                    }
-                                }
-                            }
-                        });
-                        resolve({ runs: results, warnings: warnings, formulaSkippedCount: formulaCount });
-                    });
-                });
-            }).catch(function (e) { reject(e.message || String(e)); });
+                }
+            });
+            return { results: results, warnings: warnings, formulaCount: formulaCount };
         });
     },
 
@@ -262,20 +356,27 @@ window.muktiOffice = {
         return new Promise(function (resolve, reject) {
             if (typeof Excel === 'undefined') { reject('Excel API not available'); return; }
             Excel.run(function (ctx) {
-                var sheet = ctx.workbook.worksheets.getActiveWorksheet();
-                var usedRange = sheet.getUsedRange();
-                usedRange.load(['values', 'rowCount', 'columnCount']);
+                var worksheets = ctx.workbook.worksheets;
+                worksheets.load('items');
                 return ctx.sync().then(function () {
-                    convertedRuns.forEach(function (item) {
-                        if (item.paraIndex >= usedRange.rowCount || item.runIndex >= usedRange.columnCount) return;
-                        var currentVal = usedRange.values[item.paraIndex][item.runIndex];
-                        if (currentVal && String(currentVal).trim() === item.original.trim()) {
-                            var cell = usedRange.getCell(item.paraIndex, item.runIndex);
-                            cell.values = [[item.converted]];
-                            cell.format.font.name = outputFont;
-                        }
+                    var ops = convertedRuns.map(function (item) {
+                        var si = (item.sheetIndex !== undefined) ? item.sheetIndex : 0;
+                        if (si >= worksheets.items.length) return Promise.resolve();
+                        var ws = worksheets.items[si];
+                        var usedRange = ws.getUsedRange();
+                        usedRange.load(['values', 'rowCount', 'columnCount']);
+                        return ctx.sync().then(function () {
+                            if (item.paraIndex >= usedRange.rowCount || item.runIndex >= usedRange.columnCount) return;
+                            var currentVal = usedRange.values[item.paraIndex][item.runIndex];
+                            if (currentVal && String(currentVal).trim() === item.original.trim()) {
+                                var cell = usedRange.getCell(item.paraIndex, item.runIndex);
+                                cell.values = [[item.converted]];
+                                cell.format.font.name = outputFont;
+                            }
+                            return ctx.sync();
+                        }).catch(function () {});
                     });
-                    return ctx.sync();
+                    return Promise.all(ops);
                 }).then(function () { resolve(true); });
             }).catch(function (e) { reject(e.message || String(e)); });
         });
@@ -285,20 +386,27 @@ window.muktiOffice = {
         return new Promise(function (resolve, reject) {
             if (typeof Excel === 'undefined') { reject('Excel API not available'); return; }
             Excel.run(function (ctx) {
-                var sheet = ctx.workbook.worksheets.getActiveWorksheet();
-                var usedRange = sheet.getUsedRange();
-                usedRange.load(['values', 'rowCount', 'columnCount']);
+                var worksheets = ctx.workbook.worksheets;
+                worksheets.load('items');
                 return ctx.sync().then(function () {
-                    snapshot.forEach(function (item) {
-                        if (item.paraIndex >= usedRange.rowCount || item.runIndex >= usedRange.columnCount) return;
-                        var currentVal = usedRange.values[item.paraIndex][item.runIndex];
-                        if (currentVal && String(currentVal).trim() === item.converted.trim()) {
-                            var cell = usedRange.getCell(item.paraIndex, item.runIndex);
-                            cell.values = [[item.original]];
-                            cell.format.font.name = item.fontName;
-                        }
+                    var ops = snapshot.map(function (item) {
+                        var si = (item.sheetIndex !== undefined) ? item.sheetIndex : 0;
+                        if (si >= worksheets.items.length) return Promise.resolve();
+                        var ws = worksheets.items[si];
+                        var usedRange = ws.getUsedRange();
+                        usedRange.load(['values', 'rowCount', 'columnCount']);
+                        return ctx.sync().then(function () {
+                            if (item.paraIndex >= usedRange.rowCount || item.runIndex >= usedRange.columnCount) return;
+                            var currentVal = usedRange.values[item.paraIndex][item.runIndex];
+                            if (currentVal && String(currentVal).trim() === item.converted.trim()) {
+                                var cell = usedRange.getCell(item.paraIndex, item.runIndex);
+                                cell.values = [[item.original]];
+                                cell.format.font.name = item.fontName;
+                            }
+                            return ctx.sync();
+                        }).catch(function () {});
                     });
-                    return ctx.sync();
+                    return Promise.all(ops);
                 }).then(function () { resolve(true); });
             }).catch(function (e) { reject(e.message || String(e)); });
         });

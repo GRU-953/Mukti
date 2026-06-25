@@ -10,6 +10,13 @@
     </div>
     <div class="mukti-subtitle">@(_isEnglish ? "Bijoy / SutonnyMJ → Unicode Bengali" : "বিজয় থেকে ইউনিকোড রূপান্তর")</div>
 
+    @if (!string.IsNullOrEmpty(_updateBannerText))
+    {
+        <div class="update-banner" @onclick="OpenReleasePage" style="background:#fff3cd;border:1px solid #ffc107;border-radius:4px;padding:8px;margin-bottom:8px;cursor:pointer;font-size:12px;color:#856404;">
+            @_updateBannerText
+        </div>
+    }
+
     <button class="btn-primary" @onclick="ScanDocument" disabled="@(_scanning || _converter == null)">
         @(_scanning ? (_isEnglish ? "Scanning..." : "স্ক্যান হচ্ছে...") : (_isEnglish ? "Scan Document" : "স্ক্যান করুন"))
     </button>
@@ -58,7 +65,7 @@
 
 @code {
     bool _isEnglish = false, _scanning = false, _applying = false, _canUndo = false;
-    string _status = "", _warning = "", _currentHost = "";
+    string _status = "", _warning = "", _currentHost = "", _updateBannerText = "";
     List<PreviewRow> _previewItems = new();
     List<ScanRun> _snapshot = new();
     Converter? _converter;
@@ -79,6 +86,7 @@
         } catch (Exception ex) {
             _status = "Engine load error: " + ex.Message;
         }
+        _ = CheckForUpdateAsync();
     }
 
     void ToggleLanguage() => _isEnglish = !_isEnglish;
@@ -134,7 +142,7 @@
                     var converted = _converter.Convert(run.Text);
                     if (converted != run.Text) {
                         _previewItems.Add(new PreviewRow { Before = run.Text.Trim(), After = converted.Trim() });
-                        _snapshot.Add(new ScanRun { Original = run.Text, Converted = converted, FontName = run.FontName, ParaIndex = run.ParaIndex, RunIndex = run.RunIndex });
+                        _snapshot.Add(new ScanRun { Original = run.Text, Converted = converted, FontName = run.FontName, ParaIndex = run.ParaIndex, RunIndex = run.RunIndex, SheetIndex = run.SheetIndex });
                     }
                 }
                 _status = _previewItems.Count > 0
@@ -162,7 +170,7 @@
         if (_snapshot.Count == 0) return;
         _applying = true; StateHasChanged();
         try {
-            var payload = _snapshot.Select(s => new { original = s.Original, converted = s.Converted, paraIndex = s.ParaIndex, runIndex = s.RunIndex }).ToArray();
+            var payload = _snapshot.Select(s => new { original = s.Original, converted = s.Converted, paraIndex = s.ParaIndex, runIndex = s.RunIndex, sheetIndex = s.SheetIndex }).ToArray();
             var jsFn = _currentHost == "Excel" ? "muktiOffice.applyExcelConversion"
                      : _currentHost == "PowerPoint" ? "muktiOffice.applyPowerPointConversion"
                      : "muktiOffice.applyWordConversion";
@@ -177,7 +185,7 @@
     {
         if (_snapshot.Count == 0) return;
         try {
-            var payload = _snapshot.Select(s => new { original = s.Original, converted = s.Converted, fontName = s.FontName, paraIndex = s.ParaIndex, runIndex = s.RunIndex }).ToArray();
+            var payload = _snapshot.Select(s => new { original = s.Original, converted = s.Converted, fontName = s.FontName, paraIndex = s.ParaIndex, runIndex = s.RunIndex, sheetIndex = s.SheetIndex }).ToArray();
             var jsFn = _currentHost == "Excel" ? "muktiOffice.revertExcelConversion"
                      : _currentHost == "PowerPoint" ? "muktiOffice.revertPowerPointConversion"
                      : "muktiOffice.revertWordConversion";
@@ -188,8 +196,35 @@
         StateHasChanged();
     }
 
+    async Task CheckForUpdateAsync()
+    {
+        const string current = "2.0.2";
+        try
+        {
+            Http.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "Mukti-Mac");
+            var json = await Http.GetStringAsync("https://api.github.com/repos/GRU-953/Mukti/releases/latest");
+            var m = System.Text.RegularExpressions.Regex.Match(json, @"""tag_name""\s*:\s*""v?([\d.]+)""");
+            if (!m.Success) return;
+            var latest = m.Groups[1].Value;
+            if (new Version(latest) > new Version(current))
+            {
+                _updateBannerText = _isEnglish
+                    ? $"New version {latest} available — click to download"
+                    : $"নতুন সংস্করণ {latest} পাওয়া গেছে — ডাউনলোড করতে ক্লিক করুন";
+                StateHasChanged();
+            }
+        }
+        catch { }
+    }
+
+    void OpenReleasePage()
+    {
+        try { _ = JS.InvokeAsync<object>("window.open", "https://github.com/GRU-953/Mukti/releases/latest", "_blank"); }
+        catch { }
+    }
+
     class PreviewRow { public string Before { get; set; } = ""; public string After { get; set; } = ""; }
-    class ScanRun { public string Original { get; set; } = ""; public string Converted { get; set; } = ""; public string FontName { get; set; } = ""; public int ParaIndex { get; set; } public int RunIndex { get; set; } }
+    class ScanRun { public string Original { get; set; } = ""; public string Converted { get; set; } = ""; public string FontName { get; set; } = ""; public int ParaIndex { get; set; } public int RunIndex { get; set; } public int SheetIndex { get; set; } }
     class ScanResult { public List<RunEntry> Runs { get; set; } = new(); public List<string> Warnings { get; set; } = new(); public int FormulaSkippedCount { get; set; } }
-    class RunEntry { public string Text { get; set; } = ""; public string FontName { get; set; } = ""; public int ParaIndex { get; set; } public int RunIndex { get; set; } }
+    class RunEntry { public string Text { get; set; } = ""; public string FontName { get; set; } = ""; public int ParaIndex { get; set; } public int RunIndex { get; set; } public int SheetIndex { get; set; } }
 }

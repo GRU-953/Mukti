@@ -10,9 +10,8 @@ Read before adding any of these. Each was explicitly considered and rejected.
 **Path forward:** GitHub Releases direct download.
 
 ## U-002 — Automatic in-app updates
-**Not built.** No auto-update mechanism.
-**Why:** Auto-update requires signing certificate continuity and a release API. Re-downloading from GitHub is the v2 update path.
-**Path forward:** v2.1 can add a "new version available" banner linking to GitHub Releases.
+**Update banner built in v2.0.2.** Both Windows (WPF) and Mac (Blazor) check `https://api.github.com/repos/GRU-953/Mukti/releases/latest` at startup and display a yellow banner when a newer release is found. Clicking opens the releases page. The check is fire-and-forget; any network failure is silently swallowed.
+**Not built:** Auto-silent-update (download + install without user action). Requires signing certificate continuity and administrator privileges — out of scope for a volunteer project.
 
 ## U-003 — Reverse conversion (Unicode to Bijoy)
 **Not built.** Converting Unicode back to Bijoy is not implemented.
