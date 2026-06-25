@@ -1,0 +1,96 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  windows-installer:
+    name: Build + Sign Windows installer
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Install Inno Setup
+        run: choco install innosetup --yes
+      - name: Restore and publish
+        run: |
+          dotnet restore Mukti.sln
+          dotnet publish src/Mukti.WindowsAddin/Mukti.WindowsAddin.csproj --configuration Release --runtime win-x64 --self-contained true --output src/Mukti.WindowsAddin/bin/Release/net8.0-windows/win-x64/publish
+      - name: Build Inno Setup installer
+        run: iscc installer\\windows\\setup.iss
+      - name: Upload unsigned installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: win-installer
+          path: installer/windows/output/*.exe
+      # SignPath Foundation - free code signing for open source
+      # Apply at https://about.signpath.io/product/open-source
+      # Then add SIGNPATH_API_TOKEN + SIGNPATH_ORGANIZATION_ID secrets
+      - name: Sign with SignPath Foundation
+        uses: signpath/github-action-submit-signing-request@v1
+        if: ${{ secrets.SIGNPATH_API_TOKEN != '' }}
+        with:
+          api-token: '${{ secrets.SIGNPATH_API_TOKEN }}'
+          organization-id: '${{ secrets.SIGNPATH_ORGANIZATION_ID }}'
+          project-slug: mukti
+          signing-policy-slug: release-signing
+          artifact-configuration-slug: inno-setup
+          github-artifact-id: win-installer
+          wait-for-completion: true
+          output-artifact-directory: installer/windows/output/signed
+
+  mac-pkg:
+    name: Build Mac pkg
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Build Mac package
+        run: |
+          chmod +x installer/mac/build-pkg.sh installer/mac/pkg-scripts/postinstall installer/mac/pkg-scripts/preremove
+          bash installer/mac/build-pkg.sh
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: mac-pkg
+          path: installer/mac/output/*.pkg
+
+  github-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: [windows-installer, mac-pkg]
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-artifacts
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Mukti ${{ github.ref_name }}
+          body: |
+            ## Mukti ${{ github.ref_name }}
+
+            ### Install
+            - **Windows**: Download Mukti-Setup-*.exe and double-click. Mukti appears in the Office ribbon automatically.
+            - **Mac**: Download Mukti-*.pkg. Right-click then Open (once, to bypass Gatekeeper). Then open Word.
+
+            ### Privacy
+            Your document content never leaves your device.
+
+            ### Support
+            https://github.com/GRU-953/Mukti/issues
+          files: |
+            release-artifacts/**/*.exe
+            release-artifacts/**/*.pkg
+          draft: false
+          prerelease: false

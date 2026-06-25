@@ -1,0 +1,20 @@
+html, body { margin:0;padding:0;height:100%;font-family:'Segoe UI','Apple SD Gothic Neo',sans-serif;background:#FDF5E6;color:#3D2B1F;font-size:13px;overflow-x:hidden; }
+.mukti-panel { padding:12px;max-width:320px; }
+.mukti-header { display:flex;align-items:center;gap:8px;margin-bottom:6px; }
+.mukti-title { font-size:22px;font-weight:bold;color:#3D2B1F; }
+.btn-lang { background:#D4B896;border:none;border-radius:5px;padding:3px 8px;cursor:pointer;font-size:11px;color:#3D2B1F; }
+.btn-lang:hover { background:#C4A886; }
+.mukti-subtitle { font-size:11px;color:#7A5C3A;margin-bottom:12px; }
+.btn-primary { width:100%;background:#E07B39;color:white;border:none;border-radius:8px;padding:10px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:6px; }
+.btn-primary:hover { background:#C9692A; }
+.btn-primary:disabled { background:#D4B896;color:#8A7060;cursor:default; }
+.btn-secondary { width:100%;background:#8B6914;color:white;border:none;border-radius:8px;padding:10px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:6px; }
+.status-box { background:#FFF3E0;border-radius:8px;padding:8px 10px;margin:8px 0;font-size:12px;color:#5D4037; }
+.warning-box { background:#FFF8E1;border:1px solid #FFB300;border-radius:8px;padding:8px 10px;margin:6px 0;font-size:11px;color:#7A5C3A; }
+.preview-header { font-size:12px;font-weight:600;color:#3D2B1F;margin:12px 0 4px; }
+.preview-table { width:100%;border-collapse:collapse;font-size:11px;border:1px solid #D4B896;background:#FFFBF4;margin-bottom:8px; }
+.preview-table th { background:#EDD9B0;padding:4px 6px;text-align:left;font-weight:600;border-bottom:1px solid #D4B896; }
+.preview-table td { padding:3px 6px;border-bottom:1px solid #F0E0C0;word-break:break-all;max-width:130px; }
+.preview-table tr:last-child td { border-bottom:none; }
+.footer-note { margin-top:16px;font-size:10px;color:#9E8B7A; }
+.preview-scroll { max-height:300px;overflow-y:auto; }

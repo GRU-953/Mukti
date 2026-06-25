@@ -1,0 +1,3 @@
+{"id": "edge-empty", "category": "edge", "features": [], "source": [], "sourceKeys": "", "expected": "", "description": "empty input -> empty", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "edge-space", "category": "edge", "features": ["passthrough", "POLICY"], "source": [32, 32, 32], "sourceKeys": "   ", "expected": "   ", "description": "whitespace preserved verbatim (no munging)", "ref": "maintainer-verified (policy)"}
+{"id": "edge-unicode-noop", "category": "edge", "features": ["passthrough", "POLICY"], "source": [2438, 2478, 2495], "sourceKeys": "আমি", "expected": "আমি", "description": "already-Unicode input is a no-op", "ref": "maintainer-verified (policy)"}

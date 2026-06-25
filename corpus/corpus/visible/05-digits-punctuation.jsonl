@@ -1,0 +1,6 @@
+{"id": "digit-0", "category": "digits", "features": [], "source": [48], "sourceKeys": "0", "expected": "০", "description": "digit 0", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "digit-5", "category": "digits", "features": [], "source": [53], "sourceKeys": "5", "expected": "৫", "description": "digit 5", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "digit-9", "category": "digits", "features": [], "source": [57], "sourceKeys": "9", "expected": "৯", "description": "digit 9", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "digits-1971", "category": "digits", "features": [], "source": [49, 57, 55, 49], "sourceKeys": "1971", "expected": "১৯৭১", "description": "year 1971", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "digits-2026", "category": "digits", "features": [], "source": [50, 48, 50, 54], "sourceKeys": "2026", "expected": "২০২৬", "description": "year 2026", "ref": "docs/phase0/findings/06-mapping-research.md"}
+{"id": "dari-word", "category": "punctuation", "features": ["dari"], "source": [101, 118, 115, 106, 118, 124], "sourceKeys": "evsjv|", "expected": "বাংলা।", "description": "word + dari", "ref": "docs/phase0/findings/06-mapping-research.md"}

@@ -1,0 +1,58 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/gru-953/mukti/corpus/schema/case.schema.json",
+  "title": "Mukti corpus case",
+  "description": "One Bijoy/SutonnyMJ -> Unicode conversion test case.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "category", "source", "expected"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$",
+      "description": "Unique, stable, kebab-case id."
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "consonants",
+        "vowels",
+        "vowel-signs",
+        "conjuncts",
+        "reordering",
+        "digits",
+        "punctuation",
+        "mixed-script",
+        "words",
+        "sentences",
+        "edge"
+      ]
+    },
+    "features": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Linguistic feature tags for per-feature scoring, e.g. reph, pre-base-reorder, ya-phala, virama, khanda-ta, nukta, chandrabindu, dari."
+    },
+    "source": {
+      "type": "array",
+      "minItems": 0,
+      "items": { "type": "integer", "minimum": 0, "maximum": 1114111 },
+      "description": "Code points the converter receives (Bijoy/SutonnyMJ ANSI bytes as code points). Authoritative input."
+    },
+    "sourceKeys": {
+      "type": "string",
+      "description": "Human-readable ASCII keystrokes, informational only."
+    },
+    "expected": {
+      "type": "string",
+      "description": "Correct Unicode Bengali output. MUST be NFC."
+    },
+    "description": {
+      "type": "string"
+    },
+    "ref": {
+      "type": "string",
+      "description": "Justification anchor: a GROUND-TRUTH.md reference or 'maintainer-verified'."
+    }
+  }
+}

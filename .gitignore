@@ -1,0 +1,41 @@
+# .NET build output
+bin/
+obj/
+out/
+publish/
+artifacts/
+
+# User-specific Visual Studio files
+*.user
+*.suo
+.vs/
+.idea/
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+project.lock.json
+project.fragment.lock.json
+
+# Inno Setup output
+installer/windows/output/
+
+# Mac installer output
+installer/mac/output/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Test results
+TestResults/
+*.trx
+*.coverage
+
+# Secrets
+*.pfx
+*.p12
+.env
+secrets.json

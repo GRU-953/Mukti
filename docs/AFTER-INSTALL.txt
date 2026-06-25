@@ -1,0 +1,15 @@
+Thank you for installing Mukti v2!
+
+Mukti is now registered with Microsoft Office.
+Next time you open Word, Excel, or PowerPoint, look for the
+"Mukti" tab in the ribbon at the top.
+
+Click the Mukti button to open the conversion panel.
+Then: Scan the document, review the changes, and click Apply.
+
+If the Mukti tab does not appear:
+  Go to File -> Options -> Add-ins
+  Set "Manage" to "COM Add-ins" and click Go
+  Tick the checkbox next to "Mukti" and click OK
+
+For help: https://github.com/GRU-953/Mukti

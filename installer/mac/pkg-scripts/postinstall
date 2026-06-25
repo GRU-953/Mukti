@@ -1,0 +1,22 @@
+#!/bin/bash
+set -euo pipefail
+
+INSTALL_PATH="/Library/Application Support/Mukti"
+WEF_WORD="$HOME/Library/Containers/com.microsoft.Word/Data/Documents/wef"
+WEF_EXCEL="$HOME/Library/Containers/com.microsoft.Excel/Data/Documents/wef"
+WEF_PPT="$HOME/Library/Containers/com.microsoft.Powerpoint/Data/Documents/wef"
+
+MANIFEST_SRC="$INSTALL_PATH/wwwroot/manifest.xml"
+for WEF_DIR in "$WEF_WORD" "$WEF_EXCEL" "$WEF_PPT"; do
+    if [ -d "$(dirname "$WEF_DIR")" ]; then
+        mkdir -p "$WEF_DIR"
+        cp "$MANIFEST_SRC" "$WEF_DIR/mukti-manifest.xml"
+        echo "Manifest -> $WEF_DIR"
+    fi
+done
+
+PLIST="/Library/LaunchAgents/com.mukti.server.plist"
+if [ -f "$PLIST" ]; then
+    launchctl load "$PLIST" 2>/dev/null || true
+fi
+echo "Mukti installed. Open Word and look for the Mukti button."
