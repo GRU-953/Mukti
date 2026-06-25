@@ -43,7 +43,7 @@ jobs:
       # Then add SIGNPATH_API_TOKEN + SIGNPATH_ORGANIZATION_ID secrets to this repo
       - name: Sign with SignPath Foundation
         uses: signpath/github-action-submit-signing-request@v1
-        if: ${{ secrets.SIGNPATH_API_TOKEN != '' }}
+        continue-on-error: true
         with:
           api-token: '${{ secrets.SIGNPATH_API_TOKEN }}'
           organization-id: '${{ secrets.SIGNPATH_ORGANIZATION_ID }}'
