@@ -21,7 +21,7 @@ Copy-paste the relevant sections below.
 Free, offline Microsoft Office add-in that converts Bijoy/SutonnyMJ-encoded Bengali text to Unicode — for Windows and Mac.
 
 **Long description:**
-Mukti is an open-source Microsoft Office add-in for Windows and Mac that converts legacy Bijoy/SutonnyMJ-encoded Bengali text to Unicode in-place, directly inside Word, Excel, and PowerPoint. All conversion runs locally using a C# engine compiled from a 177-entry mapping table validated by a 363-case corpus. No document content ever leaves the user's device. The project targets non-technical Bengali-speaking users who receive documents in Bijoy encoding and need them in Unicode without installing font packages or learning command-line tools.
+Mukti is an open-source Microsoft Office add-in for Windows and Mac that converts legacy Bijoy/SutonnyMJ-encoded Bengali text to Unicode in-place, directly inside Word, Excel, and PowerPoint — including tables, headers/footers, footnotes, formula-free Excel cells, and speaker notes. All conversion runs locally on the user's device using a C# engine built on a 188-entry glyph map validated by 387 corpus tests and a clean scan of 306,620 real-world Bijoy runs from 757 Office documents. No document content ever leaves the device. The project targets non-technical Bengali-speaking users who receive documents in Bijoy encoding and need them in Unicode without installing font packages or learning command-line tools.
 
 **Licence:** MIT (see LICENSE file in repository)
 
@@ -35,11 +35,11 @@ Mukti is an open-source Microsoft Office add-in for Windows and Mac that convert
 
 ## What to sign
 
-**File to sign:** `Mukti-Setup-2.0.0.exe` (Inno Setup output)
+**File to sign:** `Mukti-Setup-2.0.2.exe` and future releases (Inno Setup output — PE .exe)
 
-**Signing policy:** Release signing (Authenticode, SHA-256)
+**Signing policy:** `release-signing` (Authenticode, SHA-256)
 
-**Artifact configuration:** PE file (standard .exe)
+**Artifact configuration:** `inno-setup` (PE file, standard .exe)
 
 ---
 

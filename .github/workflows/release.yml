@@ -22,14 +22,19 @@ jobs:
           dotnet publish src/Mukti.WindowsAddin/Mukti.WindowsAddin.csproj --configuration Release --runtime win-x64 --self-contained true --output src/Mukti.WindowsAddin/bin/Release/net8.0-windows/win-x64/publish
       - name: Build Inno Setup installer
         run: iscc installer\\windows\\setup.iss
-      - name: Upload unsigned installer
-        uses: actions/upload-artifact@v4
-        with:
-          name: win-installer
-          path: installer/windows/output/*.exe
       # SignPath Foundation - free code signing for open source
       # Apply at https://about.signpath.io/product/open-source
       # Then add SIGNPATH_API_TOKEN + SIGNPATH_ORGANIZATION_ID secrets
+      - name: Stage unsigned for signing
+        run: |
+          mkdir -p installer/windows/output/stage
+          cp installer/windows/output/*.exe installer/windows/output/stage/
+      - name: Upload for signing
+        id: upload_for_signing
+        uses: actions/upload-artifact@v4
+        with:
+          name: win-installer-unsigned
+          path: installer/windows/output/stage/*.exe
       - name: Sign with SignPath Foundation
         uses: signpath/github-action-submit-signing-request@v1
         if: ${{ secrets.SIGNPATH_API_TOKEN != '' }}
@@ -39,9 +44,24 @@ jobs:
           project-slug: mukti
           signing-policy-slug: release-signing
           artifact-configuration-slug: inno-setup
-          github-artifact-id: win-installer
+          github-artifact-id: win-installer-unsigned
           wait-for-completion: true
           output-artifact-directory: installer/windows/output/signed
+      - name: Use signed installer if available
+        shell: bash
+        run: |
+          if [ -d installer/windows/output/signed ] && ls installer/windows/output/signed/*.exe 2>/dev/null; then
+            cp installer/windows/output/signed/*.exe installer/windows/output/
+            echo "Using signed installer"
+          else
+            echo "Using unsigned installer (SignPath not configured)"
+          fi
+      - name: Upload installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: win-installer
+          path: installer/windows/output/*.exe
+          exclude: installer/windows/output/stage/**
 
   mac-pkg:
     name: Build Mac pkg
