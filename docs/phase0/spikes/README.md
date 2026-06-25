@@ -40,3 +40,18 @@ Both are also **partially de-risked already** by the Phase 0 forensic evidence:
 
 So the residual risk is low; the kits convert it to certainty with one ~15-minute
 session in Word. See each kit for how to run it and what to send back.
+
+## Troubleshooting the kits
+
+- **"`$ is not defined`"** — fixed; the snippets are now plain Office.js (no
+  jQuery, no button). Make sure you've copied the latest snippet from the kit.
+- **"The content is blocked because it isn't signed by a valid security
+  certificate" (ADD-IN ERROR)** — a *desktop* Word + Script Lab quirk: Word's
+  built-in browser engine can't validate the certificate of the content Script
+  Lab loads. It is unrelated to Mukti (we sideload, we don't sign). **Easiest
+  fix: run the kit in Word on the web** (in a browser at office.com), which
+  validates certificates normally. On desktop it usually clears by checking the
+  PC clock is correct and installing the **Microsoft Edge WebView2 Runtime**,
+  then restarting Word.
+- Always **select the Bijoy text first**, then click **Run** — the snippet reads
+  the current selection.
