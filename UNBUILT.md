@@ -30,7 +30,7 @@ Read before adding any of these. Each was explicitly considered and rejected.
 **Path forward:** Cells from formulas flagged as "formula — skipped" in the preview.
 
 ## U-006 — PowerPoint notes pane and SmartArt
-**Not built.** Only visible text shapes on slides are converted.
+**Partially built.** Visible text shapes on slides are converted (Mac + Windows). Speaker notes and SmartArt are not.
 **Why:** Speaker notes require a higher WordApi requirement set on Mac. SmartArt XML is internal and not exposed via Office.js.
 
 ## U-007 — ARM64 Windows build

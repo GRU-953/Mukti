@@ -53,7 +53,7 @@
 
 @code {
     bool _isEnglish = false, _scanning = false, _applying = false, _canUndo = false;
-    string _status = "", _warning = "";
+    string _status = "", _warning = "", _currentHost = "";
     List<PreviewRow> _previewItems = new();
     List<ScanRun> _snapshot = new();
     Converter? _converter;
@@ -80,32 +80,42 @@
 
     async Task ScanDocument()
     {
-        _scanning = true; _status = ""; _warning = "";
+        _scanning = true; _status = ""; _warning = ""; _currentHost = "";
         _previewItems.Clear(); _snapshot.Clear(); _canUndo = false;
         StateHasChanged();
         try {
             if (_converter == null || _fontRegistry == null) { _status = _isEnglish ? "Engine not ready." : "ইঞ্জিন প্রস্তুত নেই।"; return; }
             var bijoyFonts = _fontRegistry.KnownBijoyFonts.Select(f => f.ToLowerInvariant()).ToArray();
+            var markers = _fontRegistry.BengaliMarkers.ToArray();
             var host = await JS.InvokeAsync<string>("muktiOffice.getHostName");
-            if (host == "Word") {
-                var scanResult = await JS.InvokeAsync<ScanResult>("muktiOffice.scanWordDocument", new object[] { bijoyFonts });
-                if (scanResult?.Runs == null || scanResult.Runs.Count == 0) { _status = _isEnglish ? "No Bijoy text found." : "কোনো বিজয় লেখা পাওয়া যায়নি।"; return; }
-                foreach (var run in scanResult.Runs) {
-                    var converted = _converter.Convert(run.Text);
-                    if (converted != run.Text) {
-                        _previewItems.Add(new PreviewRow { Before = run.Text.Trim(), After = converted.Trim() });
-                        _snapshot.Add(new ScanRun { Original = run.Text, Converted = converted, FontName = run.FontName, ParaIndex = run.ParaIndex, RunIndex = run.RunIndex });
-                    }
-                }
-                _status = _previewItems.Count > 0
-                    ? (_isEnglish ? $"Found {_previewItems.Count} run(s)." : $"{_previewItems.Count}টি রান পাওয়া গেছে।")
-                    : (_isEnglish ? "Nothing to convert." : "রূপান্তরের কিছু নেই।");
-                if (scanResult.Warnings != null && scanResult.Warnings.Count > 0)
-                    _warning = (_isEnglish ? "Unsupported fonts skipped: " : "অজানা ফন্ট বাদ দেওয়া হয়েছে: ")
-                        + string.Join(", ", scanResult.Warnings);
-            } else {
-                _status = _isEnglish ? $"{host}: scanning not yet supported." : $"{host}: স্ক্যান এখনো সমর্থিত নয়।";
+            _currentHost = host;
+
+            ScanResult? scanResult = null;
+            if (host == "Word")
+                scanResult = await JS.InvokeAsync<ScanResult>("muktiOffice.scanWordDocument", new object[] { bijoyFonts, markers });
+            else if (host == "Excel")
+                scanResult = await JS.InvokeAsync<ScanResult>("muktiOffice.scanExcelDocument", new object[] { bijoyFonts, markers });
+            else if (host == "PowerPoint")
+                scanResult = await JS.InvokeAsync<ScanResult>("muktiOffice.scanPowerPointDocument", new object[] { bijoyFonts, markers });
+            else {
+                _status = _isEnglish ? $"{host}: scanning not supported." : $"{host}: স্ক্যান সমর্থিত নয়।";
+                return;
             }
+
+            if (scanResult?.Runs == null || scanResult.Runs.Count == 0) { _status = _isEnglish ? "No Bijoy text found." : "কোনো বিজয় লেখা পাওয়া যায়নি।"; return; }
+            foreach (var run in scanResult.Runs) {
+                var converted = _converter.Convert(run.Text);
+                if (converted != run.Text) {
+                    _previewItems.Add(new PreviewRow { Before = run.Text.Trim(), After = converted.Trim() });
+                    _snapshot.Add(new ScanRun { Original = run.Text, Converted = converted, FontName = run.FontName, ParaIndex = run.ParaIndex, RunIndex = run.RunIndex });
+                }
+            }
+            _status = _previewItems.Count > 0
+                ? (_isEnglish ? $"Found {_previewItems.Count} run(s)." : $"{_previewItems.Count}টি রান পাওয়া গেছে।")
+                : (_isEnglish ? "Nothing to convert." : "রূপান্তরের কিছু নেই।");
+            if (scanResult.Warnings != null && scanResult.Warnings.Count > 0)
+                _warning = (_isEnglish ? "Unsupported fonts skipped: " : "অজানা ফন্ট বাদ দেওয়া হয়েছে: ")
+                    + string.Join(", ", scanResult.Warnings);
         } catch (Exception ex) { _status = (_isEnglish ? "Error: " : "ত্রুটি: ") + ex.Message; }
         finally { _scanning = false; StateHasChanged(); }
     }
@@ -116,7 +126,10 @@
         _applying = true; StateHasChanged();
         try {
             var payload = _snapshot.Select(s => new { original = s.Original, converted = s.Converted, paraIndex = s.ParaIndex, runIndex = s.RunIndex }).ToArray();
-            await JS.InvokeAsync<bool>("muktiOffice.applyWordConversion", payload, "Noto Sans Bengali");
+            var jsFn = _currentHost == "Excel" ? "muktiOffice.applyExcelConversion"
+                     : _currentHost == "PowerPoint" ? "muktiOffice.applyPowerPointConversion"
+                     : "muktiOffice.applyWordConversion";
+            await JS.InvokeAsync<bool>(jsFn, payload, "Noto Sans Bengali");
             _status = _isEnglish ? $"Done — {_snapshot.Count} run(s) converted." : $"সম্পন্ন — {_snapshot.Count}টি রান রূপান্তরিত।";
             _previewItems.Clear(); _canUndo = true;
         } catch (Exception ex) { _status = (_isEnglish ? "Error: " : "ত্রুটি: ") + ex.Message; }
@@ -128,7 +141,10 @@
         if (_snapshot.Count == 0) return;
         try {
             var payload = _snapshot.Select(s => new { original = s.Original, converted = s.Converted, fontName = s.FontName, paraIndex = s.ParaIndex, runIndex = s.RunIndex }).ToArray();
-            await JS.InvokeAsync<bool>("muktiOffice.revertWordConversion", payload);
+            var jsFn = _currentHost == "Excel" ? "muktiOffice.revertExcelConversion"
+                     : _currentHost == "PowerPoint" ? "muktiOffice.revertPowerPointConversion"
+                     : "muktiOffice.revertWordConversion";
+            await JS.InvokeAsync<bool>(jsFn, payload);
             _status = _isEnglish ? "Reverted successfully." : "পূর্বাবস্থায় ফেরানো হয়েছে।";
             _canUndo = false; _previewItems.Clear(); _snapshot.Clear();
         } catch (Exception ex) { _status = (_isEnglish ? "Revert error: " : "ফেরানোয় ত্রুটি: ") + ex.Message; }
