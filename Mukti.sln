@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{1E5C0315-EB74-4CF8-B8E3-9EB129DF9B18}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mukti.Engine", "src\Mukti.Engine\Mukti.Engine.csproj", "{95C1F06F-4D97-409C-818F-BF8EC3252A30}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mukti.Engine.Tests", "src\Mukti.Engine.Tests\Mukti.Engine.Tests.csproj", "{61562376-5F39-4C74-8A13-5012D3271864}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mukti.WindowsAddin", "src\Mukti.WindowsAddin\Mukti.WindowsAddin.csproj", "{6F13FCB3-CCDB-456C-A08E-EB941E44CABC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mukti.Mac", "src\Mukti.Mac\Mukti.Mac.csproj", "{3BF7EE98-39D5-47EE-8A14-DB4318F410E4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mukti.Server", "src\Mukti.Server\Mukti.Server.csproj", "{2C0A0410-B655-46F7-9EBF-78C56981B239}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{95C1F06F-4D97-409C-818F-BF8EC3252A30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95C1F06F-4D97-409C-818F-BF8EC3252A30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95C1F06F-4D97-409C-818F-BF8EC3252A30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95C1F06F-4D97-409C-818F-BF8EC3252A30}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61562376-5F39-4C74-8A13-5012D3271864}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61562376-5F39-4C74-8A13-5012D3271864}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61562376-5F39-4C74-8A13-5012D3271864}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61562376-5F39-4C74-8A13-5012D3271864}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F13FCB3-CCDB-456C-A08E-EB941E44CABC}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{6F13FCB3-CCDB-456C-A08E-EB941E44CABC}.Debug|Any CPU.Build.0 = Debug|x64
+		{6F13FCB3-CCDB-456C-A08E-EB941E44CABC}.Release|Any CPU.ActiveCfg = Release|x64
+		{6F13FCB3-CCDB-456C-A08E-EB941E44CABC}.Release|Any CPU.Build.0 = Release|x64
+		{3BF7EE98-39D5-47EE-8A14-DB4318F410E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3BF7EE98-39D5-47EE-8A14-DB4318F410E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3BF7EE98-39D5-47EE-8A14-DB4318F410E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3BF7EE98-39D5-47EE-8A14-DB4318F410E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2C0A0410-B655-46F7-9EBF-78C56981B239}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C0A0410-B655-46F7-9EBF-78C56981B239}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C0A0410-B655-46F7-9EBF-78C56981B239}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C0A0410-B655-46F7-9EBF-78C56981B239}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{95C1F06F-4D97-409C-818F-BF8EC3252A30} = {1E5C0315-EB74-4CF8-B8E3-9EB129DF9B18}
+		{61562376-5F39-4C74-8A13-5012D3271864} = {1E5C0315-EB74-4CF8-B8E3-9EB129DF9B18}
+		{6F13FCB3-CCDB-456C-A08E-EB941E44CABC} = {1E5C0315-EB74-4CF8-B8E3-9EB129DF9B18}
+		{3BF7EE98-39D5-47EE-8A14-DB4318F410E4} = {1E5C0315-EB74-4CF8-B8E3-9EB129DF9B18}
+		{2C0A0410-B655-46F7-9EBF-78C56981B239} = {1E5C0315-EB74-4CF8-B8E3-9EB129DF9B18}
+	EndGlobalSection
+EndGlobal

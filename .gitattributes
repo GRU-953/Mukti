@@ -1,0 +1,17 @@
+# Auto-detect text and normalise to LF in the repository
+* text=auto
+
+# Shell scripts must always be LF (they run on macOS/Linux in CI)
+*.sh text eol=lf
+installer/mac/pkg-scripts/postinstall text eol=lf
+installer/mac/pkg-scripts/preremove text eol=lf
+
+# Windows-only scripts are fine as CRLF
+*.ps1 text eol=crlf
+*.iss text eol=crlf
+
+# Binaries — never mangle
+*.dll binary
+*.png binary
+*.ico binary
+*.wasm binary

@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <OutputType>Library</OutputType>
+    <EnableComHosting>true</EnableComHosting>
+    <UseWindowsForms>true</UseWindowsForms>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Platforms>x64</Platforms>
+    <PlatformTarget>x64</PlatformTarget>
+    <AssemblyName>Mukti.WindowsAddin</AssemblyName>
+    <RootNamespace>Mukti.WindowsAddin</RootNamespace>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <AssemblyVersion>2.0.0.0</AssemblyVersion>
+    <FileVersion>2.0.0.0</FileVersion>
+    <Product>Mukti</Product>
+    <Company>Mukti Open Source</Company>
+    <Copyright>MIT License</Copyright>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Office.Interop.Word" Version="15.0.4797.1004" />
+    <PackageReference Include="Microsoft.Office.Interop.Excel" Version="15.0.4797.1004" />
+    <PackageReference Include="Microsoft.Office.Interop.PowerPoint" Version="15.0.4420.1018" />
+    <ProjectReference Include="..\Mukti.Engine\Mukti.Engine.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- office.dll provides Microsoft.Office.Core types: IRibbonExtensibility, ICustomTaskPaneConsumer, ICTPFactory, IRibbonUI, IRibbonControl, CustomTaskPane, CustomTaskPaneCollection -->
+    <Reference Include="office">
+      <HintPath>libs\office.dll</HintPath>
+      <EmbedInteropTypes>false</EmbedInteropTypes>
+    </Reference>
+    <!-- Extensibility.dll provides IDTExtensibility2, ext_ConnectMode, ext_DisconnectMode -->
+    <Reference Include="Extensibility">
+      <HintPath>libs\Extensibility.dll</HintPath>
+      <EmbedInteropTypes>false</EmbedInteropTypes>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\ribbon.xml" />
+    <EmbeddedResource Include="Resources\icon16.png" />
+    <EmbeddedResource Include="Resources\icon32.png" />
+  </ItemGroup>
+</Project>

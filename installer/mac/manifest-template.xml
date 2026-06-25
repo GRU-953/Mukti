@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:type="TaskPaneApp">
+  <Id>F4E71C21-9B7A-4C3E-8D22-8F91A235C4B2</Id>
+  <Version>2.0.0.0</Version>
+  <ProviderName>Mukti Open Source</ProviderName>
+  <DefaultLocale>bn</DefaultLocale>
+  <DisplayName DefaultValue="Mukti"/>
+  <Description DefaultValue="Convert Bijoy/SutonnyMJ Bengali text to Unicode"/>
+  <IconUrl DefaultValue="http://localhost:__PORT__/icon32.png"/>
+  <HighResolutionIconUrl DefaultValue="http://localhost:__PORT__/icon32.png"/>
+  <SupportUrl DefaultValue="https://github.com/GRU-953/Mukti"/>
+  <AppDomains><AppDomain>http://localhost:__PORT__</AppDomain></AppDomains>
+  <Hosts>
+    <Host Name="Document"/>
+    <Host Name="Workbook"/>
+    <Host Name="Presentation"/>
+  </Hosts>
+  <DefaultSettings>
+    <SourceLocation DefaultValue="http://localhost:__PORT__/"/>
+  </DefaultSettings>
+  <Permissions>ReadWriteDocument</Permissions>
+  <VersionOverrides xmlns="http://schemas.microsoft.com/office/taskpaneappversionoverrides" xsi:type="VersionOverridesV1_0">
+    <Hosts>
+      <Host xsi:type="Document">
+        <DesktopFormFactor>
+          <FunctionFile resid="Commands.Url"/>
+          <ExtensionPoint xsi:type="PrimaryCommandSurface">
+            <OfficeTab id="TabHome">
+              <Group id="muktiGroup">
+                <Label resid="CommandsGroup.Label"/>
+                <Icon>
+                  <bt:Image size="16" resid="Icon.16x16"/>
+                  <bt:Image size="32" resid="Icon.32x32"/>
+                  <bt:Image size="80" resid="Icon.80x80"/>
+                </Icon>
+                <Control xsi:type="Button" id="muktiButton">
+                  <Label resid="TaskpaneButton.Label"/>
+                  <Supertip>
+                    <Title resid="TaskpaneButton.Label"/>
+                    <Description resid="TaskpaneButton.Tooltip"/>
+                  </Supertip>
+                  <Icon>
+                    <bt:Image size="16" resid="Icon.16x16"/>
+                    <bt:Image size="32" resid="Icon.32x32"/>
+                    <bt:Image size="80" resid="Icon.80x80"/>
+                  </Icon>
+                  <Action xsi:type="ShowTaskpane">
+                    <TaskpaneId>muktiTaskpane</TaskpaneId>
+                    <SourceLocation resid="Taskpane.Url"/>
+                  </Action>
+                </Control>
+              </Group>
+            </OfficeTab>
+          </ExtensionPoint>
+        </DesktopFormFactor>
+      </Host>
+    </Hosts>
+    <Resources>
+      <bt:Images>
+        <bt:Image id="Icon.16x16" DefaultValue="http://localhost:__PORT__/icon16.png"/>
+        <bt:Image id="Icon.32x32" DefaultValue="http://localhost:__PORT__/icon32.png"/>
+        <bt:Image id="Icon.80x80" DefaultValue="http://localhost:__PORT__/icon32.png"/>
+      </bt:Images>
+      <bt:Urls>
+        <bt:Url id="Commands.Url" DefaultValue="http://localhost:__PORT__/"/>
+        <bt:Url id="Taskpane.Url" DefaultValue="http://localhost:__PORT__/"/>
+      </bt:Urls>
+      <bt:ShortStrings>
+        <bt:String id="CommandsGroup.Label" DefaultValue="Mukti"/>
+        <bt:String id="TaskpaneButton.Label" DefaultValue="Mukti"/>
+      </bt:ShortStrings>
+      <bt:LongStrings>
+        <bt:String id="TaskpaneButton.Tooltip" DefaultValue="Open Mukti to convert Bijoy/SutonnyMJ Bengali to Unicode."/>
+      </bt:LongStrings>
+    </Resources>
+  </VersionOverrides>
+</OfficeApp>

@@ -1,0 +1,134 @@
+@page "/"
+@using Mukti.Engine
+@inject IJSRuntime JS
+@inject HttpClient Http
+
+<div class="mukti-panel">
+    <div class="mukti-header">
+        <span class="mukti-title">@(_isEnglish ? "Mukti" : "মুক্তি")</span>
+        <button class="btn-lang" @onclick="ToggleLanguage">@(_isEnglish ? "বাংলা" : "EN")</button>
+    </div>
+    <div class="mukti-subtitle">@(_isEnglish ? "Bijoy / SutonnyMJ → Unicode Bengali" : "বিজয় থেকে ইউনিকোড রূপান্তর")</div>
+
+    <button class="btn-primary" @onclick="ScanDocument" disabled="@(_scanning || _converter == null)">
+        @(_scanning ? (_isEnglish ? "Scanning..." : "স্ক্যান হচ্ছে...") : (_isEnglish ? "Scan Document" : "স্ক্যান করুন"))
+    </button>
+
+    @if (!string.IsNullOrEmpty(_status))
+    {
+        <div class="status-box">@_status</div>
+    }
+
+    @if (_previewItems.Count > 0)
+    {
+        <div class="preview-header">@(_isEnglish ? "Changes to apply:" : "পরিবর্তনের তালিকা:")</div>
+        <div class="preview-scroll">
+            <table class="preview-table">
+                <thead><tr><th>@(_isEnglish ? "Before" : "আগে")</th><th>@(_isEnglish ? "After" : "পরে")</th></tr></thead>
+                <tbody>
+                    @foreach (var item in _previewItems)
+                    {
+                        <tr><td>@item.Before</td><td>@item.After</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <button class="btn-primary" @onclick="ApplyConversion" disabled="@_applying">
+            @(_applying ? (_isEnglish ? "Applying..." : "প্রয়োগ হচ্ছে...") : (_isEnglish ? "Apply Conversion" : "রূপান্তর করুন"))
+        </button>
+    }
+
+    @if (_canUndo)
+    {
+        <button class="btn-secondary" @onclick="UndoConversion">@(_isEnglish ? "Undo Conversion" : "পূর্বাবস্থায় ফেরান")</button>
+    }
+
+    <div class="footer-note">@(_isEnglish ? "Your document content never leaves your device." : "আপনার নথির বিষয়বস্তু কখনও ডিভাইসের বাইরে যায় না।")</div>
+</div>
+
+@code {
+    bool _isEnglish = false, _scanning = false, _applying = false, _canUndo = false;
+    string _status = "", _warning = "";
+    List<PreviewRow> _previewItems = new();
+    List<ScanRun> _snapshot = new();
+    Converter? _converter;
+    FontRegistry? _fontRegistry;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try {
+            var lang = await JS.InvokeAsync<string>("muktiOffice.getDisplayLanguage");
+            _isEnglish = !lang.StartsWith("bn", StringComparison.OrdinalIgnoreCase);
+        } catch { _isEnglish = false; }
+
+        try {
+            var json = await Http.GetStringAsync("data/bijoy-sutonnymj.json");
+            var glyphMap = new GlyphMap(json, isContent: true);
+            _converter = new Converter(glyphMap);
+            _fontRegistry = new FontRegistry();
+        } catch (Exception ex) {
+            _status = "Engine load error: " + ex.Message;
+        }
+    }
+
+    void ToggleLanguage() => _isEnglish = !_isEnglish;
+
+    async Task ScanDocument()
+    {
+        _scanning = true; _status = ""; _warning = "";
+        _previewItems.Clear(); _snapshot.Clear(); _canUndo = false;
+        StateHasChanged();
+        try {
+            if (_converter == null || _fontRegistry == null) { _status = _isEnglish ? "Engine not ready." : "ইঞ্জিন প্রস্তুত নেই।"; return; }
+            var bijoyFonts = _fontRegistry.KnownBijoyFonts.Select(f => f.ToLowerInvariant()).ToArray();
+            var host = await JS.InvokeAsync<string>("muktiOffice.getHostName");
+            if (host == "Word") {
+                var scanResult = await JS.InvokeAsync<ScanResult>("muktiOffice.scanWordDocument", new object[] { bijoyFonts });
+                if (scanResult?.Runs == null || scanResult.Runs.Count == 0) { _status = _isEnglish ? "No Bijoy text found." : "কোনো বিজয় লেখা পাওয়া যায়নি।"; return; }
+                foreach (var run in scanResult.Runs) {
+                    var converted = _converter.Convert(run.Text);
+                    if (converted != run.Text) {
+                        _previewItems.Add(new PreviewRow { Before = run.Text.Trim(), After = converted.Trim() });
+                        _snapshot.Add(new ScanRun { Original = run.Text, Converted = converted, FontName = run.FontName, ParaIndex = run.ParaIndex, RunIndex = run.RunIndex });
+                    }
+                }
+                _status = _previewItems.Count > 0
+                    ? (_isEnglish ? $"Found {_previewItems.Count} run(s)." : $"{_previewItems.Count}টি রান পাওয়া গেছে।")
+                    : (_isEnglish ? "Nothing to convert." : "রূপান্তরের কিছু নেই।");
+            } else {
+                _status = _isEnglish ? $"{host}: scanning not yet supported." : $"{host}: স্ক্যান এখনো সমর্থিত নয়।";
+            }
+        } catch (Exception ex) { _status = (_isEnglish ? "Error: " : "ত্রুটি: ") + ex.Message; }
+        finally { _scanning = false; StateHasChanged(); }
+    }
+
+    async Task ApplyConversion()
+    {
+        if (_snapshot.Count == 0) return;
+        _applying = true; StateHasChanged();
+        try {
+            var payload = _snapshot.Select(s => new { original = s.Original, converted = s.Converted, paraIndex = s.ParaIndex, runIndex = s.RunIndex }).ToArray();
+            await JS.InvokeAsync<bool>("muktiOffice.applyWordConversion", payload, "Noto Sans Bengali");
+            _status = _isEnglish ? $"Done — {_snapshot.Count} run(s) converted." : $"সম্পন্ন — {_snapshot.Count}টি রান রূপান্তরিত।";
+            _previewItems.Clear(); _canUndo = true;
+        } catch (Exception ex) { _status = (_isEnglish ? "Error: " : "ত্রুটি: ") + ex.Message; }
+        finally { _applying = false; StateHasChanged(); }
+    }
+
+    async Task UndoConversion()
+    {
+        if (_snapshot.Count == 0) return;
+        try {
+            var payload = _snapshot.Select(s => new { original = s.Original, converted = s.Converted, fontName = s.FontName, paraIndex = s.ParaIndex, runIndex = s.RunIndex }).ToArray();
+            await JS.InvokeAsync<bool>("muktiOffice.revertWordConversion", payload);
+            _status = _isEnglish ? "Reverted successfully." : "পূর্বাবস্থায় ফেরানো হয়েছে।";
+            _canUndo = false; _previewItems.Clear(); _snapshot.Clear();
+        } catch (Exception ex) { _status = (_isEnglish ? "Revert error: " : "ফেরানোয় ত্রুটি: ") + ex.Message; }
+        StateHasChanged();
+    }
+
+    class PreviewRow { public string Before { get; set; } = ""; public string After { get; set; } = ""; }
+    class ScanRun { public string Original { get; set; } = ""; public string Converted { get; set; } = ""; public string FontName { get; set; } = ""; public int ParaIndex { get; set; } public int RunIndex { get; set; } }
+    class ScanResult { public List<RunEntry> Runs { get; set; } = new(); public List<string> Warnings { get; set; } = new(); }
+    class RunEntry { public string Text { get; set; } = ""; public string FontName { get; set; } = ""; public int ParaIndex { get; set; } public int RunIndex { get; set; } }
+}

@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-engine:
+    name: Engine tests
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Restore
+        run: dotnet restore Mukti.sln
+      - name: Build
+        run: dotnet build Mukti.sln --configuration Release --no-restore
+      - name: Test
+        run: dotnet test src/Mukti.Engine.Tests/Mukti.Engine.Tests.csproj --configuration Release --no-build --verbosity normal
+
+  build-windows:
+    name: Build Windows add-in
+    runs-on: windows-latest
+    needs: test-engine
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Publish
+        run: |
+          dotnet restore Mukti.sln
+          dotnet publish src/Mukti.WindowsAddin/Mukti.WindowsAddin.csproj --configuration Release --runtime win-x64 --self-contained true --output artifacts/win-addin
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: win-addin
+          path: artifacts/win-addin/
+
+  build-mac:
+    name: Build Mac add-in
+    runs-on: macos-latest
+    needs: test-engine
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Restore and publish Blazor WASM
+        run: |
+          dotnet restore Mukti.sln
+          dotnet publish src/Mukti.Mac/Mukti.Mac.csproj --configuration Release --output artifacts/mac-wasm
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: mac-wasm
+          path: artifacts/mac-wasm/

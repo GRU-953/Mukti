@@ -1,0 +1,13 @@
+#!/bin/bash
+
+WEF_WORD="$HOME/Library/Containers/com.microsoft.Word/Data/Documents/wef"
+WEF_EXCEL="$HOME/Library/Containers/com.microsoft.Excel/Data/Documents/wef"
+WEF_PPT="$HOME/Library/Containers/com.microsoft.Powerpoint/Data/Documents/wef"
+
+launchctl unload "/Library/LaunchAgents/com.mukti.server.plist" 2>/dev/null || true
+
+for WEF_DIR in "$WEF_WORD" "$WEF_EXCEL" "$WEF_PPT"; do
+    rm -f "$WEF_DIR/mukti-manifest.xml" 2>/dev/null || true
+done
+
+echo "Mukti removed."
