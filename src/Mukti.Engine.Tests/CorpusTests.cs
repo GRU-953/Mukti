@@ -15,13 +15,24 @@ namespace Mukti.Engine.Tests;
 
 public sealed class CorpusTests
 {
-    // Hard-coded corpus base path (both the original source corpus and the
-    // Mukti-v2 local copy are available; we prefer the local copy).
-    private const string CorpusBase = @"D:\Mukti_new\Mukti-v2\corpus\corpus";
-    private const string DataFilePath = @"D:\Mukti_new\Mukti-v2\data\bijoy-sutonnymj.json";
+    // Resolve paths relative to the repo root at runtime so tests pass on any
+    // machine (local dev or CI). Walks up from the test output directory until
+    // it finds Mukti.sln.
+    private static readonly string SolutionRoot = FindSolutionRoot();
+    private static readonly string DataFilePath = Path.Combine(SolutionRoot, "data", "bijoy-sutonnymj.json");
+    private static readonly string CorpusBase = Path.Combine(SolutionRoot, "corpus", "corpus");
 
-    // Fallback to the original corpus location if the Mukti-v2 copy is absent.
-    private const string CorpusBaseFallback = @"D:\Mukti_new\Mukti_newMukti\corpus";
+    private static string FindSolutionRoot()
+    {
+        var dir = AppContext.BaseDirectory;
+        while (dir != null)
+        {
+            if (File.Exists(Path.Combine(dir, "Mukti.sln"))) return dir;
+            dir = Path.GetDirectoryName(dir);
+        }
+        throw new DirectoryNotFoundException(
+            "Cannot locate Mukti.sln — run tests from within the repository.");
+    }
 
     // -----------------------------------------------------------------------
     // Shared converter instance — loaded once for the whole test class.
@@ -51,7 +62,7 @@ public sealed class CorpusTests
     {
         var cases = new List<CorpusCase>();
 
-        var corpusBase = Directory.Exists(CorpusBase) ? CorpusBase : CorpusBaseFallback;
+        var corpusBase = CorpusBase;
 
         // Visible corpus
         var visibleDir = Path.Combine(corpusBase, "visible");

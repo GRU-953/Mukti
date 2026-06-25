@@ -35,7 +35,7 @@ Mukti is an open-source Microsoft Office add-in for Windows and Mac that convert
 
 ## What to sign
 
-**File to sign:** `Mukti-Setup-2.0.2.exe` and future releases (Inno Setup output — PE .exe)
+**File to sign:** `Mukti-Setup-2.0.3.exe` and future releases (Inno Setup output — PE .exe)
 
 **Signing policy:** `release-signing` (Authenticode, SHA-256)
 
