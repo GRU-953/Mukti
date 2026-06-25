@@ -36,7 +36,7 @@ granularity. Run it once in Word and send me the result.
 ### Snippet (paste into the Script Lab "Script" box)
 
 ```js
-$("#run").click(() => tryCatch(run));
+Office.onReady(() => run().catch((e) => console.error(e)));
 
 async function run() {
   await Word.run(async (context) => {
@@ -64,12 +64,6 @@ async function run() {
       ? "RESULT: GREEN — per-word font reading works; mixed-font paragraphs CAN be handled"
       : "RESULT: RED or PARTIAL — see fonts above; send this output to the maintainer");
   });
-}
-
-/** Boilerplate Script Lab needs. */
-async function tryCatch(callback) {
-  try { await callback(); }
-  catch (error) { console.error(error); }
 }
 ```
 

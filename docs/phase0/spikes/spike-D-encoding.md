@@ -30,7 +30,7 @@ that drives every pre‑base reorder is missed and conversion silently mangles.
 ### Snippet
 
 ```js
-$("#run").click(() => tryCatch(run));
+Office.onReady(() => run().catch((e) => console.error(e)));
 
 async function run() {
   await Word.run(async (context) => {
@@ -61,11 +61,6 @@ async function run() {
         : "RESULT: LIKELY OK — send the CODE POINTS line so the maintainer can confirm against the corpus"
     );
   });
-}
-
-async function tryCatch(callback) {
-  try { await callback(); }
-  catch (error) { console.error(error); }
 }
 ```
 

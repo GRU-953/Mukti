@@ -32,7 +32,7 @@ edits on Word's native undo stack). This kit confirms snapshot-restore fidelity.
 ### Snippet
 
 ```js
-$("#run").click(() => tryCatch(run));
+Office.onReady(() => run().catch((e) => console.error(e)));
 
 async function run() {
   await Word.run(async (context) => {
@@ -82,11 +82,6 @@ async function run() {
       ? "RESULT: GREEN — snapshot/restore round-trips text + formatting exactly"
       : "RESULT: RED — something did not round-trip; send this output to the maintainer");
   });
-}
-
-async function tryCatch(callback) {
-  try { await callback(); }
-  catch (error) { console.error(error); }
 }
 ```
 
