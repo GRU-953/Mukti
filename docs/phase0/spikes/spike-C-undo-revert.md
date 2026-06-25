@@ -34,53 +34,69 @@ edits on Word's native undo stack). This kit confirms snapshot-restore fidelity.
 ```js
 Office.onReady(() => run().catch((e) => console.error(e)));
 
+// Self-contained: appends a formatted test line, snapshots it, "converts" it,
+// restores it from the snapshot, verifies the round-trip, then deletes the test
+// line. No manual selecting needed — open a BLANK / throwaway document and Run.
 async function run() {
   await Word.run(async (context) => {
-    const sel = context.document.getSelection();
+    const p = context.document.body.insertParagraph("Mukti revert test", "End");
+    p.font.name = "Calibri";
+    p.font.bold = true;
+    p.font.italic = false;
+    p.font.size = 14;
+    p.font.color = "#C00000";
+    await context.sync();
 
-    // 1. SNAPSHOT the original text + formatting
-    sel.load("text");
-    sel.font.load("name, bold, italic, size, color");
+    // 1. SNAPSHOT the formatted line
+    let r = p.getRange();
+    r.load("text");
+    r.font.load("name, bold, italic, size, color");
     await context.sync();
     const snap = {
-      text: sel.text, name: sel.font.name, bold: sel.font.bold,
-      italic: sel.font.italic, size: sel.font.size, color: sel.font.color,
+      text: r.text, name: r.font.name, bold: r.font.bold,
+      italic: r.font.italic, size: r.font.size, color: r.font.color,
     };
     console.log("SNAPSHOT: " + JSON.stringify(snap));
 
-    // 2. SIMULATE a conversion (replace text, change font)
-    sel.insertText("(((converted)))", "Replace");
-    sel.font.name = "Noto Sans Bengali";
+    // 2. SIMULATE a conversion (replace text + change font)
+    r = p.getRange();
+    r.insertText("(((converted)))", "Replace");
+    r.font.name = "Noto Sans Bengali";
+    r.font.bold = false;
     await context.sync();
 
     // 3. RESTORE from the snapshot
-    const sel2 = context.document.getSelection();
-    sel2.insertText(snap.text, "Replace");
-    sel2.font.name = snap.name;
-    sel2.font.bold = snap.bold;
-    sel2.font.italic = snap.italic;
-    sel2.font.size = snap.size;
-    sel2.font.color = snap.color;
+    r = p.getRange();
+    r.insertText(snap.text, "Replace");
+    r.font.name = snap.name;
+    r.font.bold = snap.bold;
+    r.font.italic = snap.italic;
+    r.font.size = snap.size;
+    r.font.color = snap.color;
     await context.sync();
 
     // 4. VERIFY the round-trip
-    sel2.load("text");
-    sel2.font.load("name, bold, italic, size, color");
+    r = p.getRange();
+    r.load("text");
+    r.font.load("name, bold, italic, size, color");
     await context.sync();
     const ok =
-      sel2.text === snap.text &&
-      sel2.font.name === snap.name &&
-      sel2.font.bold === snap.bold &&
-      sel2.font.italic === snap.italic &&
-      sel2.font.size === snap.size &&
-      sel2.font.color === snap.color;
+      r.text === snap.text &&
+      r.font.name === snap.name &&
+      r.font.bold === snap.bold &&
+      r.font.italic === snap.italic &&
+      r.font.size === snap.size &&
+      r.font.color === snap.color;
     console.log("AFTER RESTORE: " + JSON.stringify({
-      text: sel2.text, name: sel2.font.name, bold: sel2.font.bold,
-      italic: sel2.font.italic, size: sel2.font.size, color: sel2.font.color,
+      text: r.text, name: r.font.name, bold: r.font.bold,
+      italic: r.font.italic, size: r.font.size, color: r.font.color,
     }));
     console.log(ok
       ? "RESULT: GREEN — snapshot/restore round-trips text + formatting exactly"
       : "RESULT: RED — something did not round-trip; send this output to the maintainer");
+
+    p.delete(); // tidy up the test line
+    await context.sync();
   });
 }
 ```

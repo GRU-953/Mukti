@@ -38,31 +38,38 @@ granularity. Run it once in Word and send me the result.
 ```js
 Office.onReady(() => run().catch((e) => console.error(e)));
 
+// Self-contained: appends a 3-word line, sets a DIFFERENT font on each word,
+// then reads the fonts back per word. No manual selecting needed — just open a
+// BLANK / throwaway document and click Run (it only appends a test line).
 async function run() {
   await Word.run(async (context) => {
     const has13 = Office.context.requirements.isSetSupported("WordApi", "1.3");
     console.log("WordApi 1.3 supported: " + has13);
 
-    const sel = context.document.getSelection();
-    // Split the selection into word-level ranges (split on spaces).
-    const ranges = sel.getTextRanges([" "], true);
-    ranges.load("items");
+    const p = context.document.body.insertParagraph("Avwg Hello 2025", "End");
     await context.sync();
 
-    ranges.items.forEach((r) => { r.load("text"); r.font.load("name"); });
+    const words = p.getTextRanges([" "], true); // split on spaces -> per word
+    words.load("items");
+    await context.sync();
+
+    const fonts = ["SutonnyMJ", "Calibri", "Times New Roman"];
+    words.items.forEach((r, i) => { r.font.name = fonts[i % fonts.length]; });
+    await context.sync();
+
+    words.items.forEach((r) => { r.load("text"); r.font.load("name"); });
     await context.sync();
 
     const distinct = new Set();
-    ranges.items.forEach((r) => {
-      console.log("part: " + JSON.stringify(r.text) + "  font: " + JSON.stringify(r.font.name));
+    words.items.forEach((r) => {
+      console.log("word: " + JSON.stringify(r.text) + "  font: " + JSON.stringify(r.font.name));
       if (r.font.name) distinct.add(r.font.name);
     });
-
-    console.log("distinct fonts read: " + distinct.size + "  [" + [...distinct].join(", ") + "]");
-    const green = has13 && ranges.items.length > 0 && distinct.size >= 2;
-    console.log(green
-      ? "RESULT: GREEN — per-word font reading works; mixed-font paragraphs CAN be handled"
-      : "RESULT: RED or PARTIAL — see fonts above; send this output to the maintainer");
+    console.log("words found: " + words.items.length +
+      "; distinct fonts read back: " + distinct.size + " [" + [...distinct].join(", ") + "]");
+    console.log(has13 && words.items.length >= 2 && distinct.size >= 2
+      ? "RESULT: GREEN — per-word font reading works (each word's font read independently)"
+      : "RESULT: RED or PARTIAL — send this whole output to the maintainer");
   });
 }
 ```
