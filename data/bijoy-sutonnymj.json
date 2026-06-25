@@ -1,6 +1,6 @@
 {
   "id": "bijoy-sutonnymj",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Bijoy/SutonnyMJ legacy glyph -> Unicode Bengali substitution map. Source values are CP1252/SutonnyMJ byte slots as Unicode code points; targets are the Unicode component(s) in glyph order (reordering is applied algorithmically by the engine, not by this data).",
   "license": "Authored from the maintainer's own MIT-licensed Mukti map (c) Aninda Sundar Howlader (GRU-953) plus cited Unicode/Microsoft OpenType specs. See docs/phase0/findings/06-mapping-research.md and D-0013.",
   "map": [
@@ -1158,6 +1158,46 @@
       ],
       "target": "দ্",
       "note": "দ + virama (leading half-da form, alt slot)"
+    },
+    {
+      "source": [39],
+      "target": "থ",
+      "note": "CP 39 straight apostrophe → tha; corpus-confirmed: অবস্থা (Ae¯'v)"
+    },
+    {
+      "source": [205],
+      "target": "ত",
+      "note": "CP 205 (Í) → ta; corpus-confirmed: বিস্তারিত (we¯ÍvwiZ)"
+    },
+    {
+      "source": [208],
+      "target": "ণ্ড",
+      "note": "CP 208 (Ð) → ṇḍa conjunct; corpus-confirmed: কর্মকাণ্ড (Kg©KvÐ)"
+    },
+    {
+      "source": [212],
+      "target": "ষ্ঠ",
+      "note": "CP 212 (Ô) → ṣṭha conjunct; corpus-confirmed: প্রতিষ্ঠান (ÖwZÔvb)"
+    },
+    {
+      "source": [213],
+      "target": "",
+      "note": "CP 213 (Õ) → empty; blank glyph slot in SutonnyMJ, corpus-confirmed: সদস্যের (m`‡m¨Õi)"
+    },
+    {
+      "source": [230],
+      "target": "ু",
+      "note": "CP 230 (æ) → u-kaar vowel sign; corpus-confirmed: গ্রুপ (MÖæc)"
+    },
+    {
+      "source": [248],
+      "target": "্ল",
+      "note": "CP 248 (ø) → virama+la; corpus-confirmed: বিশ্লেষণ (we‡kølY)"
+    },
+    {
+      "source": [250],
+      "target": "প",
+      "note": "CP 250 (ú) → pa; corpus-confirmed: সম্পদ (m¤ú`)"
     }
   ],
   "reorder": {

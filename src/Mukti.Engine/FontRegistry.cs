@@ -87,6 +87,8 @@ public sealed partial class FontRegistry
         "kalpurush",
         // SutonnyOMJ is a Unicode-OpenType font despite the MJ-like name (finding 02).
         "sutonnyomj",
+        // Shonar Bangla ships with Windows — Unicode, not Bijoy.
+        "shonar bangla",
     };
 
     // -----------------------------------------------------------------------

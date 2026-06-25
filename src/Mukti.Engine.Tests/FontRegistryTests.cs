@@ -73,6 +73,8 @@ public sealed class FontRegistryTests
     [InlineData("NikoshBan")]
     [InlineData("Kalpurush")]
     [InlineData("SutonnyOMJ")]         // OpenType variant — Unicode despite "MJ"-like name
+    [InlineData("Shonar Bangla")]       // Windows built-in Unicode Bengali font
+    [InlineData("shonar bangla")]
     public void Classify_KnownUnicodeFont_ReturnsUnicode(string fontName)
     {
         var result = _registry.Classify(fontName);
