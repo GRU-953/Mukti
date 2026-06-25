@@ -9,12 +9,12 @@ Convert Bijoy/SutonnyMJ Bengali text to Unicode — directly inside Microsoft Wo
 ## ⚡ Download & Install
 
 ### Windows (Word, Excel, PowerPoint)
-1. Download **Mukti-Setup-2.0.0.exe** from [GitHub Releases](https://github.com/GRU-953/Mukti/releases)
+1. Download **Mukti-Setup-2.0.1.exe** from [GitHub Releases](https://github.com/GRU-953/Mukti/releases)
 2. Double-click the installer — Mukti registers itself automatically
 3. Open Word (or Excel/PowerPoint) — the **Mukti** tab appears in the ribbon
 
 ### Mac (Word, Excel, PowerPoint)
-1. Download **Mukti-2.0.0.pkg** from [GitHub Releases](https://github.com/GRU-953/Mukti/releases)
+1. Download **Mukti-2.0.1.pkg** from [GitHub Releases](https://github.com/GRU-953/Mukti/releases)
 2. Right-click the .pkg → **Open** (this bypasses the Gatekeeper warning — you only need to do this once)
 3. Follow the installer steps
 4. Open Word — the **Mukti** button appears in the Home tab

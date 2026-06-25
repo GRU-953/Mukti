@@ -36,6 +36,7 @@ public partial class MuktiPanel : System.Windows.Controls.UserControl
             txtSubtitle.Text = "Bijoy / SutonnyMJ → Unicode Bengali";
             btnLang.Content = "বাংলা";
             txtScanBtn.Text = "Scan Document";
+            txtScanSelectionBtn.Text = "Scan Selection";
             txtApplyBtn.Text = "Apply Conversion";
             txtUndoBtn.Text = "Undo Conversion";
             txtFooter.Text = "Your document content never leaves your device.";
@@ -48,6 +49,7 @@ public partial class MuktiPanel : System.Windows.Controls.UserControl
             txtSubtitle.Text = "বিজয় থেকে ইউনিকোড রূপান্তর";
             btnLang.Content = "EN";
             txtScanBtn.Text = "স্ক্যান করুন";
+            txtScanSelectionBtn.Text = "নির্বাচিত স্ক্যান করুন";
             txtApplyBtn.Text = "রূপান্তর করুন";
             txtUndoBtn.Text = "পূর্বাবস্থায় ফেরান";
             txtFooter.Text = "আপনার নথির বিষয়বস্তু কখনও ডিভাইসের বাইরে যায় না।";
@@ -79,6 +81,53 @@ public partial class MuktiPanel : System.Windows.Controls.UserControl
         panelWarning.Visibility = Visibility.Collapsed;
     }
 
+    private void ResetForScan()
+    {
+        btnScan.IsEnabled = false;
+        btnScanSelection.IsEnabled = false;
+        btnApply.IsEnabled = false;
+        HideWarning();
+        _previewItems.Clear();
+        lstPreview.Visibility = Visibility.Collapsed;
+        txtPreviewHeader.Visibility = Visibility.Collapsed;
+    }
+
+    private void ShowScanResult(ConversionSnapshot result)
+    {
+        _snapshot = result;
+
+        if (result.Items.Count == 0)
+        {
+            ShowStatus(_isEnglish
+                ? "No Bijoy/SutonnyMJ text found."
+                : "কোনো বিজয়/সুতোন্নীএমজে লেখা পাওয়া যায়নি।");
+            btnApply.IsEnabled = false;
+        }
+        else
+        {
+            ShowStatus(_isEnglish
+                ? $"Found {result.Items.Count} text run(s) to convert."
+                : $"{result.Items.Count}টি রান রূপান্তরের জন্য পাওয়া গেছে।");
+
+            foreach (var item in result.Items)
+                _previewItems.Add(new PreviewItem { Before = item.Original, After = item.Converted });
+
+            txtPreviewHeader.Visibility = Visibility.Visible;
+            lstPreview.Visibility = Visibility.Visible;
+            btnApply.IsEnabled = true;
+        }
+
+        var warnings = new List<string>(result.UnsupportedFonts);
+        if (result.FormulaSkippedCount > 0)
+            warnings.Insert(0, _isEnglish
+                ? $"{result.FormulaSkippedCount} formula cell(s) skipped"
+                : $"{result.FormulaSkippedCount}টি সূত্র সেল বাদ দেওয়া হয়েছে");
+        if (warnings.Count > 0)
+            ShowWarning(_isEnglish
+                ? string.Join(" | ", warnings)
+                : string.Join(" | ", warnings));
+    }
+
     private async void BtnScan_Click(object sender, RoutedEventArgs e)
     {
         if (_integration == null)
@@ -87,48 +136,13 @@ public partial class MuktiPanel : System.Windows.Controls.UserControl
             return;
         }
 
-        btnScan.IsEnabled = false;
-        btnApply.IsEnabled = false;
-        HideWarning();
-        _previewItems.Clear();
-        lstPreview.Visibility = Visibility.Collapsed;
-        txtPreviewHeader.Visibility = Visibility.Collapsed;
-
+        ResetForScan();
         ShowStatus(_isEnglish ? "Scanning document..." : "নথি স্ক্যান করা হচ্ছে...");
 
         try
         {
             var result = await Task.Run(() => _integration.Scan());
-            _snapshot = result;
-
-            if (result.Items.Count == 0)
-            {
-                ShowStatus(_isEnglish
-                    ? "No Bijoy/SutonnyMJ text found."
-                    : "কোনো বিজয়/সুতোন্নীএমজে লেখা পাওয়া যায়নি।");
-                btnApply.IsEnabled = false;
-            }
-            else
-            {
-                ShowStatus(_isEnglish
-                    ? $"Found {result.Items.Count} text run(s) to convert."
-                    : $"{result.Items.Count}টি রান রূপান্তরের জন্য পাওয়া গেছে।");
-
-                foreach (var item in result.Items)
-                    _previewItems.Add(new PreviewItem { Before = item.Original, After = item.Converted });
-
-                txtPreviewHeader.Visibility = Visibility.Visible;
-                lstPreview.Visibility = Visibility.Visible;
-                btnApply.IsEnabled = true;
-            }
-
-            if (result.UnsupportedFonts.Count > 0)
-            {
-                var fontList = string.Join(", ", result.UnsupportedFonts);
-                ShowWarning(_isEnglish
-                    ? $"Unrecognised fonts (not converted): {fontList}"
-                    : $"অজানা ফন্ট (রূপান্তর হয়নি): {fontList}");
-            }
+            ShowScanResult(result);
         }
         catch (Exception ex)
         {
@@ -137,6 +151,35 @@ public partial class MuktiPanel : System.Windows.Controls.UserControl
         finally
         {
             btnScan.IsEnabled = true;
+            btnScanSelection.IsEnabled = true;
+        }
+    }
+
+    // U-011: Scan selection only
+    private async void BtnScanSelection_Click(object sender, RoutedEventArgs e)
+    {
+        if (_integration == null)
+        {
+            ShowStatus(_isEnglish ? "No Office document open." : "কোনো নথি খোলা নেই।");
+            return;
+        }
+
+        ResetForScan();
+        ShowStatus(_isEnglish ? "Scanning selection..." : "নির্বাচিত অংশ স্ক্যান করা হচ্ছে...");
+
+        try
+        {
+            var result = await Task.Run(() => _integration.ScanSelection());
+            ShowScanResult(result);
+        }
+        catch (Exception ex)
+        {
+            ShowStatus((_isEnglish ? "Error: " : "ত্রুটি: ") + ex.Message);
+        }
+        finally
+        {
+            btnScan.IsEnabled = true;
+            btnScanSelection.IsEnabled = true;
         }
     }
 
@@ -146,6 +189,7 @@ public partial class MuktiPanel : System.Windows.Controls.UserControl
 
         btnApply.IsEnabled = false;
         btnScan.IsEnabled = false;
+        btnScanSelection.IsEnabled = false;
         ShowStatus(_isEnglish ? "Applying conversion..." : "রূপান্তর প্রয়োগ করা হচ্ছে...");
 
         try
@@ -168,6 +212,7 @@ public partial class MuktiPanel : System.Windows.Controls.UserControl
         finally
         {
             btnScan.IsEnabled = true;
+            btnScanSelection.IsEnabled = true;
         }
     }
 

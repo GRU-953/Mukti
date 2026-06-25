@@ -70,12 +70,16 @@
       <TextBlock x:Name="txtSubtitle" Text="বিজয় থেকে ইউনিকোড রূপান্তর"
                  FontSize="11" Foreground="#7A5C3A" Margin="0,0,0,12" TextWrapping="Wrap"/>
 
-      <!-- Scan button -->
+      <!-- Scan buttons -->
       <Button x:Name="btnScan" Style="{StaticResource MuktiButton}"
               Click="BtnScan_Click">
-        <StackPanel Orientation="Horizontal">
-          <TextBlock x:Name="txtScanBtn" Text="স্ক্যান করুন" FontSize="14" FontWeight="SemiBold"/>
-        </StackPanel>
+        <TextBlock x:Name="txtScanBtn" Text="স্ক্যান করুন" FontSize="14" FontWeight="SemiBold"/>
+      </Button>
+
+      <!-- U-011: Scan Selection button -->
+      <Button x:Name="btnScanSelection" Style="{StaticResource MuktiButton}"
+              Background="#5A7A3A" Click="BtnScanSelection_Click">
+        <TextBlock x:Name="txtScanSelectionBtn" Text="নির্বাচিত স্ক্যান করুন" FontSize="13" FontWeight="SemiBold"/>
       </Button>
 
       <!-- Status panel -->

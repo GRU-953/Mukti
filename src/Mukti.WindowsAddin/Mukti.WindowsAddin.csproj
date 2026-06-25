@@ -12,8 +12,8 @@
     <AssemblyName>Mukti.WindowsAddin</AssemblyName>
     <RootNamespace>Mukti.WindowsAddin</RootNamespace>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-    <AssemblyVersion>2.0.0.0</AssemblyVersion>
-    <FileVersion>2.0.0.0</FileVersion>
+    <AssemblyVersion>2.0.1.0</AssemblyVersion>
+    <FileVersion>2.0.1.0</FileVersion>
     <Product>Mukti</Product>
     <Company>Mukti Open Source</Company>
     <Copyright>MIT License</Copyright>

@@ -14,6 +14,11 @@
         @(_scanning ? (_isEnglish ? "Scanning..." : "স্ক্যান হচ্ছে...") : (_isEnglish ? "Scan Document" : "স্ক্যান করুন"))
     </button>
 
+    @* U-011: Scan Selection *@
+    <button class="btn-secondary" style="background:#5A7A3A" @onclick="ScanSelection" disabled="@(_scanning || _converter == null)">
+        @(_isEnglish ? "Scan Selection" : "নির্বাচিত স্ক্যান করুন")
+    </button>
+
     @if (!string.IsNullOrEmpty(_status))
     {
         <div class="status-box">@_status</div>
@@ -80,6 +85,17 @@
 
     async Task ScanDocument()
     {
+        await PerformScan(selectionOnly: false);
+    }
+
+    // U-011: scan selected text only
+    async Task ScanSelection()
+    {
+        await PerformScan(selectionOnly: true);
+    }
+
+    async Task PerformScan(bool selectionOnly)
+    {
         _scanning = true; _status = ""; _warning = ""; _currentHost = "";
         _previewItems.Clear(); _snapshot.Clear(); _canUndo = false;
         StateHasChanged();
@@ -92,9 +108,15 @@
 
             ScanResult? scanResult = null;
             if (host == "Word")
-                scanResult = await JS.InvokeAsync<ScanResult>("muktiOffice.scanWordDocument", new object[] { bijoyFonts, markers });
+            {
+                var fn = selectionOnly ? "muktiOffice.scanWordSelection" : "muktiOffice.scanWordDocument";
+                scanResult = await JS.InvokeAsync<ScanResult>(fn, new object[] { bijoyFonts, markers });
+            }
             else if (host == "Excel")
-                scanResult = await JS.InvokeAsync<ScanResult>("muktiOffice.scanExcelDocument", new object[] { bijoyFonts, markers });
+            {
+                var fn = selectionOnly ? "muktiOffice.scanExcelSelection" : "muktiOffice.scanExcelDocument";
+                scanResult = await JS.InvokeAsync<ScanResult>(fn, new object[] { bijoyFonts, markers });
+            }
             else if (host == "PowerPoint")
                 scanResult = await JS.InvokeAsync<ScanResult>("muktiOffice.scanPowerPointDocument", new object[] { bijoyFonts, markers });
             else {
@@ -102,20 +124,35 @@
                 return;
             }
 
-            if (scanResult?.Runs == null || scanResult.Runs.Count == 0) { _status = _isEnglish ? "No Bijoy text found." : "কোনো বিজয় লেখা পাওয়া যায়নি।"; return; }
-            foreach (var run in scanResult.Runs) {
-                var converted = _converter.Convert(run.Text);
-                if (converted != run.Text) {
-                    _previewItems.Add(new PreviewRow { Before = run.Text.Trim(), After = converted.Trim() });
-                    _snapshot.Add(new ScanRun { Original = run.Text, Converted = converted, FontName = run.FontName, ParaIndex = run.ParaIndex, RunIndex = run.RunIndex });
-                }
+            if (scanResult?.Runs == null || scanResult.Runs.Count == 0)
+            {
+                _status = _isEnglish ? "No Bijoy text found." : "কোনো বিজয় লেখা পাওয়া যায়নি।";
             }
-            _status = _previewItems.Count > 0
-                ? (_isEnglish ? $"Found {_previewItems.Count} run(s)." : $"{_previewItems.Count}টি রান পাওয়া গেছে।")
-                : (_isEnglish ? "Nothing to convert." : "রূপান্তরের কিছু নেই।");
-            if (scanResult.Warnings != null && scanResult.Warnings.Count > 0)
-                _warning = (_isEnglish ? "Unsupported fonts skipped: " : "অজানা ফন্ট বাদ দেওয়া হয়েছে: ")
-                    + string.Join(", ", scanResult.Warnings);
+            else
+            {
+                foreach (var run in scanResult.Runs) {
+                    var converted = _converter.Convert(run.Text);
+                    if (converted != run.Text) {
+                        _previewItems.Add(new PreviewRow { Before = run.Text.Trim(), After = converted.Trim() });
+                        _snapshot.Add(new ScanRun { Original = run.Text, Converted = converted, FontName = run.FontName, ParaIndex = run.ParaIndex, RunIndex = run.RunIndex });
+                    }
+                }
+                _status = _previewItems.Count > 0
+                    ? (_isEnglish ? $"Found {_previewItems.Count} run(s)." : $"{_previewItems.Count}টি রান পাওয়া গেছে।")
+                    : (_isEnglish ? "Nothing to convert." : "রূপান্তরের কিছু নেই।");
+            }
+
+            // Build warning: unsupported fonts + U-005 formula count
+            var warningParts = new List<string>();
+            if (scanResult?.FormulaSkippedCount > 0)
+                warningParts.Add(_isEnglish
+                    ? $"{scanResult.FormulaSkippedCount} formula cell(s) skipped"
+                    : $"{scanResult.FormulaSkippedCount}টি সূত্র সেল বাদ দেওয়া হয়েছে");
+            if (scanResult?.Warnings != null && scanResult.Warnings.Count > 0)
+                warningParts.Add((_isEnglish ? "Unknown fonts: " : "অজানা ফন্ট: ") + string.Join(", ", scanResult.Warnings));
+            if (warningParts.Count > 0)
+                _warning = string.Join(" | ", warningParts);
+
         } catch (Exception ex) { _status = (_isEnglish ? "Error: " : "ত্রুটি: ") + ex.Message; }
         finally { _scanning = false; StateHasChanged(); }
     }
@@ -153,6 +190,6 @@
 
     class PreviewRow { public string Before { get; set; } = ""; public string After { get; set; } = ""; }
     class ScanRun { public string Original { get; set; } = ""; public string Converted { get; set; } = ""; public string FontName { get; set; } = ""; public int ParaIndex { get; set; } public int RunIndex { get; set; } }
-    class ScanResult { public List<RunEntry> Runs { get; set; } = new(); public List<string> Warnings { get; set; } = new(); }
+    class ScanResult { public List<RunEntry> Runs { get; set; } = new(); public List<string> Warnings { get; set; } = new(); public int FormulaSkippedCount { get; set; } }
     class RunEntry { public string Text { get; set; } = ""; public string FontName { get; set; } = ""; public int ParaIndex { get; set; } public int RunIndex { get; set; } }
 }

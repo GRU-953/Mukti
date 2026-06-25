@@ -20,18 +20,13 @@ Read before adding any of these. Each was explicitly considered and rejected.
 **Path forward:** Separate tool, separate corpus, separate decision.
 
 ## U-004 — Headers, footers, footnotes in Word
-**Not built.** Conversion covers body text and tables only.
-**Why:** WordApi 1.3 does not expose headers/footers for write access. Same as original Mukti known-limitation 1.
-**Path forward:** Revisit when WordApi raises requirement set.
+**Built in v2.0.1.** Windows (COM): scans and converts doc.Sections headers/footers and doc.Footnotes/Endnotes. Mac: scans via Word.js `section.getHeader/getFooter` with graceful fallback for older requirement sets.
 
 ## U-005 — Excel formula conversion
-**Not built.** Only cell display values converted; formula strings untouched.
-**Why:** Converting Bengali text inside formulas risks breaking spreadsheet logic silently.
-**Path forward:** Cells from formulas flagged as "formula — skipped" in the preview.
+**Built in v2.0.1.** Formula cells are detected (Windows: `cell.HasFormula`; Mac: formula string starts with `=`) and reported as a count in the warning panel — "X formula cell(s) skipped". Text-value cells are converted as before; formula cells are never touched.
 
 ## U-006 — PowerPoint notes pane and SmartArt
-**Partially built.** Visible text shapes on slides are converted (Mac + Windows). Speaker notes and SmartArt are not.
-**Why:** Speaker notes require a higher WordApi requirement set on Mac. SmartArt XML is internal and not exposed via Office.js.
+**Speaker notes built in v2.0.1.** Windows (COM): scans and converts `slide.NotesPage.Shapes[2].TextFrame`. Mac: scans `slide.notes.body` (PowerPointApi 1.5+) with graceful fallback on older requirement sets. SmartArt XML remains not exposed via Office.js and is still not converted.
 
 ## U-007 — ARM64 Windows build
 **Not built.** Only x64 Windows.
@@ -50,9 +45,7 @@ Read before adding any of these. Each was explicitly considered and rejected.
 **Why:** Sending document content to a server would violate the core privacy guarantee.
 
 ## U-011 — Selection-only conversion (highlighted text)
-**Not built in v2.** Converts the whole document.
-**Why:** Office.js selection events add complexity. Whole-document scan is the safe MVP.
-**Path forward:** v2.1 — add "Convert selection" button.
+**Built in v2.0.1.** "Scan Selection" button added to both Windows (WPF) and Mac (Blazor) UIs. Windows uses `_app.Selection.Range`; Mac uses `ctx.document.getSelection()` for Word and `ctx.workbook.getSelectedRange()` for Excel. PPT selection falls back to full-slide scan.
 
 ## U-012 — macOS code signing
 **Not built.** The Mac .pkg is unsigned.

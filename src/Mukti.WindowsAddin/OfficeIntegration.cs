@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 namespace Mukti.WindowsAddin;
 
-// A single text run found during scanning
 public class RunItem
 {
     public string Original { get; set; } = "";
@@ -11,20 +10,18 @@ public class RunItem
     public string FontName { get; set; } = "";
     public int ParagraphIndex { get; set; }
     public int RunIndex { get; set; }
-    public string AppType { get; set; } = ""; // "Word", "Excel", "PowerPoint"
-    // Stored original text for revert
+    public string AppType { get; set; } = "";
     public string? SnapshotText { get; set; }
 }
 
-// Result of a scan operation
 public class ConversionSnapshot
 {
     public List<RunItem> Items { get; set; } = new();
     public List<string> UnsupportedFonts { get; set; } = new();
     public string AppType { get; set; } = "";
+    public int FormulaSkippedCount { get; set; }  // U-005
 }
 
-// Handles all three Office apps via dynamic
 public class OfficeIntegration
 {
     private readonly dynamic _app;
@@ -38,7 +35,6 @@ public class OfficeIntegration
         _fontRegistry = Connect.GetFontRegistry();
     }
 
-    // ── Detect app type ───────────────────────────────────────────────────
     private string GetAppType()
     {
         try
@@ -52,55 +48,83 @@ public class OfficeIntegration
         return "Unknown";
     }
 
-    // ── Scan ─────────────────────────────────────────────────────────────
+    // ── Full-document scan ────────────────────────────────────────────────
     public ConversionSnapshot Scan()
     {
         var appType = GetAppType();
         return appType switch
         {
-            "Word"        => ScanWord(),
-            "Excel"       => ScanExcel(),
+            "Word"        => ScanWord(selectionOnly: false),
+            "Excel"       => ScanExcel(selectionOnly: false),
             "PowerPoint"  => ScanPowerPoint(),
             _             => new ConversionSnapshot { AppType = appType }
         };
     }
 
-    private ConversionSnapshot ScanWord()
+    // U-011: selection-only scan
+    public ConversionSnapshot ScanSelection()
+    {
+        var appType = GetAppType();
+        return appType switch
+        {
+            "Word"        => ScanWord(selectionOnly: true),
+            "Excel"       => ScanExcel(selectionOnly: true),
+            "PowerPoint"  => ScanPowerPoint(),   // PPT selection is complex; fall back to full scan
+            _             => new ConversionSnapshot { AppType = appType }
+        };
+    }
+
+    // ── Word scan ─────────────────────────────────────────────────────────
+
+    private ConversionSnapshot ScanWord(bool selectionOnly)
     {
         var snap = new ConversionSnapshot { AppType = "Word" };
         try
         {
             var doc = _app.ActiveDocument;
             int paraIdx = 0;
-            foreach (dynamic para in doc.Paragraphs)
-            {
-                ScanRange(para.Range, snap, paraIdx++);
-            }
-        }
-        catch (Exception ex)
-        {
-            // Log but don't crash
-            snap.UnsupportedFonts.Add($"Scan error: {ex.Message}");
-        }
-        return snap;
-    }
 
-    private ConversionSnapshot ScanExcel()
-    {
-        var snap = new ConversionSnapshot { AppType = "Excel" };
-        try
-        {
-            var sheet = _app.ActiveSheet;
-            var usedRange = sheet.UsedRange;
-            int idx = 0;
-            foreach (dynamic cell in usedRange.Cells)
+            if (selectionOnly)
             {
+                var sel = _app.Selection;
+                // wdNoSelection = 0
+                if ((int)sel.Type == 0)
+                {
+                    snap.UnsupportedFonts.Add("No text selected.");
+                    return snap;
+                }
+                ScanRange(sel.Range, snap, paraIdx++);
+            }
+            else
+            {
+                // Body paragraphs
+                foreach (dynamic para in doc.Paragraphs)
+                    ScanRange(para.Range, snap, paraIdx++);
+
+                // U-004: Headers and footers
                 try
                 {
-                    string text = (string)cell.Text;
-                    if (string.IsNullOrEmpty(text)) continue;
-                    string fontName = (string)cell.Font.Name;
-                    ProcessRun(text, fontName, snap, idx++, 0);
+                    foreach (dynamic section in doc.Sections)
+                    {
+                        foreach (dynamic hf in section.Headers)
+                            try { ScanRange(hf.Range, snap, paraIdx++); } catch { }
+                        foreach (dynamic hf in section.Footers)
+                            try { ScanRange(hf.Range, snap, paraIdx++); } catch { }
+                    }
+                }
+                catch { }
+
+                // U-004: Footnotes and endnotes
+                try
+                {
+                    foreach (dynamic fn in doc.Footnotes)
+                        try { ScanRange(fn.Range, snap, paraIdx++); } catch { }
+                }
+                catch { }
+                try
+                {
+                    foreach (dynamic en in doc.Endnotes)
+                        try { ScanRange(en.Range, snap, paraIdx++); } catch { }
                 }
                 catch { }
             }
@@ -112,6 +136,70 @@ public class OfficeIntegration
         return snap;
     }
 
+    private void ScanRange(dynamic range, ConversionSnapshot snap, int paraIdx)
+    {
+        try
+        {
+            int runIdx = 0;
+            foreach (dynamic word in range.Words)
+            {
+                try
+                {
+                    string text = (string)word.Text;
+                    string fontName = (string)word.Font.Name;
+                    if (string.IsNullOrWhiteSpace(text)) continue;
+                    ProcessRun(text.Trim(), fontName, snap, paraIdx, runIdx++);
+                }
+                catch { }
+            }
+        }
+        catch { }
+    }
+
+    // ── Excel scan ────────────────────────────────────────────────────────
+
+    private ConversionSnapshot ScanExcel(bool selectionOnly)
+    {
+        var snap = new ConversionSnapshot { AppType = "Excel" };
+        try
+        {
+            dynamic cells = selectionOnly
+                ? _app.Selection.Cells
+                : _app.ActiveSheet.UsedRange.Cells;
+            int idx = 0;
+            foreach (dynamic cell in cells)
+                ScanExcelCell(cell, snap, ref idx);
+        }
+        catch (Exception ex)
+        {
+            snap.UnsupportedFonts.Add($"Scan error: {ex.Message}");
+        }
+        return snap;
+    }
+
+    private void ScanExcelCell(dynamic cell, ConversionSnapshot snap, ref int idx)
+    {
+        try
+        {
+            // U-005: flag formula cells — skip conversion, count for warning
+            bool hasFormula = false;
+            try { hasFormula = (bool)cell.HasFormula; } catch { }
+            if (hasFormula)
+            {
+                snap.FormulaSkippedCount++;
+                return;
+            }
+
+            string text = (string)cell.Text;
+            if (string.IsNullOrEmpty(text)) return;
+            string fontName = (string)cell.Font.Name;
+            ProcessRun(text, fontName, snap, idx++, 0);
+        }
+        catch { }
+    }
+
+    // ── PowerPoint scan ───────────────────────────────────────────────────
+
     private ConversionSnapshot ScanPowerPoint()
     {
         var snap = new ConversionSnapshot { AppType = "PowerPoint" };
@@ -121,6 +209,7 @@ public class OfficeIntegration
             int idx = 0;
             foreach (dynamic slide in pres.Slides)
             {
+                // Visible shapes on each slide
                 foreach (dynamic shape in slide.Shapes)
                 {
                     try
@@ -138,6 +227,25 @@ public class OfficeIntegration
                     }
                     catch { }
                 }
+
+                // U-006: Speaker notes — NotesPage.Shapes[2] is the notes text placeholder
+                try
+                {
+                    var notesFrame = slide.NotesPage.Shapes[2].TextFrame;
+                    if ((int)notesFrame.HasText != 0)
+                    {
+                        foreach (dynamic notesPara in notesFrame.TextRange.Paragraphs())
+                        {
+                            foreach (dynamic notesRun in notesPara.Runs())
+                            {
+                                string text = (string)notesRun.Text;
+                                string fontName = (string)notesRun.Font.Name;
+                                ProcessRun(text, fontName, snap, idx++, 0);
+                            }
+                        }
+                    }
+                }
+                catch { }
             }
         }
         catch (Exception ex)
@@ -147,27 +255,7 @@ public class OfficeIntegration
         return snap;
     }
 
-    private void ScanRange(dynamic range, ConversionSnapshot snap, int paraIdx)
-    {
-        try
-        {
-            // Iterate character runs within the range
-            int runIdx = 0;
-            // Use Words collection for Word documents as a proxy for runs
-            foreach (dynamic word in range.Words)
-            {
-                try
-                {
-                    string text = (string)word.Text;
-                    string fontName = (string)word.Font.Name;
-                    if (string.IsNullOrWhiteSpace(text)) continue;
-                    ProcessRun(text.Trim(), fontName, snap, paraIdx, runIdx++);
-                }
-                catch { }
-            }
-        }
-        catch { }
-    }
+    // ── Shared run processor ──────────────────────────────────────────────
 
     private void ProcessRun(string text, string fontName, ConversionSnapshot snap, int paraIdx, int runIdx)
     {
@@ -198,26 +286,25 @@ public class OfficeIntegration
     }
 
     // ── Apply ─────────────────────────────────────────────────────────────
+
     public void Apply(ConversionSnapshot snapshot)
     {
-        // For the apply, we do a fresh scan-and-replace in the document.
-        // This is safer than trying to navigate by index (which can be invalidated).
         var appType = GetAppType();
         switch (appType)
         {
-            case "Word":       ApplyWord(snapshot); break;
-            case "Excel":      ApplyExcel(snapshot); break;
-            case "PowerPoint": ApplyPowerPoint(snapshot); break;
+            case "Word":       ApplyWord(); break;
+            case "Excel":      ApplyExcel(); break;
+            case "PowerPoint": ApplyPowerPoint(); break;
         }
     }
 
-    private void ApplyWord(ConversionSnapshot snapshot)
+    private void ApplyWord()
     {
         var doc = _app.ActiveDocument;
-        // Use Find/Replace approach: scan words and replace Bijoy text
-        foreach (dynamic para in doc.Paragraphs)
+
+        void ApplyRange(dynamic range)
         {
-            foreach (dynamic word in para.Range.Words)
+            foreach (dynamic word in range.Words)
             {
                 try
                 {
@@ -227,22 +314,47 @@ public class OfficeIntegration
                     if (cls.Class != FontClass.Bijoy) continue;
                     var converted = _converter.Convert(text.Trim());
                     if (converted == text.Trim()) continue;
-                    // Replace the text in-place
                     word.Text = text.Replace(text.Trim(), converted);
                     word.Font.Name = "Noto Sans Bengali";
                 }
                 catch { }
             }
         }
+
+        // Body
+        foreach (dynamic para in doc.Paragraphs)
+            ApplyRange(para.Range);
+
+        // U-004: Headers and footers
+        try
+        {
+            foreach (dynamic section in doc.Sections)
+            {
+                foreach (dynamic hf in section.Headers)
+                    try { ApplyRange(hf.Range); } catch { }
+                foreach (dynamic hf in section.Footers)
+                    try { ApplyRange(hf.Range); } catch { }
+            }
+        }
+        catch { }
+
+        // U-004: Footnotes and endnotes
+        try { foreach (dynamic fn in doc.Footnotes) try { ApplyRange(fn.Range); } catch { } } catch { }
+        try { foreach (dynamic en in doc.Endnotes) try { ApplyRange(en.Range); } catch { } } catch { }
     }
 
-    private void ApplyExcel(ConversionSnapshot snapshot)
+    private void ApplyExcel()
     {
         var sheet = _app.ActiveSheet;
         foreach (dynamic cell in sheet.UsedRange.Cells)
         {
             try
             {
+                // U-005: skip formula cells
+                bool hasFormula = false;
+                try { hasFormula = (bool)cell.HasFormula; } catch { }
+                if (hasFormula) continue;
+
                 string text = (string)cell.Text;
                 string fontName = (string)cell.Font.Name;
                 var cls = _fontRegistry.Classify(fontName);
@@ -256,7 +368,7 @@ public class OfficeIntegration
         }
     }
 
-    private void ApplyPowerPoint(ConversionSnapshot snapshot)
+    private void ApplyPowerPoint()
     {
         var pres = _app.ActivePresentation;
         foreach (dynamic slide in pres.Slides)
@@ -287,25 +399,53 @@ public class OfficeIntegration
                 }
                 catch { }
             }
+
+            // U-006: Apply to speaker notes
+            try
+            {
+                var notesFrame = slide.NotesPage.Shapes[2].TextFrame;
+                if ((int)notesFrame.HasText != 0)
+                {
+                    foreach (dynamic notesPara in notesFrame.TextRange.Paragraphs())
+                    {
+                        foreach (dynamic notesRun in notesPara.Runs())
+                        {
+                            try
+                            {
+                                string text = (string)notesRun.Text;
+                                string fontName = (string)notesRun.Font.Name;
+                                var cls = _fontRegistry.Classify(fontName);
+                                if (cls.Class != FontClass.Bijoy) continue;
+                                var converted = _converter.Convert(text);
+                                if (converted == text) continue;
+                                notesRun.Text = converted;
+                                notesRun.Font.Name = "Noto Sans Bengali";
+                            }
+                            catch { }
+                        }
+                    }
+                }
+            }
+            catch { }
         }
     }
 
     // ── Revert ─────────────────────────────────────────────────────────────
+
     public void Revert(ConversionSnapshot snapshot)
     {
-        // Re-scan the document. Anywhere we find the converted text, put back the original.
-        // This is a best-effort revert using the snapshot data.
         var appType = GetAppType();
         switch (appType)
         {
-            case "Word": RevertWord(snapshot); break;
+            case "Word":       RevertWord(snapshot); break;
+            case "Excel":      RevertExcel(snapshot); break;
+            case "PowerPoint": RevertPowerPoint(snapshot); break;
         }
     }
 
     private void RevertWord(ConversionSnapshot snapshot)
     {
         var doc = _app.ActiveDocument;
-        // Build lookup: converted -> (original, fontName)
         var lookup = new Dictionary<string, (string orig, string font)>();
         foreach (var item in snapshot.Items)
         {
@@ -313,9 +453,9 @@ public class OfficeIntegration
                 lookup[item.Converted.Trim()] = (item.Original, item.FontName);
         }
 
-        foreach (dynamic para in doc.Paragraphs)
+        void RevertRange(dynamic range)
         {
-            foreach (dynamic word in para.Range.Words)
+            foreach (dynamic word in range.Words)
             {
                 try
                 {
@@ -328,6 +468,117 @@ public class OfficeIntegration
                 }
                 catch { }
             }
+        }
+
+        // Body
+        foreach (dynamic para in doc.Paragraphs)
+            RevertRange(para.Range);
+
+        // U-004: Headers and footers
+        try
+        {
+            foreach (dynamic section in doc.Sections)
+            {
+                foreach (dynamic hf in section.Headers)
+                    try { RevertRange(hf.Range); } catch { }
+                foreach (dynamic hf in section.Footers)
+                    try { RevertRange(hf.Range); } catch { }
+            }
+        }
+        catch { }
+
+        // U-004: Footnotes and endnotes
+        try { foreach (dynamic fn in doc.Footnotes) try { RevertRange(fn.Range); } catch { } } catch { }
+        try { foreach (dynamic en in doc.Endnotes) try { RevertRange(en.Range); } catch { } } catch { }
+    }
+
+    private void RevertExcel(ConversionSnapshot snapshot)
+    {
+        var sheet = _app.ActiveSheet;
+        var lookup = new Dictionary<string, (string orig, string font)>();
+        foreach (var item in snapshot.Items)
+        {
+            if (!lookup.ContainsKey(item.Converted.Trim()))
+                lookup[item.Converted.Trim()] = (item.Original, item.FontName);
+        }
+
+        foreach (dynamic cell in sheet.UsedRange.Cells)
+        {
+            try
+            {
+                string text = ((string)cell.Text).Trim();
+                if (lookup.TryGetValue(text, out var original))
+                {
+                    cell.Value = original.orig;
+                    cell.Font.Name = original.font;
+                }
+            }
+            catch { }
+        }
+    }
+
+    private void RevertPowerPoint(ConversionSnapshot snapshot)
+    {
+        var pres = _app.ActivePresentation;
+        var lookup = new Dictionary<string, (string orig, string font)>();
+        foreach (var item in snapshot.Items)
+        {
+            if (!lookup.ContainsKey(item.Converted.Trim()))
+                lookup[item.Converted.Trim()] = (item.Original, item.FontName);
+        }
+
+        foreach (dynamic slide in pres.Slides)
+        {
+            foreach (dynamic shape in slide.Shapes)
+            {
+                try
+                {
+                    if (!shape.HasTextFrame) continue;
+                    foreach (dynamic para in shape.TextFrame.TextRange.Paragraphs())
+                    {
+                        foreach (dynamic run in para.Runs())
+                        {
+                            try
+                            {
+                                string text = ((string)run.Text).Trim();
+                                if (lookup.TryGetValue(text, out var original))
+                                {
+                                    run.Text = ((string)run.Text).Replace(text, original.orig);
+                                    run.Font.Name = original.font;
+                                }
+                            }
+                            catch { }
+                        }
+                    }
+                }
+                catch { }
+            }
+
+            // U-006: Revert speaker notes
+            try
+            {
+                var notesFrame = slide.NotesPage.Shapes[2].TextFrame;
+                if ((int)notesFrame.HasText != 0)
+                {
+                    foreach (dynamic notesPara in notesFrame.TextRange.Paragraphs())
+                    {
+                        foreach (dynamic notesRun in notesPara.Runs())
+                        {
+                            try
+                            {
+                                string text = ((string)notesRun.Text).Trim();
+                                if (lookup.TryGetValue(text, out var original))
+                                {
+                                    notesRun.Text = ((string)notesRun.Text).Replace(text, original.orig);
+                                    notesRun.Font.Name = original.font;
+                                }
+                            }
+                            catch { }
+                        }
+                    }
+                }
+            }
+            catch { }
         }
     }
 }
