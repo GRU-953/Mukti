@@ -7,7 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Mukti.Engine;
 
-CorpusDriver.Run();
+CorpusDriver.Run(args);
 
 class CorpusDriver
 {
@@ -83,12 +83,26 @@ class CorpusDriver
         return runs;
     }
 
-    public static void Run()
+    static string FindRepoRoot()
+    {
+        var dir = AppContext.BaseDirectory;
+        while (dir != null)
+        {
+            if (File.Exists(Path.Combine(dir, "Mukti.sln"))) return dir;
+            dir = Path.GetDirectoryName(dir);
+        }
+        throw new DirectoryNotFoundException("Cannot locate Mukti.sln.");
+    }
+
+    public static void Run(string[] args)
     {
         Console.OutputEncoding = Encoding.UTF8;
-        var conv = new Converter(new GlyphMap(@"D:\Mukti_new\Mukti-v2\data\bijoy-sutonnymj.json"));
+        var repoRoot = FindRepoRoot();
+        var dataPath = Path.Combine(repoRoot, "data", "bijoy-sutonnymj.json");
+        var conv = new Converter(new GlyphMap(dataPath));
 
-        var files = Directory.GetFiles(@"D:\Test_files", "*.*", SearchOption.AllDirectories)
+        var testDir = args.Length > 0 ? args[0] : @"D:\Test_files";
+        var files = Directory.GetFiles(testDir, "*.*", SearchOption.AllDirectories)
             .Where(f => { var e = Path.GetExtension(f).ToLowerInvariant(); return e == ".docx" || e == ".xlsx" || e == ".pptx"; })
             .OrderBy(f => f)
             .ToArray();

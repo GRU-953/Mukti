@@ -1,6 +1,6 @@
 #define AppName "Mukti"
-#define AppVersion "2.0.3"
-#define AppPublisher "Mukti Open Source"
+#define AppVersion "2.0.4"
+#define AppPublisher "GRU-953"
 #define AppURL "https://github.com/GRU-953/Mukti"
 #define AppGuid "F4E71C21-9B7A-4C3E-8D22-8F91A235C4B1"
 #define BuildOutput "..\\..\\src\\Mukti.WindowsAddin\\bin\\Release\\net8.0-windows\\win-x64\\publish"

@@ -35,7 +35,7 @@ Mukti is an open-source Microsoft Office add-in for Windows and Mac that convert
 
 ## What to sign
 
-**File to sign:** `Mukti-Setup-2.0.3.exe` and future releases (Inno Setup output — PE .exe)
+**File to sign:** `Mukti-Setup-2.0.4.exe` and future releases (Inno Setup output — PE .exe)
 
 **Signing policy:** `release-signing` (Authenticode, SHA-256)
 
@@ -59,6 +59,8 @@ Once added, every push of a `v*.*.*` tag triggers `release.yml` which:
 2. Uploads it to SignPath Foundation for signing
 3. Downloads the signed `.exe`
 4. Creates a GitHub Release with the signed installer attached
+
+> **Note (v2.0.4):** Signing has been temporarily removed from `release.yml` while the SignPath connector-url configuration is pending. The release workflow now ships unsigned installers directly. Re-add signing by restoring the `signpath/github-action-submit-signing-request@v1` step.
 
 ---
 

@@ -22,8 +22,8 @@ jobs:
       - name: Test
         run: dotnet test src/Mukti.Engine.Tests/Mukti.Engine.Tests.csproj --configuration Release --no-build --verbosity normal
 
-  build-windows:
-    name: Build Windows add-in
+  build-windows-x64:
+    name: Build Windows add-in (x64)
     runs-on: windows-latest
     needs: test-engine
     steps:
@@ -31,15 +31,34 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
-      - name: Publish
+      - name: Publish x64
         run: |
           dotnet restore Mukti.sln
-          dotnet publish src/Mukti.WindowsAddin/Mukti.WindowsAddin.csproj --configuration Release --runtime win-x64 --self-contained true --output artifacts/win-addin
+          dotnet publish src/Mukti.WindowsAddin/Mukti.WindowsAddin.csproj --configuration Release --runtime win-x64 --self-contained true --output artifacts/win-addin-x64
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: win-addin
-          path: artifacts/win-addin/
+          name: win-addin-x64
+          path: artifacts/win-addin-x64/
+
+  build-windows-arm64:
+    name: Build Windows add-in (ARM64)
+    runs-on: windows-latest
+    needs: test-engine
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Publish ARM64
+        run: |
+          dotnet restore Mukti.sln
+          dotnet publish src/Mukti.WindowsAddin/Mukti.WindowsAddin.csproj --configuration Release --runtime win-arm64 --no-self-contained --output artifacts/win-addin-arm64
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: win-addin-arm64
+          path: artifacts/win-addin-arm64/
 
   build-mac:
     name: Build Mac add-in

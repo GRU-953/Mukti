@@ -7,13 +7,13 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Release tag (e.g. v2.0.3)'
+        description: 'Release tag (e.g. v2.0.4)'
         required: true
-        default: 'v2.0.3'
+        default: 'v2.0.4'
 
 jobs:
   windows-installer:
-    name: Build + Sign Windows installer
+    name: Build Windows installer (x64)
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -22,53 +22,38 @@ jobs:
           dotnet-version: '8.0.x'
       - name: Install Inno Setup
         run: choco install innosetup --yes
-      - name: Restore and publish
+      - name: Restore and publish (x64)
         run: |
           dotnet restore Mukti.sln
           dotnet publish src/Mukti.WindowsAddin/Mukti.WindowsAddin.csproj --configuration Release --runtime win-x64 --self-contained true --output src/Mukti.WindowsAddin/bin/Release/net8.0-windows/win-x64/publish
       - name: Build Inno Setup installer
         run: iscc installer\windows\setup.iss
-      - name: Stage for signing
-        run: |
-          New-Item -ItemType Directory -Force installer\windows\output\stage | Out-Null
-          Copy-Item installer\windows\output\*.exe installer\windows\output\stage\
-      - name: Upload unsigned installer
-        id: upload_for_signing
-        uses: actions/upload-artifact@v4
-        with:
-          name: win-installer-unsigned
-          path: installer/windows/output/stage/*.exe
-      # SignPath Foundation — free Authenticode signing for open source
-      # Apply at https://about.signpath.io/product/open-source
-      # Then add SIGNPATH_API_TOKEN + SIGNPATH_ORGANIZATION_ID secrets to this repo
-      - name: Sign with SignPath Foundation
-        uses: signpath/github-action-submit-signing-request@v1
-        continue-on-error: true
-        with:
-          api-token: '${{ secrets.SIGNPATH_API_TOKEN }}'
-          organization-id: '${{ secrets.SIGNPATH_ORGANIZATION_ID }}'
-          project-slug: mukti
-          signing-policy-slug: release-signing
-          artifact-configuration-slug: inno-setup
-          github-artifact-id: win-installer-unsigned
-          wait-for-completion: true
-          output-artifact-directory: installer/windows/output/signed
-      - name: Promote signed installer
-        shell: bash
-        run: |
-          if [ -d installer/windows/output/signed ] && ls installer/windows/output/signed/*.exe 2>/dev/null; then
-            cp installer/windows/output/signed/*.exe installer/windows/output/
-            echo "Using signed installer"
-          else
-            echo "Using unsigned installer (SignPath not configured)"
-          fi
       - name: Upload installer artifact
         uses: actions/upload-artifact@v4
         with:
-          name: win-installer
-          path: |
-            installer/windows/output/*.exe
-            !installer/windows/output/stage/**
+          name: win-installer-x64
+          path: installer/windows/output/Mukti-Setup-*.exe
+
+  windows-arm64:
+    name: Build Windows add-in (ARM64)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Restore and publish (ARM64)
+        run: |
+          dotnet restore Mukti.sln
+          dotnet publish src/Mukti.WindowsAddin/Mukti.WindowsAddin.csproj --configuration Release --runtime win-arm64 --no-self-contained --output src/Mukti.WindowsAddin/bin/Release/net8.0-windows/win-arm64/publish
+      - name: Package ARM64 binaries
+        run: Compress-Archive -Path src/Mukti.WindowsAddin/bin/Release/net8.0-windows/win-arm64/publish/* -DestinationPath installer/windows/output/Mukti-${{ github.ref_name }}-arm64-binaries.zip -Force
+        shell: pwsh
+      - name: Upload ARM64 artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: win-arm64-binaries
+          path: installer/windows/output/Mukti-*-arm64-binaries.zip
 
   mac-pkg:
     name: Build Mac pkg
@@ -113,7 +98,8 @@ jobs:
             ## Mukti ${{ github.ref_name }}
 
             ### Install
-            - **Windows**: Download `Mukti-Setup-*.exe` and double-click. Mukti appears in the Office ribbon automatically.
+            - **Windows (x64)**: Download `Mukti-Setup-*.exe` and double-click. Mukti appears in the Office ribbon automatically.
+            - **Windows (ARM64)**: Download `*-arm64-binaries.zip`, extract, and run `register-addin.ps1 -Install` as administrator.
             - **Mac**: Download `Mukti-*.pkg`. Right-click → **Open** (once, to bypass Gatekeeper). Then open Word.
 
             ### Privacy
@@ -124,5 +110,6 @@ jobs:
           files: |
             release-artifacts/**/*.exe
             release-artifacts/**/*.pkg
+            release-artifacts/**/*.zip
           draft: false
           prerelease: false

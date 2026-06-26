@@ -2,11 +2,11 @@
 <UserControl x:Class="Mukti.WindowsAddin.MuktiPanel"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             Background="#FDF5E6" FontFamily="Segoe UI" FontSize="13">
+             Background="#FFFFFF" FontFamily="DM Sans, Segoe UI, Tahoma" FontSize="13">
   <UserControl.Resources>
-    <!-- Warm orange button style with rounded corners -->
+    <!-- Primary button — GRU953 Teal 700 -->
     <Style x:Key="MuktiButton" TargetType="Button">
-      <Setter Property="Background" Value="#E07B39"/>
+      <Setter Property="Background" Value="#0A6E5C"/>
       <Setter Property="Foreground" Value="White"/>
       <Setter Property="FontSize" Value="14"/>
       <Setter Property="FontWeight" Value="SemiBold"/>
@@ -23,96 +23,138 @@
             </Border>
             <ControlTemplate.Triggers>
               <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="#C9692A"/>
+                <Setter Property="Background" Value="#0D8C73"/>
               </Trigger>
               <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Background" Value="#D4B896"/>
-                <Setter Property="Foreground" Value="#8A7060"/>
+                <Setter Property="Background" Value="#E2EAE7"/>
+                <Setter Property="Foreground" Value="#8FA8A2"/>
               </Trigger>
             </ControlTemplate.Triggers>
           </ControlTemplate>
         </Setter.Value>
       </Setter>
     </Style>
-    <!-- Secondary button style (undo) -->
+    <!-- Secondary button — GRU953 Indigo 700 -->
     <Style x:Key="SecondaryButton" TargetType="Button" BasedOn="{StaticResource MuktiButton}">
-      <Setter Property="Background" Value="#8B6914"/>
+      <Setter Property="Background" Value="#26336E"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Border Background="{TemplateBinding Background}"
+                    CornerRadius="8"
+                    Padding="{TemplateBinding Padding}">
+              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="#2E3D85"/>
+              </Trigger>
+              <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Background" Value="#E2EAE7"/>
+                <Setter Property="Foreground" Value="#8FA8A2"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
     </Style>
   </UserControl.Resources>
 
   <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
     <StackPanel Margin="12,12,12,12">
 
-      <!-- U-002: Update banner (hidden by default) -->
-      <Border x:Name="panelUpdateBanner" Background="#FFF3CD" BorderBrush="#FFC107" BorderThickness="1"
-              CornerRadius="4" Padding="8,6" Margin="0,0,0,8" Visibility="Collapsed">
+      <!-- Update banner (U-002, hidden by default) -->
+      <Border x:Name="panelUpdateBanner" Background="#E8F4F1" BorderBrush="#0A6E5C" BorderThickness="1"
+              CornerRadius="6" Padding="8,6" Margin="0,0,0,8" Visibility="Collapsed">
           <TextBlock x:Name="txtUpdateBanner" TextWrapping="Wrap" FontSize="12"
-                     Foreground="#856404" Cursor="Hand" MouseLeftButtonUp="BtnUpdate_Click"/>
+                     Foreground="#0A6E5C" Cursor="Hand" MouseLeftButtonUp="BtnUpdate_Click"/>
       </Border>
 
-      <!-- Header -->
-      <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-        <TextBlock x:Name="txtTitle" Text="মুক্তি" FontSize="22" FontWeight="Bold"
-                   Foreground="#3D2B1F" VerticalAlignment="Center"/>
-        <Button x:Name="btnLang" Content="EN" Width="36" Height="26" Margin="8,0,0,0"
-                FontSize="11" Background="#D4B896" Foreground="#3D2B1F"
+      <!-- Header: logo + title + lang toggle -->
+      <StackPanel Orientation="Horizontal" Margin="0,0,0,6" VerticalAlignment="Center">
+        <!-- Brand icon (28×28 rounded) -->
+        <Border Width="28" Height="28" CornerRadius="7" Margin="0,0,8,0">
+          <Border.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+              <GradientStop Color="#3A4A9E" Offset="0"/>
+              <GradientStop Color="#0A6E5C" Offset="0.6"/>
+              <GradientStop Color="#14A88A" Offset="1"/>
+            </LinearGradientBrush>
+          </Border.Background>
+          <TextBlock Text="ম" FontSize="16" FontWeight="Bold" Foreground="#F4B53C"
+                     HorizontalAlignment="Center" VerticalAlignment="Center"
+                     FontFamily="Noto Sans Bengali, Vrinda, Tahoma"/>
+        </Border>
+        <TextBlock x:Name="txtTitle" Text="মুক্তি" FontSize="20" FontWeight="Bold"
+                   Foreground="#26336E" VerticalAlignment="Center"
+                   FontFamily="Noto Sans Bengali, DM Sans, Segoe UI"/>
+        <Button x:Name="btnLang" Content="EN" Width="38" Height="26" Margin="8,0,0,0"
+                FontSize="11" FontWeight="SemiBold"
                 Cursor="Hand" Click="BtnLang_Click">
           <Button.Template>
             <ControlTemplate TargetType="Button">
-              <Border Background="{TemplateBinding Background}" CornerRadius="5"
+              <Border Background="#E8F4F1" CornerRadius="5"
+                      BorderBrush="#14A88A" BorderThickness="1"
                       Padding="4,2">
                 <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
               </Border>
               <ControlTemplate.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                  <Setter Property="Background" Value="#C4A886"/>
+                  <Setter Property="Background" Value="#E2EAE7"/>
                 </Trigger>
               </ControlTemplate.Triggers>
             </ControlTemplate>
           </Button.Template>
+          <Button.Foreground><SolidColorBrush Color="#0A6E5C"/></Button.Foreground>
         </Button>
       </StackPanel>
 
       <!-- Subtitle -->
       <TextBlock x:Name="txtSubtitle" Text="বিজয় থেকে ইউনিকোড রূপান্তর"
-                 FontSize="11" Foreground="#7A5C3A" Margin="0,0,0,12" TextWrapping="Wrap"/>
+                 FontSize="11" Foreground="#4A6360" Margin="0,0,0,12" TextWrapping="Wrap"
+                 FontFamily="Noto Sans Bengali, DM Sans, Segoe UI"/>
 
-      <!-- Scan buttons -->
+      <!-- Scan Document -->
       <Button x:Name="btnScan" Style="{StaticResource MuktiButton}"
               Click="BtnScan_Click">
-        <TextBlock x:Name="txtScanBtn" Text="স্ক্যান করুন" FontSize="14" FontWeight="SemiBold"/>
+        <TextBlock x:Name="txtScanBtn" Text="স্ক্যান করুন" FontSize="14" FontWeight="SemiBold"
+                   FontFamily="Noto Sans Bengali, DM Sans, Segoe UI"/>
       </Button>
 
-      <!-- U-011: Scan Selection button -->
-      <Button x:Name="btnScanSelection" Style="{StaticResource MuktiButton}"
-              Background="#5A7A3A" Click="BtnScanSelection_Click">
-        <TextBlock x:Name="txtScanSelectionBtn" Text="নির্বাচিত স্ক্যান করুন" FontSize="13" FontWeight="SemiBold"/>
+      <!-- U-011: Scan Selection -->
+      <Button x:Name="btnScanSelection" Style="{StaticResource SecondaryButton}"
+              Click="BtnScanSelection_Click">
+        <TextBlock x:Name="txtScanSelectionBtn" Text="নির্বাচিত স্ক্যান করুন" FontSize="13" FontWeight="SemiBold"
+                   FontFamily="Noto Sans Bengali, DM Sans, Segoe UI"/>
       </Button>
 
       <!-- Status panel -->
-      <Border x:Name="panelStatus" Background="#FFF3E0" CornerRadius="8"
+      <Border x:Name="panelStatus" Background="#E8F4F1" CornerRadius="8"
               Padding="10,8" Margin="0,8,0,0" Visibility="Collapsed">
         <TextBlock x:Name="txtStatus" TextWrapping="Wrap" FontSize="12"
-                   Foreground="#5D4037"/>
+                   Foreground="#0F2420"
+                   FontFamily="Noto Sans Bengali, DM Sans, Segoe UI"/>
       </Border>
 
-      <!-- Warning panel (unsupported fonts) -->
-      <Border x:Name="panelWarning" Background="#FFF8E1" CornerRadius="8"
-              BorderBrush="#FFB300" BorderThickness="1"
+      <!-- Warning panel -->
+      <Border x:Name="panelWarning" Background="#FEF9EC" CornerRadius="8"
+              BorderBrush="#E0990F" BorderThickness="1"
               Padding="10,8" Margin="0,6,0,0" Visibility="Collapsed">
         <TextBlock x:Name="txtWarning" TextWrapping="Wrap" FontSize="11"
-                   Foreground="#7A5C3A"/>
+                   Foreground="#5A3D00"
+                   FontFamily="Noto Sans Bengali, DM Sans, Segoe UI"/>
       </Border>
 
       <!-- Preview list header -->
       <TextBlock x:Name="txtPreviewHeader" Text="পরিবর্তনের তালিকা" FontSize="12"
-                 FontWeight="SemiBold" Foreground="#3D2B1F" Margin="0,12,0,4"
-                 Visibility="Collapsed"/>
+                 FontWeight="SemiBold" Foreground="#26336E" Margin="0,12,0,4"
+                 Visibility="Collapsed"
+                 FontFamily="Noto Sans Bengali, DM Sans, Segoe UI"/>
 
-      <!-- Preview list: before/after runs -->
+      <!-- Preview list -->
       <ListView x:Name="lstPreview" MaxHeight="300" Margin="0,0,0,8"
-                Visibility="Collapsed" BorderBrush="#D4B896" BorderThickness="1"
-                Background="#FFFBF4">
+                Visibility="Collapsed" BorderBrush="#E2EAE7" BorderThickness="1"
+                Background="#FAFCFB">
         <ListView.View>
           <GridView>
             <GridViewColumn x:Name="colBefore" Header="আগে" Width="130"
@@ -123,22 +165,25 @@
         </ListView.View>
       </ListView>
 
-      <!-- Apply button -->
+      <!-- Apply conversion -->
       <Button x:Name="btnApply" Style="{StaticResource MuktiButton}"
               IsEnabled="False" Click="BtnApply_Click">
-        <TextBlock x:Name="txtApplyBtn" Text="রূপান্তর করুন"/>
+        <TextBlock x:Name="txtApplyBtn" Text="রূপান্তর করুন"
+                   FontFamily="Noto Sans Bengali, DM Sans, Segoe UI"/>
       </Button>
 
-      <!-- Undo button -->
+      <!-- Undo -->
       <Button x:Name="btnUndo" Style="{StaticResource SecondaryButton}"
               IsEnabled="False" Visibility="Collapsed" Click="BtnUndo_Click">
-        <TextBlock x:Name="txtUndoBtn" Text="পূর্বাবস্থায় ফেরান"/>
+        <TextBlock x:Name="txtUndoBtn" Text="পূর্বাবস্থায় ফেরান"
+                   FontFamily="Noto Sans Bengali, DM Sans, Segoe UI"/>
       </Button>
 
-      <!-- Footer note -->
+      <!-- Footer -->
       <TextBlock x:Name="txtFooter" Margin="0,16,0,0" FontSize="10"
-                 Foreground="#9E8B7A" TextWrapping="Wrap"
-                 Text="আপনার নথির বিষয়বস্তু কখনও ডিভাইসের বাইরে যায় না।"/>
+                 Foreground="#8FA8A2" TextWrapping="Wrap"
+                 Text="আপনার নথির বিষয়বস্তু কখনও ডিভাইসের বাইরে যায় না।"
+                 FontFamily="Noto Sans Bengali, DM Sans, Segoe UI"/>
     </StackPanel>
   </ScrollViewer>
 </UserControl>

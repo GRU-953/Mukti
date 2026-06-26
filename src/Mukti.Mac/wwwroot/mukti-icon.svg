@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Mukti">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#3A4A9E"/>
+      <stop offset="55%" stop-color="#0A6E5C"/>
+      <stop offset="100%" stop-color="#14A88A"/>
+    </linearGradient>
+  </defs>
+  <!-- Rounded square tile — 15px corner radius -->
+  <rect width="64" height="64" rx="15" ry="15" fill="url(#bg)"/>
+  <!-- Soaring bird: left wing -->
+  <path d="M10 31 C17 21 25 24 31 28" stroke="white" stroke-width="3" fill="none"
+        stroke-linecap="round" stroke-linejoin="round" opacity="0.95"/>
+  <!-- Soaring bird: right wing -->
+  <path d="M33 28 C39 24 47 21 54 31" stroke="white" stroke-width="3" fill="none"
+        stroke-linecap="round" stroke-linejoin="round" opacity="0.95"/>
+  <!-- Bird body centre dot -->
+  <circle cx="32" cy="28" r="2.5" fill="white" opacity="0.95"/>
+  <!-- Bengali letter ম (Ma) in amber -->
+  <text x="32" y="53"
+        font-family="'Noto Sans Bengali', Vrinda, 'Arial Unicode MS', sans-serif"
+        font-size="19" font-weight="700"
+        fill="#F4B53C"
+        text-anchor="middle"
+        dominant-baseline="auto">ম</text>
+</svg>

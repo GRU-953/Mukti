@@ -5,6 +5,7 @@
 
 <div class="mukti-panel">
     <div class="mukti-header">
+        <img src="mukti-icon.svg" class="mukti-logo" alt="Mukti" />
         <span class="mukti-title">@(_isEnglish ? "Mukti" : "মুক্তি")</span>
         <button class="btn-lang" @onclick="ToggleLanguage">@(_isEnglish ? "বাংলা" : "EN")</button>
     </div>
@@ -12,7 +13,7 @@
 
     @if (!string.IsNullOrEmpty(_updateBannerText))
     {
-        <div class="update-banner" @onclick="OpenReleasePage" style="background:#fff3cd;border:1px solid #ffc107;border-radius:4px;padding:8px;margin-bottom:8px;cursor:pointer;font-size:12px;color:#856404;">
+        <div class="update-banner" @onclick="OpenReleasePage">
             @_updateBannerText
         </div>
     }
@@ -22,7 +23,7 @@
     </button>
 
     @* U-011: Scan Selection *@
-    <button class="btn-secondary" style="background:#5A7A3A" @onclick="ScanSelection" disabled="@(_scanning || _converter == null)">
+    <button class="btn-secondary" @onclick="ScanSelection" disabled="@(_scanning || _converter == null)">
         @(_isEnglish ? "Scan Selection" : "নির্বাচিত স্ক্যান করুন")
     </button>
 
@@ -91,16 +92,10 @@
 
     void ToggleLanguage() => _isEnglish = !_isEnglish;
 
-    async Task ScanDocument()
-    {
-        await PerformScan(selectionOnly: false);
-    }
+    async Task ScanDocument() => await PerformScan(selectionOnly: false);
 
     // U-011: scan selected text only
-    async Task ScanSelection()
-    {
-        await PerformScan(selectionOnly: true);
-    }
+    async Task ScanSelection() => await PerformScan(selectionOnly: true);
 
     async Task PerformScan(bool selectionOnly)
     {
@@ -150,7 +145,6 @@
                     : (_isEnglish ? "Nothing to convert." : "রূপান্তরের কিছু নেই।");
             }
 
-            // Build warning: unsupported fonts + U-005 formula count
             var warningParts = new List<string>();
             if (scanResult?.FormulaSkippedCount > 0)
                 warningParts.Add(_isEnglish
@@ -198,7 +192,7 @@
 
     async Task CheckForUpdateAsync()
     {
-        const string current = "2.0.3";
+        const string current = "2.0.4";
         try
         {
             Http.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "Mukti-Mac");

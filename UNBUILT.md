@@ -28,9 +28,9 @@ Read before adding any of these. Each was explicitly considered and rejected.
 **Speaker notes built in v2.0.1.** Windows (COM): scans and converts `slide.NotesPage.Shapes[2].TextFrame`. Mac: scans `slide.notes.body` (PowerPointApi 1.5+) with graceful fallback on older requirement sets. SmartArt XML remains not exposed via Office.js and is still not converted.
 
 ## U-007 — ARM64 Windows build
-**Not built.** Only x64 Windows.
-**Why:** Needs validation on ARM64 Windows. The x64 build runs under emulation on ARM64 Windows devices.
-**Path forward:** Add win-arm64 CI target once validated.
+**Partially built.** CI target added in v2.0.4; ARM64 installer pending.
+**What's done:** `ci.yml` adds a `build-windows-arm64` job; `release.yml` publishes a `win-arm64` ZIP artifact. `<PlatformTarget>` is now conditional so cross-compilation works.
+**What remains:** A proper ARM64 installer (setup-arm64.iss) and ARM64-specific COM registry paths under `HKLM\SOFTWARE\Microsoft\Office\...\Addins\` for ARM64 Office. Requires testing on an ARM64 Windows device.
 
 ## U-008 — Grammar and spell checking
 **Not built.** Mukti only changes encoding, not content. Entirely out of scope.
