@@ -3,6 +3,16 @@ using System.Collections.Generic;
 
 namespace Mukti.WindowsAddin;
 
+internal static class HardwareProfile
+{
+    internal static readonly long AvailableRamBytes = GC.GetGCMemoryInfo().TotalAvailableMemoryBytes;
+
+    // Office automation is single-threaded apartment (STA), so we never parallelise the scan
+    // itself — CPU core count would buy nothing here. This flag only gates the periodic GC hint
+    // in ProcessRun, which keeps the working set small on 2 GB machines during very large documents.
+    internal static bool IsLowMemory => AvailableRamBytes < 1_500_000_000L;
+}
+
 public class RunItem
 {
     public string Original { get; set; } = "";
@@ -300,8 +310,19 @@ public class OfficeIntegration
 
     // ── Shared run processor ──────────────────────────────────────────────
 
+    private int _processRunCallCount = 0;
+
     private void ProcessRun(string text, string fontName, ConversionSnapshot snap, int paraIdx, int runIdx)
     {
+        // Low-memory GC hint: on machines with < 1.5 GB available RAM, collect every 500 processed
+        // runs to prevent unbounded COM interop growth during large document scans.
+        if (HardwareProfile.IsLowMemory)
+        {
+            _processRunCallCount++;
+            if (_processRunCallCount % 500 == 0)
+                GC.Collect();
+        }
+
         var classification = _fontRegistry.Classify(fontName);
         switch (classification.Class)
         {

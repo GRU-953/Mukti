@@ -665,5 +665,14 @@ window.muktiOffice = {
                 }).then(function () { resolve(true); });
             }).catch(function (e) { reject(e.message || String(e)); });
         });
+    },
+
+    getHardwareHint: function() {
+        var cores = (typeof navigator !== 'undefined' && navigator.hardwareConcurrency) ? navigator.hardwareConcurrency : 1;
+        var lowMem = false;
+        if (typeof performance !== 'undefined' && performance.memory && performance.memory.jsHeapSizeLimit) {
+            lowMem = performance.memory.jsHeapSizeLimit < 1073741824;
+        }
+        return { cores: cores, lowMem: lowMem };
     }
 };
