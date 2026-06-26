@@ -67,7 +67,7 @@ static class AuditRunner
                 Console.Error.WriteLine("Run from inside the repository, or specify path via --data.");
                 Environment.Exit(1);
             }
-            conv = new Converter(new GlyphMap(File.ReadAllText(dataPath)));
+            conv = new Converter(new GlyphMap(dataPath));
         }
 
         var allFiles = Directory.GetFiles(directory, "*.*", SearchOption.AllDirectories)
