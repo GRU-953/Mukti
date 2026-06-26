@@ -19,6 +19,7 @@
     }
 
     <button class="btn-primary" @onclick="ScanDocument" disabled="@(_scanning || _converter == null)">
+        @if (_scanning) { <span class="mukti-spinner" aria-hidden="true"></span> }
         @(_scanning ? (_isEnglish ? "Scanning..." : "স্ক্যান হচ্ছে...") : (_isEnglish ? "Scan Document" : "স্ক্যান করুন"))
     </button>
 
@@ -27,7 +28,14 @@
         @(_isEnglish ? "Scan Selection" : "নির্বাচিত স্ক্যান করুন")
     </button>
 
-    @if (!string.IsNullOrEmpty(_status))
+    @if (_noDocOpen)
+    {
+        <div class="no-doc-box">
+            <span class="no-doc-icon" aria-hidden="true">&#x2299;</span>
+            <span>@(_isEnglish ? "No document open. Open a Word, Excel, or PowerPoint file first." : "কোনো নথি খোলা নেই। প্রথমে Word, Excel বা PowerPoint ফাইল খুলুন।")</span>
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(_status))
     {
         <div class="status-box">@_status</div>
     }
@@ -46,7 +54,7 @@
                 <tbody>
                     @foreach (var item in _previewItems)
                     {
-                        <tr><td>@item.Before</td><td>@item.After</td></tr>
+                        <tr><td class="before-col">@item.Before</td><td class="after-col">@item.After</td></tr>
                     }
                 </tbody>
             </table>
@@ -65,7 +73,7 @@
 </div>
 
 @code {
-    bool _isEnglish = false, _scanning = false, _applying = false, _canUndo = false;
+    bool _isEnglish = false, _scanning = false, _applying = false, _canUndo = false, _noDocOpen = false;
     string _status = "", _warning = "", _currentHost = "", _updateBannerText = "";
     List<PreviewRow> _previewItems = new();
     List<ScanRun> _snapshot = new();
@@ -99,7 +107,7 @@
 
     async Task PerformScan(bool selectionOnly)
     {
-        _scanning = true; _status = ""; _warning = ""; _currentHost = "";
+        _scanning = true; _status = ""; _warning = ""; _currentHost = ""; _noDocOpen = false;
         _previewItems.Clear(); _snapshot.Clear(); _canUndo = false;
         StateHasChanged();
         try {
@@ -122,6 +130,10 @@
             }
             else if (host == "PowerPoint")
                 scanResult = await JS.InvokeAsync<ScanResult>("muktiOffice.scanPowerPointDocument", new object[] { bijoyFonts, markers });
+            else if (host == "None") {
+                _noDocOpen = true;
+                return;
+            }
             else {
                 _status = _isEnglish ? $"{host}: scanning not supported." : $"{host}: স্ক্যান সমর্থিত নয়।";
                 return;

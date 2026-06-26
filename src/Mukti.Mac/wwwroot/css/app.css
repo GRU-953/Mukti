@@ -119,6 +119,47 @@ html, body {
 
 .preview-scroll { max-height: 300px; overflow-y: auto; }
 
+/* ── Mukti v2 additions ──────────────────────────────────────────────────── */
+
+@keyframes mukti-spin {
+  to { transform: rotate(360deg); }
+}
+
+.mukti-spinner {
+  display: inline-block;
+  width: 13px; height: 13px;
+  border: 2px solid rgba(255,255,255,0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: mukti-spin 0.7s linear infinite;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+
+.preview-table td.before-col {
+  font-family: 'Courier New', Courier, monospace;
+  background: #F3F4F6;
+  color: #555;
+}
+
+.preview-table td.after-col {
+  font-family: 'Noto Sans Bengali', sans-serif;
+}
+
+.no-doc-box {
+  display: flex; align-items: flex-start; gap: 8px;
+  background: var(--teal-100); border: 1px solid var(--teal-500);
+  border-radius: 8px; padding: 10px 12px; margin: 8px 0;
+  font-size: 12px; color: var(--teal-700);
+  font-family: 'Noto Sans Bengali', 'DM Sans', sans-serif;
+}
+
+.no-doc-icon {
+  font-size: 18px; line-height: 1; color: var(--teal-700); flex-shrink: 0;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+
 @media (prefers-color-scheme: dark) {
   html, body { background: #0D1B18; color: #C8E6E0; }
   .mukti-title { color: #C8E6E0; }
@@ -140,4 +181,7 @@ html, body {
   .preview-table th { background: #1A3530; color: #C8E6E0; border-color: #254540; }
   .preview-table td { border-color: #1A3530; color: #C8E6E0; }
   .footer-note { color: #4A6360; }
+  .preview-table td.before-col { background: #1A2520; color: #8AA8A2; }
+  .no-doc-box { background: #0F2E28; border-color: var(--teal-500); color: #C8E6E0; }
+  .no-doc-icon { color: #14A88A; }
 }
