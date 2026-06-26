@@ -1,6 +1,6 @@
-# Mukti Audit Report — v2.0.4
+# Mukti Audit Report — v2.0.7
 
-Audit of `D:\Test_files` (757 Office documents) using `tools/AuditScanner` on 2026-06-26.
+Audit of `D:\Test_files` using `tools/AuditScanner` on 2026-06-26.
 
 ---
 
@@ -8,12 +8,19 @@ Audit of `D:\Test_files` (757 Office documents) using `tools/AuditScanner` on 20
 
 | Metric | Result |
 |--------|--------|
-| Files scanned | 756 |
-| Files skipped | 1 (Word lock file `~$...docx` — not a real document) |
+| Documents scanned | 756 |
+| Files skipped (errors) | 0 |
+| Office owner/lock files excluded by design | 1 (`~$...docx`, 162 bytes — not a document) |
 | Files with Bijoy text | 163 |
-| Total Bijoy runs | 306,620+ |
-| Safety failures | 1 file, 2 occurrences |
-| Elapsed | ~30 seconds |
+| Total Bijoy runs | 248,757 |
+| Largest single file | 32,423 runs |
+| Safety failures | 1 file, 2 occurrences (pre-existing source data, not an engine fault) |
+| Elapsed | ~35 seconds |
+
+Every real document was processed with zero read failures. The single `~$`-prefixed entry is a
+transient Microsoft Office owner/lock file (written while a document is open); it has no ZIP central
+directory and is never a user document, so the scanner now excludes `~$` files by design rather than
+counting them as a skip.
 
 ---
 

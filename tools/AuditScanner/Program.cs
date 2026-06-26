@@ -84,6 +84,10 @@ static class AuditRunner
 
         var allFiles = Directory.GetFiles(directory, "*.*", SearchOption.AllDirectories)
             .Where(f => { var e = Path.GetExtension(f).ToLowerInvariant(); return e == ".docx" || e == ".xlsx" || e == ".pptx"; })
+            // Exclude Office owner/lock files ("~$name.docx") — these are transient ~162-byte
+            // artifacts Office writes while a document is open. They are never valid OOXML
+            // (no ZIP central directory) and are not user documents, so skipping them is correct.
+            .Where(f => !Path.GetFileName(f).StartsWith("~$", StringComparison.Ordinal))
             .OrderBy(f => new FileInfo(f).Length)   // small files first, large last
             .ToArray();
 
