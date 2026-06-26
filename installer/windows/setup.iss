@@ -1,5 +1,5 @@
-#define AppName "Mukti"
-#define AppVersion "2.0.12"
+﻿#define AppName "Mukti"
+#define AppVersion "2.0.13"
 #define AppPublisher "GRU-953"
 #define AppURL "https://github.com/GRU-953/Mukti"
 #define AppGuid "F4E71C21-9B7A-4C3E-8D22-8F91A235C4B1"
@@ -18,7 +18,7 @@ AppUpdatesURL={#AppURL}
 ; admin, "current user" would be the ADMIN account and the logged-in user's Word/
 ; Excel/PowerPoint would never see the add-in. Installing per-user keeps every
 ; registration in the real user's hive, which is where Office looks. It also
-; removes the UAC prompt — friendlier for non-technical users.
+; removes the UAC prompt â€” friendlier for non-technical users.
 DefaultDirName={localappdata}\\Mukti
 DefaultGroupName={#AppName}
 AllowNoIcons=yes
@@ -49,7 +49,7 @@ Source: "..\\..\\data\\bijoy-sutonnymj.json"; DestDir: "{app}\\data"; Flags: ign
 Source: "{#BuildOutput}\\*.dll"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 Source: "{#BuildOutput}\\*.json"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 ; The .NET comhost reads this sidecar to map CLSIDs to managed types at runtime.
-; dotnet publish does not copy it automatically — the csproj CopyClsidMapToPublish target does.
+; dotnet publish does not copy it automatically â€” the csproj CopyClsidMapToPublish target does.
 Source: "{#BuildOutput}\\*.clsidmap"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 ; Override the auto-generated runtimeconfig with the framework-dependent version.
 ; dotnet publish --self-contained generates "includedFrameworks" which the .NET comhost
@@ -81,6 +81,7 @@ function InitializeSetup(): Boolean;
 var
   dummy: String;
   officeFound: Boolean;
+  dummyCard: Cardinal;
 begin
   Result := True;
 
@@ -110,16 +111,16 @@ begin
      not RegKeyExists(HKLM, 'SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x64\sharedfx\Microsoft.WindowsDesktop.App\8.0') then
   begin
     if MsgBox(
-      '.NET 8 Desktop Runtime is not installed.' + #13#10 +
-      'Mukti requires it to run. Please download and install it from:' + #13#10 + #13#10 +
-      'https://dotnet.microsoft.com/download/dotnet/8.0' + #13#10 + #13#10 +
-      'Install ".NET 8 Desktop Runtime (x64)" then run this installer again.' + #13#10 + #13#10 +
-      'Continue anyway (for testing only)?',
-      mbConfirmation, MB_YESNO) = IDNO then
+      'Mukti needs the .NET 8 Desktop Runtime to work.' + #13#10 +
+      'It is free and provided by Microsoft.' + #13#10 + #13#10 +
+      'Click Yes to open the download page.' + #13#10 +
+      'After installing .NET 8, run this setup again.',
+      mbConfirmation, MB_YESNO) = IDYES then
     begin
-      Result := False;
-      exit;
+      ShellExec('open', 'https://dotnet.microsoft.com/en-us/download/dotnet/8.0/runtime', '', '', SW_SHOWNORMAL, ewNoWait, dummyCard);
     end;
+    Result := False;
+    exit;
   end;
 
   // Detect any supported Office installation:

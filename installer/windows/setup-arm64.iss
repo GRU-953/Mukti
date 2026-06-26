@@ -1,5 +1,5 @@
-#define AppName "Mukti"
-#define AppVersion "2.0.12"
+﻿#define AppName "Mukti"
+#define AppVersion "2.0.13"
 #define AppPublisher "GRU-953"
 #define AppURL "https://github.com/GRU-953/Mukti"
 #define AppGuid "A7B3C9D1-2E4F-5A6B-7C8D-9E0F1A2B3C4D"
@@ -54,7 +54,7 @@ var
   msg: String;
 begin
   msg :=
-    'Mukti ARM64 — Preview Build' + #13#10 + #13#10 +
+    'Mukti ARM64 â€” Preview Build' + #13#10 + #13#10 +
     'Microsoft Office does not yet ship a native ARM64 build.' + #13#10 +
     'On Windows ARM64 devices, Office currently runs as x64 under emulation.' + #13#10 + #13#10 +
     'This installer copies the ARM64 binaries to:' + #13#10 +
@@ -70,7 +70,28 @@ begin
 end;
 
 function InitializeSetup(): Boolean;
+var
+  dummyCard: Cardinal;
 begin
   Result := True;
+
+  // Require .NET 8 WindowsDesktop Runtime (framework-dependent deployment).
+  // Without it the comhost cannot initialize the managed add-in.
+  if not RegKeyExists(HKLM, 'SOFTWARE\dotnet\Setup\InstalledVersions\arm64\sharedfx\Microsoft.WindowsDesktop.App\8.0') and
+     not RegKeyExists(HKLM, 'SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\arm64\sharedfx\Microsoft.WindowsDesktop.App\8.0') then
+  begin
+    if MsgBox(
+      'Mukti needs the .NET 8 Desktop Runtime to work.' + #13#10 +
+      'It is free and provided by Microsoft.' + #13#10 + #13#10 +
+      'Click Yes to open the download page.' + #13#10 +
+      'After installing .NET 8, run this setup again.',
+      mbConfirmation, MB_YESNO) = IDYES then
+    begin
+      ShellExec('open', 'https://dotnet.microsoft.com/en-us/download/dotnet/8.0/runtime', '', '', SW_SHOWNORMAL, ewNoWait, dummyCard);
+    end;
+    Result := False;
+    exit;
+  end;
+
   ShowArm64Notice;
 end;

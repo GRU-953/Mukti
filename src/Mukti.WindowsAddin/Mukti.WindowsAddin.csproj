@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net8.0-windows</TargetFramework>
     <OutputType>Library</OutputType>
@@ -13,8 +13,8 @@
     <AssemblyName>Mukti.WindowsAddin</AssemblyName>
     <RootNamespace>Mukti.WindowsAddin</RootNamespace>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-    <AssemblyVersion>2.0.12.0</AssemblyVersion>
-    <FileVersion>2.0.12.0</FileVersion>
+    <AssemblyVersion>2.0.13.0</AssemblyVersion>
+    <FileVersion>2.0.13.0</FileVersion>
     <Product>Mukti</Product>
     <Company>GRU-953</Company>
     <Copyright>MIT License</Copyright>

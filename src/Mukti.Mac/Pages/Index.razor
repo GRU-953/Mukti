@@ -1,4 +1,4 @@
-@page "/"
+﻿@page "/"
 @using Mukti.Engine
 @inject IJSRuntime JS
 @inject HttpClient Http
@@ -6,10 +6,10 @@
 <div class="mukti-panel">
     <div class="mukti-header">
         <img src="mukti-icon.svg" class="mukti-logo" alt="Mukti" />
-        <span class="mukti-title">@(_isEnglish ? "Mukti" : "মুক্তি")</span>
-        <button class="btn-lang" @onclick="ToggleLanguage">@(_isEnglish ? "বাংলা" : "EN")</button>
+        <span class="mukti-title">@(_isEnglish ? "Mukti" : "à¦®à§à¦•à§à¦¤à¦¿")</span>
+        <button class="btn-lang" @onclick="ToggleLanguage">@(_isEnglish ? "à¦¬à¦¾à¦‚à¦²à¦¾" : "EN")</button>
     </div>
-    <div class="mukti-subtitle">@(_isEnglish ? "Bijoy / SutonnyMJ → Unicode Bengali" : "বিজয় থেকে ইউনিকোড রূপান্তর")</div>
+    <div class="mukti-subtitle">@(_isEnglish ? "Bijoy / SutonnyMJ â†’ Unicode Bengali" : "à¦¬à¦¿à¦œà¦¯à¦¼ à¦¥à§‡à¦•à§‡ à¦‡à¦‰à¦¨à¦¿à¦•à§‹à¦¡ à¦°à§‚à¦ªà¦¾à¦¨à§à¦¤à¦°")</div>
 
     @if (!string.IsNullOrEmpty(_updateBannerText))
     {
@@ -20,19 +20,19 @@
 
     <button class="btn-primary" @onclick="ScanDocument" disabled="@(_scanning || _converter == null)">
         @if (_scanning) { <span class="mukti-spinner" aria-hidden="true"></span> }
-        @(_scanning ? (_isEnglish ? "Scanning..." : "স্ক্যান হচ্ছে...") : (_isEnglish ? "Scan Document" : "স্ক্যান করুন"))
+        @(_scanning ? (_isEnglish ? "Scanning..." : "à¦¸à§à¦•à§à¦¯à¦¾à¦¨ à¦¹à¦šà§à¦›à§‡...") : (_isEnglish ? "Scan Document" : "à¦¸à§à¦•à§à¦¯à¦¾à¦¨ à¦•à¦°à§à¦¨"))
     </button>
 
     @* U-011: Scan Selection *@
     <button class="btn-secondary" @onclick="ScanSelection" disabled="@(_scanning || _converter == null)">
-        @(_isEnglish ? "Scan Selection" : "নির্বাচিত স্ক্যান করুন")
+        @(_isEnglish ? "Scan Selection" : "à¦¨à¦¿à¦°à§à¦¬à¦¾à¦šà¦¿à¦¤ à¦¸à§à¦•à§à¦¯à¦¾à¦¨ à¦•à¦°à§à¦¨")
     </button>
 
     @if (_noDocOpen)
     {
         <div class="no-doc-box">
             <span class="no-doc-icon" aria-hidden="true">&#x2299;</span>
-            <span>@(_isEnglish ? "No document open. Open a Word, Excel, or PowerPoint file first." : "কোনো নথি খোলা নেই। প্রথমে Word, Excel বা PowerPoint ফাইল খুলুন।")</span>
+            <span>@(_isEnglish ? "No document open. Open a Word, Excel, or PowerPoint file first." : "à¦•à§‹à¦¨à§‹ à¦¨à¦¥à¦¿ à¦–à§‹à¦²à¦¾ à¦¨à§‡à¦‡à¥¤ à¦ªà§à¦°à¦¥à¦®à§‡ Word, Excel à¦¬à¦¾ PowerPoint à¦«à¦¾à¦‡à¦² à¦–à§à¦²à§à¦¨à¥¤")</span>
         </div>
     }
     else if (!string.IsNullOrEmpty(_status))
@@ -47,10 +47,10 @@
 
     @if (_previewItems.Count > 0)
     {
-        <div class="preview-header">@(_isEnglish ? "Changes to apply:" : "পরিবর্তনের তালিকা:")</div>
+        <div class="preview-header">@(_isEnglish ? "Changes to apply:" : "à¦ªà¦°à¦¿à¦¬à¦°à§à¦¤à¦¨à§‡à¦° à¦¤à¦¾à¦²à¦¿à¦•à¦¾:")</div>
         <div class="preview-scroll">
             <table class="preview-table">
-                <thead><tr><th>@(_isEnglish ? "Before" : "আগে")</th><th>@(_isEnglish ? "After" : "পরে")</th></tr></thead>
+                <thead><tr><th>@(_isEnglish ? "Before" : "à¦†à¦—à§‡")</th><th>@(_isEnglish ? "After" : "à¦ªà¦°à§‡")</th></tr></thead>
                 <tbody>
                     @foreach (var item in _previewItems)
                     {
@@ -60,16 +60,16 @@
             </table>
         </div>
         <button class="btn-primary" @onclick="ApplyConversion" disabled="@_applying">
-            @(_applying ? (_isEnglish ? "Applying..." : "প্রয়োগ হচ্ছে...") : (_isEnglish ? "Apply Conversion" : "রূপান্তর করুন"))
+            @(_applying ? (_isEnglish ? "Applying..." : "à¦ªà§à¦°à¦¯à¦¼à§‹à¦— à¦¹à¦šà§à¦›à§‡...") : (_isEnglish ? "Apply Conversion" : "à¦°à§‚à¦ªà¦¾à¦¨à§à¦¤à¦° à¦•à¦°à§à¦¨"))
         </button>
     }
 
     @if (_canUndo)
     {
-        <button class="btn-secondary" @onclick="UndoConversion">@(_isEnglish ? "Undo Conversion" : "পূর্বাবস্থায় ফেরান")</button>
+        <button class="btn-secondary" @onclick="UndoConversion">@(_isEnglish ? "Undo Conversion" : "à¦ªà§‚à¦°à§à¦¬à¦¾à¦¬à¦¸à§à¦¥à¦¾à¦¯à¦¼ à¦«à§‡à¦°à¦¾à¦¨")</button>
     }
 
-    <div class="footer-note">@(_isEnglish ? "Your document content never leaves your device." : "আপনার নথির বিষয়বস্তু কখনও ডিভাইসের বাইরে যায় না।")</div>
+    <div class="footer-note">@(_isEnglish ? "Your document content never leaves your device." : "à¦†à¦ªà¦¨à¦¾à¦° à¦¨à¦¥à¦¿à¦° à¦¬à¦¿à¦·à¦¯à¦¼à¦¬à¦¸à§à¦¤à§ à¦•à¦–à¦¨à¦“ à¦¡à¦¿à¦­à¦¾à¦‡à¦¸à§‡à¦° à¦¬à¦¾à¦‡à¦°à§‡ à¦¯à¦¾à¦¯à¦¼ à¦¨à¦¾à¥¤")</div>
 </div>
 
 @code {
@@ -118,7 +118,7 @@
         _previewItems.Clear(); _snapshot.Clear(); _canUndo = false;
         StateHasChanged();
         try {
-            if (_converter == null || _fontRegistry == null) { _status = _isEnglish ? "Engine not ready." : "ইঞ্জিন প্রস্তুত নেই।"; return; }
+            if (_converter == null || _fontRegistry == null) { _status = _isEnglish ? "Engine not ready." : "à¦‡à¦žà§à¦œà¦¿à¦¨ à¦ªà§à¦°à¦¸à§à¦¤à§à¦¤ à¦¨à§‡à¦‡à¥¤"; return; }
             var bijoyFonts = _fontRegistry.KnownBijoyFonts.Select(f => f.ToLowerInvariant()).ToArray();
             var markers = _fontRegistry.BengaliMarkers.ToArray();
             var host = await JS.InvokeAsync<string>("muktiOffice.getHostName");
@@ -142,13 +142,13 @@
                 return;
             }
             else {
-                _status = _isEnglish ? $"{host}: scanning not supported." : $"{host}: স্ক্যান সমর্থিত নয়।";
+                _status = _isEnglish ? $"{host}: scanning not supported." : $"{host}: à¦¸à§à¦•à§à¦¯à¦¾à¦¨ à¦¸à¦®à¦°à§à¦¥à¦¿à¦¤ à¦¨à¦¯à¦¼à¥¤";
                 return;
             }
 
             if (scanResult?.Runs == null || scanResult.Runs.Count == 0)
             {
-                _status = _isEnglish ? "No Bijoy text found." : "কোনো বিজয় লেখা পাওয়া যায়নি।";
+                _status = _isEnglish ? "No Bijoy text found." : "à¦•à§‹à¦¨à§‹ à¦¬à¦¿à¦œà¦¯à¦¼ à¦²à§‡à¦–à¦¾ à¦ªà¦¾à¦“à¦¯à¦¼à¦¾ à¦¯à¦¾à¦¯à¦¼à¦¨à¦¿à¥¤";
             }
             else
             {
@@ -166,26 +166,26 @@
                 }
                 int total = _snapshot.Count;
                 if (total == 0)
-                    _status = _isEnglish ? "Nothing to convert." : "রূপান্তরের কিছু নেই।";
+                    _status = _isEnglish ? "Nothing to convert." : "à¦°à§‚à¦ªà¦¾à¦¨à§à¦¤à¦°à§‡à¦° à¦•à¦¿à¦›à§ à¦¨à§‡à¦‡à¥¤";
                 else if (_previewItems.Count < total)
                     _status = _isEnglish
-                        ? $"Found {total} run(s) — showing first {_previewItems.Count} (low-resource mode)."
-                        : $"{total}টি রান পাওয়া গেছে — প্রথম {_previewItems.Count}টি দেখানো হচ্ছে (কম-রিসোর্স মোড)।";
+                        ? $"Found {total} run(s) â€” showing first {_previewItems.Count} (low-resource mode)."
+                        : $"{total}à¦Ÿà¦¿ à¦°à¦¾à¦¨ à¦ªà¦¾à¦“à¦¯à¦¼à¦¾ à¦—à§‡à¦›à§‡ â€” à¦ªà§à¦°à¦¥à¦® {_previewItems.Count}à¦Ÿà¦¿ à¦¦à§‡à¦–à¦¾à¦¨à§‹ à¦¹à¦šà§à¦›à§‡ (à¦•à¦®-à¦°à¦¿à¦¸à§‹à¦°à§à¦¸ à¦®à§‹à¦¡)à¥¤";
                 else
-                    _status = _isEnglish ? $"Found {total} run(s)." : $"{total}টি রান পাওয়া গেছে।";
+                    _status = _isEnglish ? $"Found {total} run(s)." : $"{total}à¦Ÿà¦¿ à¦°à¦¾à¦¨ à¦ªà¦¾à¦“à¦¯à¦¼à¦¾ à¦—à§‡à¦›à§‡à¥¤";
             }
 
             var warningParts = new List<string>();
             if (scanResult?.FormulaSkippedCount > 0)
                 warningParts.Add(_isEnglish
                     ? $"{scanResult.FormulaSkippedCount} formula cell(s) skipped"
-                    : $"{scanResult.FormulaSkippedCount}টি সূত্র সেল বাদ দেওয়া হয়েছে");
+                    : $"{scanResult.FormulaSkippedCount}à¦Ÿà¦¿ à¦¸à§‚à¦¤à§à¦° à¦¸à§‡à¦² à¦¬à¦¾à¦¦ à¦¦à§‡à¦“à¦¯à¦¼à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡");
             if (scanResult?.Warnings != null && scanResult.Warnings.Count > 0)
-                warningParts.Add((_isEnglish ? "Unknown fonts: " : "অজানা ফন্ট: ") + string.Join(", ", scanResult.Warnings));
+                warningParts.Add((_isEnglish ? "Unknown fonts: " : "à¦…à¦œà¦¾à¦¨à¦¾ à¦«à¦¨à§à¦Ÿ: ") + string.Join(", ", scanResult.Warnings));
             if (warningParts.Count > 0)
                 _warning = string.Join(" | ", warningParts);
 
-        } catch (Exception ex) { _status = (_isEnglish ? "Error: " : "ত্রুটি: ") + ex.Message; }
+        } catch (Exception ex) { _status = (_isEnglish ? "Error: " : "à¦¤à§à¦°à§à¦Ÿà¦¿: ") + ex.Message; }
         finally { _scanning = false; StateHasChanged(); }
     }
 
@@ -199,9 +199,9 @@
                      : _currentHost == "PowerPoint" ? "muktiOffice.applyPowerPointConversion"
                      : "muktiOffice.applyWordConversion";
             await JS.InvokeAsync<bool>(jsFn, payload, "Noto Sans Bengali");
-            _status = _isEnglish ? $"Done — {_snapshot.Count} run(s) converted." : $"সম্পন্ন — {_snapshot.Count}টি রান রূপান্তরিত।";
+            _status = _isEnglish ? $"Done â€” {_snapshot.Count} run(s) converted." : $"à¦¸à¦®à§à¦ªà¦¨à§à¦¨ â€” {_snapshot.Count}à¦Ÿà¦¿ à¦°à¦¾à¦¨ à¦°à§‚à¦ªà¦¾à¦¨à§à¦¤à¦°à¦¿à¦¤à¥¤";
             _previewItems.Clear(); _canUndo = true;
-        } catch (Exception ex) { _status = (_isEnglish ? "Error: " : "ত্রুটি: ") + ex.Message; }
+        } catch (Exception ex) { _status = (_isEnglish ? "Error: " : "à¦¤à§à¦°à§à¦Ÿà¦¿: ") + ex.Message; }
         finally { _applying = false; StateHasChanged(); }
     }
 
@@ -214,15 +214,15 @@
                      : _currentHost == "PowerPoint" ? "muktiOffice.revertPowerPointConversion"
                      : "muktiOffice.revertWordConversion";
             await JS.InvokeAsync<bool>(jsFn, payload);
-            _status = _isEnglish ? "Reverted successfully." : "পূর্বাবস্থায় ফেরানো হয়েছে।";
+            _status = _isEnglish ? "Reverted successfully." : "à¦ªà§‚à¦°à§à¦¬à¦¾à¦¬à¦¸à§à¦¥à¦¾à¦¯à¦¼ à¦«à§‡à¦°à¦¾à¦¨à§‹ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤";
             _canUndo = false; _previewItems.Clear(); _snapshot.Clear();
-        } catch (Exception ex) { _status = (_isEnglish ? "Revert error: " : "ফেরানোয় ত্রুটি: ") + ex.Message; }
+        } catch (Exception ex) { _status = (_isEnglish ? "Revert error: " : "à¦«à§‡à¦°à¦¾à¦¨à§‹à¦¯à¦¼ à¦¤à§à¦°à§à¦Ÿà¦¿: ") + ex.Message; }
         StateHasChanged();
     }
 
     async Task CheckForUpdateAsync()
     {
-        const string current = "2.0.10";
+        const string current = "2.0.11";
         try
         {
             Http.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "Mukti-Mac");
@@ -233,8 +233,8 @@
             if (new Version(latest) > new Version(current))
             {
                 _updateBannerText = _isEnglish
-                    ? $"New version {latest} available — click to download"
-                    : $"নতুন সংস্করণ {latest} পাওয়া গেছে — ডাউনলোড করতে ক্লিক করুন";
+                    ? $"New version {latest} available â€” click to download"
+                    : $"à¦¨à¦¤à§à¦¨ à¦¸à¦‚à¦¸à§à¦•à¦°à¦£ {latest} à¦ªà¦¾à¦“à¦¯à¦¼à¦¾ à¦—à§‡à¦›à§‡ â€” à¦¡à¦¾à¦‰à¦¨à¦²à§‹à¦¡ à¦•à¦°à¦¤à§‡ à¦•à§à¦²à¦¿à¦• à¦•à¦°à§à¦¨";
                 StateHasChanged();
             }
         }

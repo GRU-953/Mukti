@@ -1,4 +1,4 @@
-# UNBUILT.md — Deliberate omissions in Mukti v2
+﻿# UNBUILT.md — Deliberate omissions in Mukti v2
 
 Read before adding any of these. Each was explicitly considered and rejected.
 
@@ -48,8 +48,9 @@ Read before adding any of these. Each was explicitly considered and rejected.
 
 ## U-012 — Code signing (Windows + macOS)
 **Abandoned by design.** Both installers ship unsigned and will stay that way. See decision D-0005.
-**Why:** Authenticode and Apple Developer signing add cost and process overhead with no benefit for a free, offline, open-source tool whose source and build are fully public. The SignPath Foundation route was dropped entirely.
+**Why:** Authenticode and Apple Developer signing add cost and process overhead with no benefit for a free, offline, open-source tool whose source and build are fully public. The SignPath Foundation route was considered and dropped.
+**Reconfirmed 2026-06-26.** Decision explicitly revisited and kept as-is.
 **User impact:** Windows — SmartScreen "More info → Run anyway"; macOS — right-click → Open to bypass Gatekeeper. Both documented in the README.
 
 ## U-013 — Separate .NET runtime download
-**Status: Resolved.** The installer uses dotnet publish --self-contained so the runtime is bundled. No separate .NET download required.
+**Status: Framework-dependent deployment (changed from self-contained).** The installer uses dotnet publish --no-self-contained. Users need .NET 8 Desktop Runtime (free, from Microsoft). The installer detects whether .NET 8 is present and opens the Microsoft download page automatically if it is missing. Installer is ~20 MB instead of ~120 MB with self-contained.
