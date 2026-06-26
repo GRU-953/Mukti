@@ -12,14 +12,60 @@ static class AuditRunner
     // ── Regex patterns ─────────────────────────────────────────────────────────
 
     static readonly Regex WRunPat   = new(@"<w:r[ >].*?</w:r>",  RegexOptions.Singleline | RegexOptions.Compiled);
-    static readonly Regex WFontPat  = new(@"w:(?:ascii|cs|hAnsi)=""[^""]*(?:SutonnyMJ|Bijoy)[^""]*""", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    // Capture the full typeface attribute VALUE (any font) so classification — not a
+    // narrow substring — decides whether the run is Bijoy. This mirrors the production
+    // FontRegistry, which normalizes the name and tests it against curated lists.
+    static readonly Regex WFontPat  = new(@"w:(?:ascii|cs|hAnsi)=""(?<tf>[^""]*)""", RegexOptions.Compiled | RegexOptions.IgnoreCase);
     static readonly Regex WTextPat  = new(@"<w:t[^>]*>(.*?)</w:t>", RegexOptions.Singleline | RegexOptions.Compiled);
     static readonly Regex ARunPat   = new(@"<a:r[ >].*?</a:r>",  RegexOptions.Singleline | RegexOptions.Compiled);
-    static readonly Regex AFontPat  = new(@"<a:(?:latin|ea|cs)[^>]*typeface=""[^""]*(?:SutonnyMJ|Bijoy)[^""]*""", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    static readonly Regex AFontPat  = new(@"<a:(?:latin|ea|cs)[^>]*typeface=""(?<tf>[^""]*)""", RegexOptions.Compiled | RegexOptions.IgnoreCase);
     static readonly Regex ATextPat  = new(@"<a:t[^>]*>(.*?)</a:t>", RegexOptions.Singleline | RegexOptions.Compiled);
     static readonly Regex SiPat     = new(@"<si>.*?</si>",        RegexOptions.Singleline | RegexOptions.Compiled);
-    static readonly Regex SiFontPat = new(@"<rFont val=""[^""]*(?:SutonnyMJ|Bijoy)[^""]*""", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    static readonly Regex SiFontPat = new(@"<rFont val=""(?<tf>[^""]*)""", RegexOptions.Compiled | RegexOptions.IgnoreCase);
     static readonly Regex SiTextPat = new(@"<t[^>]*>(.*?)</t>",  RegexOptions.Singleline | RegexOptions.Compiled);
+
+    // ── Bijoy font classification (aligned with Mukti.Engine.FontRegistry) ───────
+    //
+    // The production FontRegistry converts a run only when its typeface NORMALIZES to
+    // a curated Bijoy family name. The audit must reflect exactly that, so we mirror
+    // the registry's normalization (lowercase, drop everything from the first comma,
+    // collapse internal whitespace) and test membership against the same curated
+    // Bijoy family tokens — never a broad "contains MJ/Bijoy" fragment, which would
+    // wrongly catch Unicode fonts such as SutonnyOMJ / NikoshMJ.
+
+    // Curated Bijoy family names (lowercased, normalized). Includes the bare family
+    // tokens plus the common style-suffix spellings the registry recognizes.
+    static readonly HashSet<string> BijoyFonts = new(StringComparer.Ordinal)
+    {
+        "sutonnymj", "sutonnymj bold", "sutonnymj italic", "sutonnymj regular",
+        "sutonnymj-regular", "sutonnymjbold", "sutonny mj",
+        "sutonnycmj", "sutonnyemj", "sutonnysushreemj", "tonnybanglaj",
+        "gangamj", "padmamj", "jomunamj", "meghnamj", "teeshtamj", "turagmj", "sandipanmj",
+        "jugantormj", "samakalmj", "jaijaidinmj",
+        "siyam rupali ansi",
+    };
+
+    // Unicode Bengali fonts whose names overlap the Bijoy naming convention but must
+    // NEVER be classified as Bijoy. Exact-match membership against BijoyFonts already
+    // excludes these; this set makes the exclusion explicit and guards future edits.
+    static readonly HashSet<string> ExcludedUnicodeFonts = new(StringComparer.Ordinal)
+    {
+        "sutonnyomj", "nikoshmj", "tangonmotamj", "arhialkhanmj", "sonkhomj",
+    };
+
+    static readonly Regex WhitespaceRegex = new(@"\s+", RegexOptions.Compiled);
+
+    // Normalize a typeface attribute value exactly as FontRegistry.Normalize does, then
+    // report whether it is a curated Bijoy font (and not an excluded Unicode font).
+    static bool IsBijoyTypeface(string typeface)
+    {
+        var s = typeface.Trim().ToLowerInvariant();
+        int comma = s.IndexOf(',');
+        if (comma >= 0) s = s.Substring(0, comma);
+        s = WhitespaceRegex.Replace(s.Trim(), " ");
+        if (ExcludedUnicodeFonts.Contains(s)) return false;
+        return BijoyFonts.Contains(s);
+    }
 
     // Unicode Bengali block + safe punctuation
     static bool IsValidUnicode(char c) =>
@@ -191,7 +237,7 @@ static class AuditRunner
                 {
                     foreach (Match si in SiPat.Matches(xml))
                     {
-                        if (!SiFontPat.IsMatch(si.Value)) continue;
+                        if (!RunHasBijoyFont(si.Value, SiFontPat)) continue;
                         var t = string.Concat(SiTextPat.Matches(si.Value).Select(m => m.Groups[1].Value));
                         if (t.Trim().Length > 0) runs.Add(t);
                     }
@@ -265,11 +311,23 @@ static class AuditRunner
         // then run the heavier text extraction only on matched runs.
         foreach (Match rm in runPat.Matches(xml))
         {
-            if (!fontPat.IsMatch(rm.Value)) continue;
+            // A run may carry several font attributes (ascii/cs/hAnsi); it counts as
+            // Bijoy if ANY of them normalizes to a curated Bijoy family name.
+            if (!RunHasBijoyFont(rm.Value, fontPat)) continue;
             var text = string.Concat(textPat.Matches(rm.Value).Select(m => m.Groups[1].Value));
             if (text.Trim().Length > 0) runs.Add(text);
         }
         return runs;
+    }
+
+    // True if any typeface attribute captured by fontPat within this fragment normalizes
+    // to a curated Bijoy font. The fontPat's "tf" group holds the raw attribute value.
+    static bool RunHasBijoyFont(string fragment, Regex fontPat)
+    {
+        foreach (Match fm in fontPat.Matches(fragment))
+            if (IsBijoyTypeface(fm.Groups["tf"].Value))
+                return true;
+        return false;
     }
 
     // ── Reporting ──────────────────────────────────────────────────────────────

@@ -11,11 +11,16 @@ Audit of `D:\Test_files` using `tools/AuditScanner` on 2026-06-26.
 | Documents scanned | 756 |
 | Files skipped (errors) | 0 |
 | Office owner/lock files excluded by design | 1 (`~$...docx`, 162 bytes — not a document) |
-| Files with Bijoy text | 163 |
-| Total Bijoy runs | 248,757 |
+| Files with Bijoy text | 167 |
 | Largest single file | 32,423 runs |
 | Safety failures | 1 file, 2 occurrences (pre-existing source data, not an engine fault) |
 | Elapsed | ~35 seconds |
+
+The Bijoy file count rose from 163 to **167** in v2.0.8: the AuditScanner now shares the production
+`FontRegistry` family list (exact-match after comma-strip + whitespace-collapse), so it detects the
+same fonts the add-in converts — including `SamakalMJ`, `JomunaMJ`, `SutonnyCMJ`, `SutonnySushreeMJ`,
+and the newly verified `Siyam Rupali ANSI`. Confirmed-Unicode look-alikes (`SutonnyOMJ`, `NikoshMJ`,
+`TangonMotaMJ`, `ArhialkhanMJ`, `SonkhoMJ`) are explicitly excluded and never converted (see D-0006).
 
 Every real document was processed with zero read failures. The single `~$`-prefixed entry is a
 transient Microsoft Office owner/lock file (written while a document is open); it has no ZIP central
