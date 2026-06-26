@@ -103,6 +103,7 @@ public partial class MuktiPanel : System.Windows.Controls.UserControl
         _previewItems.Clear();
         lstPreview.Visibility = Visibility.Collapsed;
         txtPreviewHeader.Visibility = Visibility.Collapsed;
+        progressScan.Visibility = Visibility.Visible;
     }
 
     private const int PreviewCap = 300;
@@ -144,15 +145,18 @@ public partial class MuktiPanel : System.Windows.Controls.UserControl
             btnApply.IsEnabled = true;
         }
 
-        var warnings = new List<string>(result.UnsupportedFonts);
+
         if (result.FormulaSkippedCount > 0)
-            warnings.Insert(0, _isEnglish
+            ShowWarning(_isEnglish
                 ? $"{result.FormulaSkippedCount} formula cell(s) skipped"
                 : $"{result.FormulaSkippedCount}à¦Ÿà¦¿ à¦¸à§‚à¦¤à§à¦° à¦¸à§‡à¦² à¦¬à¦¾à¦¦ à¦¦à§‡à¦“à¦¯à¦¼à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡");
-        if (warnings.Count > 0)
-            ShowWarning(_isEnglish
-                ? string.Join(" | ", warnings)
-                : string.Join(" | ", warnings));
+        if (result.UnsupportedFonts.Count > 0)
+        {
+            var fontPrefix = _isEnglish
+                ? "These fonts were not converted (not on known list): "
+                : "এই ফন্টগুলো রূপান্তর করা হয়নি (তালিকায় নেই): ";
+            ShowWarning(fontPrefix + string.Join(", ", result.UnsupportedFonts));
+        }
         if (result.AlreadyUnicodeCount > 0)
             ShowWarning($"{result.AlreadyUnicodeCount} run{(result.AlreadyUnicodeCount == 1 ? "" : "s")} already in Unicode Bengali — skipped.");
     }
@@ -175,12 +179,13 @@ public partial class MuktiPanel : System.Windows.Controls.UserControl
         }
         catch (Exception ex)
         {
-            ShowStatus((_isEnglish ? "Error: " : "à¦¤à§à¦°à§à¦Ÿà¦¿: ") + ex.Message);
+            ShowStatus((_isEnglish ? "Error: " : "ত্রুটি: ") + FriendlyError(ex));
         }
         finally
         {
             btnScan.IsEnabled = true;
             btnScanSelection.IsEnabled = true;
+            progressScan.Visibility = Visibility.Collapsed;
         }
     }
 
@@ -203,12 +208,13 @@ public partial class MuktiPanel : System.Windows.Controls.UserControl
         }
         catch (Exception ex)
         {
-            ShowStatus((_isEnglish ? "Error: " : "à¦¤à§à¦°à§à¦Ÿà¦¿: ") + ex.Message);
+            ShowStatus((_isEnglish ? "Error: " : "ত্রুটি: ") + FriendlyError(ex));
         }
         finally
         {
             btnScan.IsEnabled = true;
             btnScanSelection.IsEnabled = true;
+            progressScan.Visibility = Visibility.Collapsed;
         }
     }
 
@@ -219,14 +225,16 @@ public partial class MuktiPanel : System.Windows.Controls.UserControl
         btnApply.IsEnabled = false;
         btnScan.IsEnabled = false;
         btnScanSelection.IsEnabled = false;
-        ShowStatus(_isEnglish ? "Applying conversion..." : "à¦°à§‚à¦ªà¦¾à¦¨à§à¦¤à¦° à¦ªà§à¦°à¦¯à¦¼à§‹à¦— à¦•à¦°à¦¾ à¦¹à¦šà§à¦›à§‡...");
+        progressScan.Visibility = Visibility.Visible;
+        ShowStatus(_isEnglish ? "Applying conversion..." : "রূপান্তর প্রয়োগ করা হচ্ছে...");
 
         try
         {
             await Task.Run(() => _integration.Apply(_snapshot));
             ShowStatus(_isEnglish
-                ? $"Done â€” {_snapshot.Items.Count} run(s) converted."
+                ? $"Done — {_snapshot.Items.Count} run(s) converted."
                 : $"à¦¸à¦®à§à¦ªà¦¨à§à¦¨ â€” {_snapshot.Items.Count}à¦Ÿà¦¿ à¦°à¦¾à¦¨ à¦°à§‚à¦ªà¦¾à¦¨à§à¦¤à¦°à¦¿à¦¤ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤");
+            btnApply.IsEnabled = false;
 
             btnUndo.IsEnabled = true;
             btnUndo.Visibility = Visibility.Visible;
@@ -235,13 +243,14 @@ public partial class MuktiPanel : System.Windows.Controls.UserControl
         }
         catch (Exception ex)
         {
-            ShowStatus((_isEnglish ? "Error applying: " : "à¦ªà§à¦°à¦¯à¦¼à§‹à¦—à§‡ à¦¤à§à¦°à§à¦Ÿà¦¿: ") + ex.Message);
+            ShowStatus((_isEnglish ? "Error applying: " : "প্রয়োগে ত্রুটি: ") + FriendlyError(ex));
             btnApply.IsEnabled = true;
         }
         finally
         {
             btnScan.IsEnabled = true;
             btnScanSelection.IsEnabled = true;
+            progressScan.Visibility = Visibility.Collapsed;
         }
     }
 
@@ -250,13 +259,14 @@ public partial class MuktiPanel : System.Windows.Controls.UserControl
         if (_integration == null || _snapshot == null) return;
 
         btnUndo.IsEnabled = false;
-        ShowStatus(_isEnglish ? "Reverting..." : "à¦«à¦¿à¦°à¦¿à¦¯à¦¼à§‡ à¦†à¦¨à¦¾ à¦¹à¦šà§à¦›à§‡...");
+        progressScan.Visibility = Visibility.Visible;
+        ShowStatus(_isEnglish ? "Reverting..." : "ফিরিয়ে আনা হচ্ছে...");
 
         try
         {
             await Task.Run(() => _integration.Revert(_snapshot));
-            ShowStatus(_isEnglish ? "Reverted successfully." : "à¦ªà§‚à¦°à§à¦¬à¦¾à¦¬à¦¸à§à¦¥à¦¾à¦¯à¦¼ à¦«à§‡à¦°à¦¾à¦¨à§‹ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤");
-            btnUndo.Visibility = Visibility.Collapsed;
+            ShowStatus(_isEnglish ? "Reverted successfully." : "পূর্বাবস্থায় ফেরানো হয়েছে।");
+            btnUndo.IsEnabled = false;
             btnApply.IsEnabled = false;
             _previewItems.Clear();
             lstPreview.Visibility = Visibility.Collapsed;
@@ -264,8 +274,12 @@ public partial class MuktiPanel : System.Windows.Controls.UserControl
         }
         catch (Exception ex)
         {
-            ShowStatus((_isEnglish ? "Error reverting: " : "à¦«à§‡à¦°à¦¾à¦¨à§‹à¦¯à¦¼ à¦¤à§à¦°à§à¦Ÿà¦¿: ") + ex.Message);
+            ShowStatus((_isEnglish ? "Error reverting: " : "ফেরানোয় ত্রুটি: ") + FriendlyError(ex));
             btnUndo.IsEnabled = true;
+        }
+        finally
+        {
+            progressScan.Visibility = Visibility.Collapsed;
         }
     }
 
@@ -299,6 +313,16 @@ public partial class MuktiPanel : System.Windows.Controls.UserControl
             }
         }
         catch { }
+    }
+
+    private string FriendlyError(Exception ex)
+    {
+        var msg = ex.Message ?? "";
+        if (msg.Contains("ActiveDocument") || msg.Contains("ActiveWorkbook") || msg.Contains("ActivePresentation"))
+            return _isEnglish ? "No document is open." : "কোনো নথি খোলা নেই।";
+        if (msg.Contains("HRESULT") || msg.Contains("0x8"))
+            return _isEnglish ? "Cannot access the document. Please try again." : "নথি অ্যাক্সেস করা যাচ্ছে না। আবার চেষ্টা করুন।";
+        return msg;
     }
 }
 

@@ -119,6 +119,9 @@ public sealed partial class FontRegistry
         "kobadakmj",
         "mahanandamj",
         "burigangamj",
+        // Fonts found in real-world BRAC/UPG documents (FY 25-26 survey, 112 docs)
+        "arhialkhanmj",
+        "tangonmotamj",
         // Other common Bijoy-family fonts (documented Bijoy encoding)
         "muktimj",
         "abasan mj",

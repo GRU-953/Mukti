@@ -35,6 +35,8 @@ public sealed class FontClassificationTests
     [InlineData("SamakalMJ")]
     [InlineData("Siyam Rupali ANSI")]
     [InlineData("siyam rupali ansi")]
+    [InlineData("ArhialkhanMJ")]    // confirmed Bijoy: FY 25-26 BRAC/UPG documents
+    [InlineData("TangonMotaMJ")]    // confirmed Bijoy: Enterprise Training module
     public void BijoyFonts_ClassifyAsBijoy(string fontName)
     {
         Assert.Equal(FontClass.Bijoy, _reg.Classify(fontName).Class);
@@ -57,9 +59,10 @@ public sealed class FontClassificationTests
     [InlineData("Siyam Rupali")]
     [InlineData("Noto Sans Bengali")]
     [InlineData("NikoshMJ")]        // documented false-positive — must NOT be Bijoy
-    [InlineData("TangonMotaMJ")]
-    [InlineData("ArhialkhanMJ")]
     [InlineData("SonkhoMJ")]
+    // NOTE: ArhialkhanMJ and TangonMotaMJ were here, but are now confirmed Bijoy
+    //       (found in real BRAC/UPG FY 25-26 documents) and have been moved to the
+    //       known-Bijoy list in FontRegistry.cs and the Bijoy test theory above.
     public void NonBijoyBengaliUnicodeFonts_AreNeverBijoy(string fontName)
     {
         Assert.NotEqual(FontClass.Bijoy, _reg.Classify(fontName).Class);

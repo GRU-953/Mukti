@@ -200,6 +200,11 @@ public sealed class FontRegistryTests
     [InlineData("brahmaputramj")]
     [InlineData("teestamj")]
     [InlineData("burigangamj")]
+    // Real-world BRAC/UPG document fonts (FY 25-26 survey)
+    [InlineData("ArhialkhanMJ")]
+    [InlineData("TangonMotaMJ")]
+    [InlineData("arhialkhanmj")]
+    [InlineData("tangonmotamj")]
     // Other Bijoy-family
     [InlineData("muktimj")]
     [InlineData("abasan mj")]

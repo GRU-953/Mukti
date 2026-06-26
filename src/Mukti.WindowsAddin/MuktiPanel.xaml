@@ -135,6 +135,9 @@
                    Foreground="#0F2420"
                    FontFamily="Noto Sans Bengali, DM Sans, Segoe UI"/>
       </Border>
+      <ProgressBar x:Name="progressScan" IsIndeterminate="True" Height="4"
+                   Margin="0,4,0,0" Visibility="Collapsed"
+                   Foreground="#0A6E5C" Background="#E2EAE7"/>
 
       <!-- Warning panel -->
       <Border x:Name="panelWarning" Background="#FEF9EC" CornerRadius="8"
@@ -174,7 +177,7 @@
 
       <!-- Undo -->
       <Button x:Name="btnUndo" Style="{StaticResource SecondaryButton}"
-              IsEnabled="False" Visibility="Collapsed" Click="BtnUndo_Click">
+              IsEnabled="False" Visibility="Visible" Click="BtnUndo_Click">
         <TextBlock x:Name="txtUndoBtn" Text="পূর্বাবস্থায় ফেরান"
                    FontFamily="Noto Sans Bengali, DM Sans, Segoe UI"/>
       </Button>
