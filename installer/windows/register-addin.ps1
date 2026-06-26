@@ -7,9 +7,15 @@ $Description  = "Convert Bijoy/SutonnyMJ Bengali text to Unicode"
 $OfficeApps   = @("Word", "Excel", "PowerPoint")
 
 if ($Install) {
-    # Resolve comhost path: use $AppPath if given, otherwise the script's own directory
+    # The install directory is always the canonical LOCALAPPDATA location.
+    # $AppPath (defaults to $PSScriptRoot) is only used below as the *source*
+    # for UCRT stub copies — it must NOT be used for the COM registry path.
+    # HKCU takes priority over HKLM; relative paths resolve from Office's working
+    # directory (C:\Program Files\Microsoft Office\root\Office16\), not the install
+    # dir, so the DLL would never be found. Always write the full absolute path.
+    $installDir = Join-Path $env:LOCALAPPDATA "Mukti"
+    $comdll     = Join-Path $installDir "Mukti.WindowsAddin.comhost.dll"
     if ($AppPath -eq "") { $AppPath = $PSScriptRoot }
-    $comhostDll = Join-Path $AppPath "Mukti.WindowsAddin.comhost.dll"
 
     # Microsoft 365 Click-to-Run runs Office in a virtual file system that does not
     # expose C:\Windows\System32\downlevel to COM DLLs hosted inside Office processes.
@@ -38,10 +44,10 @@ if ($Install) {
 
     # Write COM registration directly to HKCU (regsvr32 tries HKLM first and fails non-elevated)
     $clsidRoot = "HKCU:\SOFTWARE\Classes\CLSID\$Clsid"
-    New-Item -Path "$clsidRoot"                    -Force | Out-Null
-    New-Item -Path "$clsidRoot\InprocServer32"      -Force | Out-Null
-    Set-ItemProperty "$clsidRoot\InprocServer32" "(Default)"     $comhostDll
-    Set-ItemProperty "$clsidRoot\InprocServer32" "ThreadingModel" "Both"
+    New-Item -Path "$clsidRoot"                                                       -Force | Out-Null
+    New-Item -Path "$clsidRoot\InprocServer32"                                        -Force | Out-Null
+    Set-ItemProperty -Path "$clsidRoot\InprocServer32" -Name "(default)"       -Value $comdll
+    Set-ItemProperty -Path "$clsidRoot\InprocServer32" -Name "ThreadingModel"  -Value "Both"
 
     $progIdRoot = "HKCU:\SOFTWARE\Classes\$ProgId"
     New-Item -Path "$progIdRoot"        -Force | Out-Null

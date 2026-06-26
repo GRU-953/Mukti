@@ -56,10 +56,14 @@ foreach ($ucrt in $ucrtDlls) {
 }
 
 # 3) Write COM registration directly to HKCU (regsvr32 tries HKLM first and fails without elevation)
+#    IMPORTANT: always write the full absolute path to InprocServer32.
+#    HKCU takes priority over HKLM; relative paths resolve from Office's working
+#    directory (C:\Program Files\Microsoft Office\root\Office16\), not the install
+#    dir, so a relative path would cause the DLL to silently fail to load.
 $clsidRoot = "HKCU:\SOFTWARE\Classes\CLSID\$Clsid"
-New-Item -Path "$clsidRoot\InprocServer32" -Force | Out-Null
-Set-ItemProperty "$clsidRoot\InprocServer32" '(Default)'      $dll
-Set-ItemProperty "$clsidRoot\InprocServer32" 'ThreadingModel' 'Both'
+New-Item -Path "$clsidRoot\InprocServer32"                                        -Force | Out-Null
+Set-ItemProperty -Path "$clsidRoot\InprocServer32" -Name '(Default)'      -Value $dll
+Set-ItemProperty -Path "$clsidRoot\InprocServer32" -Name 'ThreadingModel' -Value 'Both'
 
 $progIdRoot = "HKCU:\SOFTWARE\Classes\$ProgId"
 New-Item -Path "$progIdRoot\CLSID" -Force | Out-Null
