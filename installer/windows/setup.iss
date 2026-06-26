@@ -1,5 +1,5 @@
 #define AppName "Mukti"
-#define AppVersion "2.0.9"
+#define AppVersion "2.0.10"
 #define AppPublisher "GRU-953"
 #define AppURL "https://github.com/GRU-953/Mukti"
 #define AppGuid "F4E71C21-9B7A-4C3E-8D22-8F91A235C4B1"
@@ -73,7 +73,7 @@ var
 begin
   Result := True;
 
-  // Block the per-machine -> per-user migration trap. Versions up to 2.0.9 installed
+  // Block the per-machine -> per-user migration trap. Versions up to 2.0.10 installed
   // for ALL USERS (admin) and recorded their uninstaller in HKLM. This per-user
   // installer (PrivilegesRequired=lowest) cannot see or remove that older copy, so
   // installing over it would leave two copies and a stale machine-wide COM

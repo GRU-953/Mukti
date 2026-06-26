@@ -261,7 +261,7 @@ public partial class MuktiPanel : System.Windows.Controls.UserControl
 
     private async void CheckForUpdateAsync()
     {
-        const string currentVersion = "2.0.9";
+        const string currentVersion = "2.0.10";
         try
         {
             using var client = new System.Net.Http.HttpClient();

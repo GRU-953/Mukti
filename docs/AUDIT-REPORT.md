@@ -1,4 +1,4 @@
-# Mukti Audit Report — v2.0.9
+# Mukti Audit Report — v2.0.10
 
 Audit of `D:\Test_files` using `tools/AuditScanner` on 2026-06-26.
 
@@ -16,7 +16,7 @@ Audit of `D:\Test_files` using `tools/AuditScanner` on 2026-06-26.
 | Safety failures | 1 file, 2 occurrences (pre-existing source data, not an engine fault) |
 | Elapsed | ~35 seconds |
 
-The Bijoy file count rose from 163 to **167** in v2.0.9: the AuditScanner now shares the production
+The Bijoy file count rose from 163 to **167** in v2.0.10: the AuditScanner now shares the production
 `FontRegistry` family list (exact-match after comma-strip + whitespace-collapse), so it detects the
 same fonts the add-in converts — including `SamakalMJ`, `JomunaMJ`, `SutonnyCMJ`, `SutonnySushreeMJ`,
 and the newly verified `Siyam Rupali ANSI`. Confirmed-Unicode look-alikes (`SutonnyOMJ`, `NikoshMJ`,

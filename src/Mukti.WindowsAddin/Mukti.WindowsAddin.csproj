@@ -13,8 +13,8 @@
     <AssemblyName>Mukti.WindowsAddin</AssemblyName>
     <RootNamespace>Mukti.WindowsAddin</RootNamespace>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-    <AssemblyVersion>2.0.9.0</AssemblyVersion>
-    <FileVersion>2.0.9.0</FileVersion>
+    <AssemblyVersion>2.0.10.0</AssemblyVersion>
+    <FileVersion>2.0.10.0</FileVersion>
     <Product>Mukti</Product>
     <Company>GRU-953</Company>
     <Copyright>MIT License</Copyright>
