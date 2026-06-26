@@ -303,4 +303,55 @@ public sealed class ReorderTests
         // No reph present (reph = Ra + Virama, not Virama + Ra), no pre-base vowel.
         Assert.Equal(input, Reorder.Apply(input));
     }
+
+    // -----------------------------------------------------------------------
+    // New tests: composite vowels, nukta swap, conjunct spanning, deep reph
+    // -----------------------------------------------------------------------
+
+    // U+09CB ো (o-kar) is the NFC form of ে + া; the new implementation forms
+    // it directly during pre-kar repositioning.
+    [Fact]
+    public void CompositeO_EKarPlusAKar_FormsOKar()
+    {
+        // Input (Bijoy intermediate): ে + ক + া  (e-kar, ka, aa-kar)
+        // Expected: ক + ো  (ka + o-kar, where ো = U+09CB)
+        Assert.Equal("কো", Reorder.Apply("েকা"));
+    }
+
+    // U+09CC ৌ (au-kar) is the NFC form of ে + ৗ; formed directly.
+    [Fact]
+    public void CompositeOu_EKarPlusAuMark_FormsAuKar()
+    {
+        // Input: ে + ক + ৗ  (e-kar, ka, au-length-mark)
+        // Expected: ক + ৌ  (ka + au-kar, where ৌ = U+09CC)
+        Assert.Equal("কৌ", Reorder.Apply("েকৗ"));
+    }
+
+    // Chandrabindu (U+0981, called "nukta" in the reference algorithm) followed
+    // by a post-kar: swap them so the chandrabindu trails the vowel sign.
+    [Fact]
+    public void NuktaPostKarSwap_ChandrabinduBeforeAaKar_Swapped()
+    {
+        // Input: ক + ঁ + া  (ka, chandrabindu, aa-kar)
+        // Expected: ক + া + ঁ  (ka, aa-kar, chandrabindu)
+        Assert.Equal("কাঁ", Reorder.Apply("কঁা"));
+    }
+
+    // Pre-kar must span the full conjunct (ka+virama+ya) before being appended.
+    [Fact]
+    public void PreKarOverConjunct_EKarSpansKaViramaYa()
+    {
+        // Input: ে + ক + ্ + য  (e-kar, ka, virama, ya)
+        // Expected: ক + ্ + য + ে  (ka+virama+ya cluster, then e-kar)
+        Assert.Equal("ক্যে", Reorder.Apply("েক্য"));
+    }
+
+    // Reph must walk all the way back to the start of a deep conjunct cluster.
+    [Fact]
+    public void RephDeepCluster_RephAfterKshaConjunct_MovesToStart()
+    {
+        // Input: ক + ্ + ষ + র + ্  (ka+virama+ssa, then ra+virama = reph stored after cluster)
+        // Expected: র + ্ + ক + ্ + ষ  (reph at cluster start)
+        Assert.Equal("র্ক্ষ", Reorder.Apply("ক্ষর্"));
+    }
 }

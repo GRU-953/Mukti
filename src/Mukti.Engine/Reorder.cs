@@ -1,85 +1,62 @@
-// Reorder.cs — Port of reorder.ts
-// Bengali cluster reordering — three algorithmic passes applied after the flat
+// Reorder.cs — Full port of _rearrange() from bijoy_unicode.py
+// Bengali cluster reordering — two algorithmic passes applied after the flat
 // glyph substitution step.
 //
 // Bijoy stores some marks in display order; Unicode stores them in logical order.
 // After substitution we must:
-//   1. Collapse an accidental double virama (e.g. স্ + ্ব -> স্ব).
-//   2. Move reph (র্) to the start of its consonant cluster.
-//   3. Move pre-base vowel signs (drawn to the left: ি ে ৈ) after their
-//      consonant unit.
+//   Preamble — collapse double virama (্্ -> ্)
+//   Pass 1   — reph repositioning + halant/vowel reordering
+//   Pass 2   — pre-kar repositioning + composite vowel formation + nukta swap
 //
 // Unicode constants used:
-//   VIRAMA  U+09CD  ্
-//   NUKTA   U+09BC  ়
-//   ি       U+09BF  i-kar
-//   ে       U+09C7  e-kar
-//   ৈ       U+09C8  ai-kar
-//   ক       U+0995  first consonant in Bengali block
-//   হ       U+09B9  last consonant in Bengali block
-//   র       U+09B0  ra (used in reph র্)
+//   VIRAMA          U+09CD  ্
+//   CHANDRABINDU    U+0981  ঁ  (called "nukta" in the reference algorithm)
+//   ি               U+09BF  i-kar
+//   ে               U+09C7  e-kar
+//   ৈ               U+09C8  ai-kar
+//   া               U+09BE  aa-kar
+//   ৗ               U+09D7  au-length mark
+//   ো               U+09CB  o-kar  (composite: ে + া)
+//   ৌ               U+09CC  au-kar (composite: ে + ৗ)
+//   র               U+09B0  ra (used in reph র্)
 //
-// Pure string logic; no I/O. All regexes are engine-controlled (not
-// user-supplied) and fixed at compile time — safe from ReDoS.
-
-using System.Text.RegularExpressions;
+// Pure string logic; no I/O.
 
 namespace Mukti.Engine;
 
 /// <summary>
 /// Applies Bengali cluster reordering passes to already glyph-substituted text.
 /// </summary>
-public static partial class Reorder
+public static class Reorder
 {
-    // Unicode scalar string constants — kept as string literals for readability.
-    // VIRAMA U+09CD
-    private const string Virama = "্";
-    // NUKTA U+09BC
-    private const string Nukta = "়";
-    // Reph = র (U+09B0) + ্ (U+09CD)
-    private const string RephStr = "র্";
+    // ── Character classification sets ────────────────────────────────────────
 
-    // Bengali consonant block range: ক (U+0995) .. হ (U+09B9).
-    // Used inside regex character class brackets: [ক-হ]
-    private const string ConsClass = @"[ক-হ]";
+    private static readonly HashSet<char> Consonants = new(
+        "কখগঘঙচছজঝঞটঠডঢণতথদধনপফবভমযরলশষসহড়ঢ়য়ৎংঃঁ");
 
-    // Pre-base vowel signs (drawn to the left of their consonant in Bijoy display order):
-    //   ি U+09BF  i-kar
-    //   ে U+09C7  e-kar
-    //   ৈ U+09C8  ai-kar
-    private const string PreBaseClass = @"[িেৈ]";
+    private static readonly HashSet<char> PreKars = new("িেৈ");
 
-    // A "consonant unit": consonant, optional nukta, then zero or more (virama+consonant[+nukta]) pairs.
-    // Pattern: [ক-হ]়?(?:্[ক-হ]়?)*
-    private const string CUnitPattern =
-        @"[ক-হ]়?(?:্[ক-হ]়?)*";
+    private static readonly HashSet<char> PostKars = new("াোৌৗুূীৃ");
 
-    // -----------------------------------------------------------------------
-    // Compiled regexes — instantiated once per process. Using [GeneratedRegex]
-    // source generator for .NET 7+ AOT-safe compiled patterns.
-    // -----------------------------------------------------------------------
+    // AllKars = PreKars ∪ PostKars
+    private static readonly HashSet<char> AllKars = new("িেৈাোৌৗুূীৃ");
 
-    // Pass 1: double virama  ্্  ->  ্
-    [GeneratedRegex("্্", RegexOptions.Compiled)]
-    private static partial Regex DoubleViramaRegex();
+    private const char Virama = '্';  // U+09CD
 
-    // Pass 2: reph reordering
-    // Matches: (any Bengali consonant)(র্)
-    // Replaces with: র্(consonant)
-    // i.e. the reph marker stored AFTER the consonant moves BEFORE it.
-    [GeneratedRegex(@"([ক-হ])র্", RegexOptions.Compiled)]
-    private static partial Regex RephRegex();
+    // Called "nukta" in the reference algorithm; actually chandrabindu U+0981
+    private const char Nukta = 'ঁ';   // U+0981
 
-    // Pass 3: pre-base vowel reordering
-    // Matches: (pre-base vowel sign)(consonant unit)
-    // Replaces with: (consonant unit)(pre-base vowel sign)
-    [GeneratedRegex(
-        @"([িেৈ])([ক-হ]়?(?:্[ক-হ]়?)*)",
-        RegexOptions.Compiled)]
-    private static partial Regex PreBaseRegex();
+    private const char Ra = 'র';      // U+09B0
+
+    // ── Bounds-safe character accessor ───────────────────────────────────────
+
+    private static char Ch(string s, int i) =>
+        i >= 0 && i < s.Length ? s[i] : '\0';
+
+    // ── Public API ───────────────────────────────────────────────────────────
 
     /// <summary>
-    /// Apply the three Bengali reordering passes to already glyph-substituted text.
+    /// Apply Bengali cluster reordering to already glyph-substituted text.
     /// </summary>
     /// <param name="input">Text after glyph map substitution.</param>
     /// <returns>Text with Bengali clusters in Unicode logical order.</returns>
@@ -87,15 +64,134 @@ public static partial class Reorder
     {
         if (string.IsNullOrEmpty(input)) return input;
 
-        // Pass 1: collapse accidental double virama
-        var s = DoubleViramaRegex().Replace(input, Virama);
+        // Preamble: collapse double virama  ্্  ->  ্
+        var text = input.Replace("্্", "্");
 
-        // Pass 2: reph — consonant immediately followed by র্ -> র্ moves before that consonant
-        s = RephRegex().Replace(s, RephStr + "$1");
+        // ── Pass 1: reph and halant reordering ───────────────────────────────
+        var i = 0;
+        while (i < text.Length)
+        {
+            // 1a. Reph repositioning:
+            //     র + ্ (not preceded by ্) -> move র্ before cluster start.
+            if (i > 0 && i < text.Length - 1 &&
+                Ch(text, i) == Ra &&
+                Ch(text, i + 1) == Virama &&
+                Ch(text, i - 1) != Virama)
+            {
+                // Walk backward past any kars to find the consonant base.
+                var check = i - 1;
+                while (check >= 0 && AllKars.Contains(Ch(text, check)))
+                    check--;
 
-        // Pass 3: pre-base vowels -> moved after their consonant unit
-        s = PreBaseRegex().Replace(s, "$2$1");
+                if (check >= 0 && Consonants.Contains(Ch(text, check)))
+                {
+                    // Walk back through virama+consonant pairs to cluster start.
+                    var clusterStart = check;
+                    while (true)
+                    {
+                        if (clusterStart - 1 < 0) break;
+                        if (Ch(text, clusterStart - 1) == Virama &&
+                            clusterStart - 2 >= 0 &&
+                            Consonants.Contains(Ch(text, clusterStart - 2)))
+                        {
+                            clusterStart -= 2;
+                        }
+                        else break;
+                    }
+                    text = text[..clusterStart] + Ra + Virama +
+                           text[clusterStart..i] + text[(i + 2)..];
+                    i = clusterStart + 2;
+                    continue;
+                }
+            }
 
-        return s;
+            // 1b. Vowel sign / nukta + virama + consonant
+            //     -> virama + consonant + vowel sign
+            if (i > 0 &&
+                Ch(text, i) == Virama &&
+                (AllKars.Contains(Ch(text, i - 1)) || Ch(text, i - 1) == Nukta) &&
+                i < text.Length - 1)
+            {
+                text = text[..(i - 1)] + Ch(text, i).ToString() +
+                       Ch(text, i + 1).ToString() + Ch(text, i - 1).ToString() +
+                       text[(i + 2)..];
+            }
+
+            // 1c. RA + virama + vowel sign
+            //     -> vowel sign + RA + virama
+            if (i > 0 && i < text.Length - 1 &&
+                Ch(text, i) == Virama &&
+                Ch(text, i - 1) == Ra &&
+                Ch(text, i - 2) != Virama &&
+                AllKars.Contains(Ch(text, i + 1)))
+            {
+                text = text[..(i - 1)] + Ch(text, i + 1).ToString() +
+                       Ch(text, i - 1).ToString() + Ch(text, i).ToString() +
+                       text[(i + 2)..];
+            }
+
+            i++;
+        }
+
+        // ── Pass 2: pre-kar repositioning and composite vowels ───────────────
+        i = 0;
+        while (i < text.Length)
+        {
+            // 2a. Pre-kar repositioning spanning conjuncts, with composite vowel
+            //     formation for ো (ে+া) and ৌ (ে+ৗ).
+            if (i < text.Length - 1 &&
+                PreKars.Contains(Ch(text, i)) &&
+                !IsSpace(Ch(text, i + 1)))
+            {
+                // Walk j forward over consonant+(virama+consonant) pairs.
+                var j = 1;
+                while (i + j < text.Length - 1 &&
+                       Consonants.Contains(Ch(text, i + j)))
+                {
+                    if (Ch(text, i + j + 1) == Virama)
+                        j += 2;
+                    else
+                        break;
+                }
+
+                // Build: everything before pre-kar + consonant unit (excluding pre-kar).
+                var basePart = text[..i] + text[(i + 1)..(i + j + 1)];
+                var l = 0;
+                var kar = Ch(text, i);
+                var nxt = Ch(text, i + j + 1);
+
+                if (kar == 'ে' && nxt == 'া')
+                {
+                    basePart += 'ো'; l = 1;
+                }
+                else if (kar == 'ে' && nxt == 'ৗ')
+                {
+                    basePart += 'ৌ'; l = 1;
+                }
+                else
+                {
+                    basePart += kar;
+                }
+
+                text = basePart + text[(i + j + l + 1)..];
+                i += j;
+                // fall through to 2b check at updated i
+            }
+
+            // 2b. Nukta + post-kar swap.
+            if (i < text.Length - 1 &&
+                Ch(text, i) == Nukta &&
+                PostKars.Contains(Ch(text, i + 1)))
+            {
+                text = text[..i] + Ch(text, i + 1).ToString() +
+                       Ch(text, i).ToString() + text[(i + 2)..];
+            }
+
+            i++;
+        }
+
+        return text;
     }
+
+    private static bool IsSpace(char c) => c is ' ' or '\t' or '\n' or '\r';
 }

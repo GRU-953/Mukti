@@ -1,9 +1,10 @@
-// Converter.cs — Port of convert.ts
+// Converter.cs — Port of convert.ts + bijoy_unicode.py
 // The main Bijoy/SutonnyMJ -> Unicode Bengali conversion pipeline.
 //
-// Pipeline (faithful port of the proven Spike-B reference converter):
-//   idempotency guard  ->  protect URLs/emails  ->  greedy longest-match glyph
-//   substitution  ->  Reorder.Apply  ->  NFC normalisation.
+// Pipeline (faithful port of the proven Spike-B reference converter + Python reference):
+//   idempotency guard  ->  protect URLs/emails  ->  PRE_MAP substitution  ->
+//   greedy longest-match glyph substitution  ->  Reorder.Apply  ->
+//   POST_MAP cleanup  ->  NFC normalisation.
 //
 // Guarantees baked into the contract (mirrors contracts.ts, D-0007, D-0008):
 //   - Output is always NFC.
@@ -89,12 +90,58 @@ public sealed partial class Converter
             }
             else
             {
-                // Normal segment: glyph-map substitution followed by cluster reordering.
-                sb.Append(Reorder.Apply(MapGlyphs(seg)));
+                // Normal segment: PRE_MAP -> glyph-map substitution -> cluster reordering.
+                sb.Append(Reorder.Apply(MapGlyphs(ApplyMap(seg, PreMap))));
             }
         }
 
-        return sb.ToString().Normalize(NormalizationForm.FormC);
+        // POST_MAP cleanup followed by NFC normalisation.
+        return ApplyMap(sb.ToString(), PostMap).Normalize(NormalizationForm.FormC);
+    }
+
+    // -----------------------------------------------------------------------
+    // PRE_MAP and POST_MAP (ported from bijoy_unicode.py)
+    // -----------------------------------------------------------------------
+
+    // Applied BEFORE glyph substitution on each non-protected segment.
+    private static readonly (string Old, string New)[] PreMap =
+    [
+        ("yy", "y"),
+        ("vv", "v"),
+        ("­­", "­"),   // soft-hyphen pair -> single soft-hyphen
+        ("y&", "y"),
+        ("„&", "„"),         // „& -> „
+        ("‡u", "u‡"),        // ‡u -> u‡  (e-kar + chandrabindu display order fix)
+        ("wu", "uw"),                  // ি + ঁ display order fix
+        (" ,", ","),
+        (" |", "|"),
+    ];
+
+    // Applied AFTER the main conversion loop, before NFC normalisation.
+    private static readonly (string Old, string New)[] PostMap =
+    [
+        ("০ঃ", "০:"), ("১ঃ", "১:"), ("২ঃ", "২:"), ("৩ঃ", "৩:"), ("৪ঃ", "৪:"),
+        ("৫ঃ", "৫:"), ("৬ঃ", "৬:"), ("৭ঃ", "৭:"), ("৮ঃ", "৮:"), ("৯ঃ", "৯:"),
+        (" ঃ", ":"),
+        ("\nঃ", "\n:"),
+        ("]ঃ", "]:"),
+        ("[ঃ", "[:"),
+        ("  ", " "),
+        ("অা", "আ"),
+        ("্‌্‌", "্‌"),
+        ("স্ত্ম", "স্ত"),
+        ("ন্ত্ম", "ন্ত"),
+    ];
+
+    /// <summary>
+    /// Apply a sequence of literal string substitutions in order.
+    /// </summary>
+    private static string ApplyMap(string text, (string Old, string New)[] map)
+    {
+        foreach (var (old, @new) in map)
+            if (!string.IsNullOrEmpty(old))
+                text = text.Replace(old, @new);
+        return text;
     }
 
     // -----------------------------------------------------------------------
