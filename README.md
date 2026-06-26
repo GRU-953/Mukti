@@ -1,115 +1,158 @@
-﻿# মুক্তি — Mukti v2
+<div align="center">
 
-**বিজয়/সুটোনিMJ থেকে ইউনিকোড বাংলায় রূপান্তর করুন — সরাসরি Microsoft Office-এ**
+<img src="./src/Mukti.Mac/wwwroot/mukti-icon.svg" width="80" height="80" alt="Mukti dove logo" />
 
-Convert Bijoy/SutonnyMJ Bengali text to Unicode — directly inside Microsoft Word, Excel, and PowerPoint.
+# মুক্তি — Mukti
 
----
+**পুরনো বিজয় বাংলাকে ইউনিকোডে রূপান্তর করুন — সরাসরি Microsoft Office-এ**
 
-## ⚡ Download & Install
+*Convert legacy Bijoy Bengali to Unicode — right inside Microsoft Office*
 
-### Windows (Word, Excel, PowerPoint)
-1. Download **Mukti-Setup-2.0.5.exe** from [GitHub Releases](https://github.com/GRU-953/Mukti/releases)
-2. Double-click the installer — Mukti registers itself automatically
-3. Open Word (or Excel/PowerPoint) — the **Mukti** tab appears in the ribbon
+<br/>
 
-### Windows ARM64 (Preview)
-1. Download **Mukti-Setup-2.0.5-arm64.exe** from [GitHub Releases](https://github.com/GRU-953/Mukti/releases)
-2. Install the binaries — no COM registration happens automatically
-3. **Note:** ARM64-native Office is not yet available from Microsoft. Office on Windows ARM64 currently runs as x64 under emulation. Use the standard x64 installer above for daily use. The ARM64 build is a preview for when ARM64-native Office ships.
-### Mac (Word, Excel, PowerPoint)
-1. Download **Mukti-2.0.5.pkg** from [GitHub Releases](https://github.com/GRU-953/Mukti/releases)
-2. Right-click the .pkg → **Open** (this bypasses the Gatekeeper warning — you only need to do this once)
-3. Follow the installer steps
-4. Open Word — the **Mukti** button appears in the Home tab
+[![Windows ডাউনলোড করুন](https://img.shields.io/badge/Windows-%E0%A6%A1%E0%A6%BE%E0%A6%89%E0%A6%A8%E0%A6%B2%E0%A7%8B%E0%A6%A1-26336E?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/GRU-953/Mukti/releases/download/v2.0.7/Mukti-Setup-2.0.7.exe)
+[![Mac ডাউনলোড করুন](https://img.shields.io/badge/Mac-%E0%A6%A1%E0%A6%BE%E0%A6%89%E0%A6%A8%E0%A6%B2%E0%A7%8B%E0%A6%A1-14A88A?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/GRU-953/Mukti/releases/download/v2.0.7/Mukti-2.0.7.pkg)
+[![MIT লাইসেন্স](https://img.shields.io/badge/License-MIT-E0990F?style=for-the-badge)](LICENSE)
 
-> **Mac note:** The installer is not code-signed (Apple charges $99/year). Right-click → Open is safe — the installer contains no network code.
+</div>
 
 ---
 
-## 🕹️ How to use
+## মুক্তি কী? (What is Mukti?)
 
-1. Open a Word document containing Bijoy/SutonnyMJ Bengali text
-2. Click the **Mukti** tab → **Mukti** button to open the task pane
-3. Click **স্ক্যান করুন** (Scan Document) — Mukti finds all Bijoy-encoded runs
-4. Review the before/after preview list
-5. Click **রূপান্তর করুন** (Apply Conversion) — text is replaced in-place, font changed to Noto Sans Bengali
-6. Made a mistake? Click **পূর্বাবস্থায় ফেরান** (Undo) to restore the original
+পুরনো বিজয় বা সুতোন্নী এমজে ফন্টে লেখা Word, Excel বা PowerPoint ফাইল ইউনিকোডে রূপান্তর করুন — সরাসরি Microsoft Office-এর মধ্যে, কোনো কপি-পেস্ট ছাড়াই।
 
-The panel auto-detects your Office language. Set it to English with the **EN** toggle button.
+Convert legacy Bijoy / SutonnyMJ Bengali text to Unicode directly inside Word, Excel, and PowerPoint — no copy-paste, no external tools.
 
----
+আপনাকে কোনো বাড়তি সফটওয়্যার ইনস্টল করতে হবে না, কোনো ওয়েবসাইটে যেতে হবে না। মুক্তি সরাসরি Microsoft Office-এর রিবনে বসে কাজ করে।
 
-## 🔒 Privacy
-
-**Your document content never leaves your device.**
-
-- Windows: conversion runs inside a local COM DLL — no network calls
-- Mac: conversion runs in WebAssembly inside Office's browser sandbox — no network calls
-- The on-demand server on Mac (`localhost:43017`) serves only static files from your own machine; it starts when Office opens and stops when Office closes
+You do not need any extra software or website. Mukti works directly from the Microsoft Office ribbon.
 
 ---
 
-## 🗂️ What fonts does Mukti convert?
+## ডাউনলোড (Download)
 
-Mukti recognises these Bijoy/SutonnyMJ font families and converts them to Unicode:
+<div align="center">
 
-`SutonnyMJ` · `SutonnyCMJ` · `SutonnyEMJ` · `GangaMJ` · `PadmaMJ` · `JomunaMJ` · `MeghnaMJ` · `TeeshTaMJ` · `TuragMJ` · `SandipanMJ` · `JugantorMJ` · `SamakalMJ` · `JaiJaiDinMJ` · and more
+### Windows
 
-Fonts already in Unicode (SolaimanLipi, Noto Sans Bengali, Kohinoor Bangla, Nikosh…) are detected and left untouched.
+<a href="https://github.com/GRU-953/Mukti/releases/download/v2.0.7/Mukti-Setup-2.0.7.exe">
+  <img src="https://img.shields.io/badge/Mukti--Setup--2.0.7.exe-%E0%A6%A1%E0%A6%BE%E0%A6%89%E0%A6%A8%E0%A6%B2%E0%A7%8B%E0%A6%A1%20%E0%A6%95%E0%A6%B0%E0%A7%81%E0%A6%A8-26336E?style=for-the-badge&logo=windows&logoColor=white" alt="Windows ডাউনলোড" />
+</a>
 
----
+### Mac
 
-## 🏗️ Build from source
+<a href="https://github.com/GRU-953/Mukti/releases/download/v2.0.7/Mukti-2.0.7.pkg">
+  <img src="https://img.shields.io/badge/Mukti--2.0.7.pkg-%E0%A6%A1%E0%A6%BE%E0%A6%89%E0%A6%A8%E0%A6%B2%E0%A7%8B%E0%A6%A1%20%E0%A6%95%E0%A6%B0%E0%A7%81%E0%A6%A8-14A88A?style=for-the-badge&logo=apple&logoColor=white" alt="Mac ডাউনলোড" />
+</a>
 
-Requirements: [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+</div>
 
-```bash
-git clone https://github.com/GRU-953/Mukti.git
-cd Mukti
-dotnet restore Mukti.sln
-dotnet build Mukti.sln --configuration Release
-dotnet test src/Mukti.Engine.Tests/Mukti.Engine.Tests.csproj
-```
+<br/>
 
-Build the Windows installer (requires [Inno Setup 6](https://jrsoftware.org/isdl.php)):
-
-```cmd
-dotnet publish src\Mukti.WindowsAddin\Mukti.WindowsAddin.csproj --configuration Release --runtime win-x64 --self-contained true --output src\Mukti.WindowsAddin\bin\Release\net8.0-windows\win-x64\publish
-iscc installer\windows\setup.iss
-```
-
-Build the Mac installer (macOS only):
-
-```bash
-bash installer/mac/build-pkg.sh
-```
+> **লক্ষ্য করুন (Note — Windows):** ইনস্টলার চালানোর সময় Windows একটি সতর্কবার্তা দেখাতে পারে — "Windows protected your PC"। এটি স্বাভাবিক। "More info" ক্লিক করুন, তারপর "Run anyway" ক্লিক করুন। সফটওয়্যারটি সম্পূর্ণ নিরাপদ এবং ওপেন-সোর্স; ইনস্টলারটি এখনো কোড-সাইন করা হয়নি বলেই এই বার্তা আসে।
+>
+> Windows users will see a SmartScreen warning ("Windows protected your PC"). Click "More info" then "Run anyway". This is expected because the installer is not yet code-signed — the software is safe and open-source.
 
 ---
 
-## 📋 Known limitations
+## ইনস্টল করুন (How to Install)
 
-- Excel formulas containing Bengali text are skipped (counts shown in a warning — formula cells are never touched)
-- PowerPoint SmartArt is not converted (not exposed via Office.js)
-- Mac installer is not code-signed (requires Apple Developer Program, $99/year)
+### Windows
 
-See [UNBUILT.md](UNBUILT.md) for the complete list of deliberate omissions.
+1. উপরের লিঙ্ক থেকে **Mukti-Setup-2.0.7.exe** ডাউনলোড করুন।
+   *(Download Mukti-Setup-2.0.7.exe from the link above.)*
+
+2. ফাইলটিতে ডাবল-ক্লিক করুন।
+   *(Double-click the downloaded file.)*
+
+3. যদি "Windows protected your PC" বার্তা দেখায় — "More info" ক্লিক করুন, তারপর "Run anyway" ক্লিক করুন।
+   *(If SmartScreen appears — click "More info", then "Run anyway".)*
+
+4. Windows অনুমতি (administrator) চাইলে **"Yes"** ক্লিক করুন — মুক্তি Office-এর সাথে যুক্ত হওয়ার জন্য এটি প্রয়োজন।
+   *(When Windows asks for administrator permission (a UAC prompt), click "Yes" — Mukti needs it to register with Office.)*
+
+5. ইনস্টলার সম্পূর্ণ হলে Microsoft Word, Excel বা PowerPoint খুলুন।
+   *(Once installation is complete, open Microsoft Word, Excel, or PowerPoint.)*
+
+6. রিবনে **Mukti** নামে একটি নতুন ট্যাব দেখতে পাবেন।
+   *(A new "Mukti" tab will appear in the ribbon.)*
 
 ---
 
-## 🤝 Contributing
+### Mac
 
-Pull requests welcome. Before changing the mapping data (`data/bijoy-sutonnymj.json`), read [docs/DECISION-LOG.md](docs/DECISION-LOG.md) — especially D-0003 (corpus-gate rule).
+1. উপরের লিঙ্ক থেকে **Mukti-2.0.7.pkg** ডাউনলোড করুন।
+   *(Download Mukti-2.0.7.pkg from the link above.)*
 
-All mapping changes must pass the corpus gate: `dotnet test` must report **≥99% pass rate** before merging.
+2. ডাউনলোড করা ফাইলটিতে ডাবল-ক্লিক করুন এবং ইনস্টলারের নির্দেশনা অনুসরণ করুন।
+   *(Double-click the downloaded file and follow the installer steps.)*
+
+3. ইনস্টলার সম্পূর্ণ হলে Microsoft Word, Excel বা PowerPoint খুলুন।
+   *(Once installation is complete, open Microsoft Word, Excel, or PowerPoint.)*
+
+4. রিবনে **Mukti** বোতামটি দেখতে পাবেন।
+   *(The Mukti button will appear in the ribbon.)*
 
 ---
 
-## 📜 Licence
+## কীভাবে ব্যবহার করবেন — ৩টি সহজ ধাপ (How to Use — 3 Simple Steps)
 
-MIT — see [LICENSE](LICENSE)
+**ধাপ ১:** Word, Excel বা PowerPoint-এ পুরনো বিজয় বা সুতোন্নী ফন্টে লেখা ফাইলটি খুলুন।
+*(Step 1: Open the file written in old Bijoy or SutonnyMJ font in Word, Excel, or PowerPoint.)*
+
+**ধাপ ২:** রিবনে "Mukti" ট্যাব বা বোতামে ক্লিক করুন।
+*(Step 2: Click the "Mukti" tab or button in the ribbon.)*
+
+**ধাপ ৩:** "Scan Document" ক্লিক করুন, তারপর "Apply Conversion" ক্লিক করুন — হয়ে গেল!
+*(Step 3: Click "Scan Document", then click "Apply Conversion" — done!)*
+
+> ভুল হলে চিন্তা নেই। Office-এর সাধারণ **Ctrl+Z** (Undo) চাপলেই সব আগের মতো ফিরে আসবে।
+> *(Made a mistake? Press the standard Ctrl+Z (Undo) to restore everything as it was.)*
 
 ---
+
+## সমর্থিত সফটওয়্যার (Supported Applications)
+
+| অ্যাপ্লিকেশন (App) | Windows | Mac |
+|---|---|---|
+| Microsoft Word | Office 2013 বা তার পরবর্তী | Office 2019 / Microsoft 365 |
+| Microsoft Excel | Office 2013 বা তার পরবর্তী | Office 2019 / Microsoft 365 |
+| Microsoft PowerPoint | Office 2013 বা তার পরবর্তী | Office 2019 / Microsoft 365 |
+
+---
+
+## গোপনীয়তা (Privacy)
+
+আপনার ডকুমেন্টের কোনো তথ্য কখনো আপনার ডিভাইসের বাইরে যায় না। সম্পূর্ণ অফলাইন। কোনো অ্যাকাউন্ট বা ইন্টারনেট সংযোগের প্রয়োজন নেই।
+
+Your document content never leaves your device. Fully offline. No account or internet connection required.
+
+---
+
+## সিস্টেম চাহিদা (System Requirements)
+
+**Windows:**
+- Windows 10 (সংস্করণ 1809) বা তার পরবর্তী *(Windows 10 version 1809 or later)*
+- .NET 8 Runtime — ইনস্টলারের মধ্যেই অন্তর্ভুক্ত, আলাদাভাবে ইনস্টল করতে হবে না *(included in the installer — no separate download needed)*
+- Microsoft Office 2013 বা তার পরবর্তী *(Microsoft Office 2013 or later)*
+
+**Mac:**
+- macOS 10.15 (Catalina) বা তার পরবর্তী *(macOS 10.15 or later)*
+- Microsoft Office 2019 বা Microsoft 365 *(Microsoft Office 2019 or Microsoft 365)*
+
+---
+
+<div align="center">
+
+[![MIT License](https://img.shields.io/badge/License-MIT-E0990F?style=flat-square)](LICENSE)
+&nbsp;
+[![GRU-953](https://img.shields.io/badge/author-GRU--953-26336E?style=flat-square)](https://github.com/GRU-953)
+&nbsp;
+[![GitHub Stars](https://img.shields.io/github/stars/GRU-953/Mukti?style=flat-square&color=14A88A)](https://github.com/GRU-953/Mukti/stargazers)
+&nbsp;
+[![Version](https://img.shields.io/badge/version-v2.0.7-E15B3C?style=flat-square)](https://github.com/GRU-953/Mukti/releases/tag/v2.0.7)
 
 *মুক্তি মানে স্বাধীনতা। Mukti means freedom.*
 
+</div>
