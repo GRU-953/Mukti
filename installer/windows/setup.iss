@@ -18,6 +18,7 @@ DefaultGroupName={#AppName}
 AllowNoIcons=yes
 OutputDir=output
 OutputBaseFilename=Mukti-Setup-{#AppVersion}
+SetupIconFile=mukti.ico
 Compression=lzma2/ultra64
 SolidCompression=yes
 MinVersion=10.0.17763
