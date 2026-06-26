@@ -23,14 +23,18 @@ if ($Install) {
     New-Item -Path "$progIdRoot\CLSID"  -Force | Out-Null
     Set-ItemProperty "$progIdRoot\CLSID" "(Default)" $Clsid
 
-    # Write Office Addin keys
+    # Write Office Addin keys to both paths:
+    #   versionless:  Office\{App}\Addins  (read by all Office versions)
+    #   versioned:    Office\16.0\{App}\Addins  (read by Office 2016/2019/2021/365)
     foreach ($app in $OfficeApps) {
-        $keyPath = "HKCU:\SOFTWARE\Microsoft\Office\$app\Addins\$ProgId"
-        New-Item -Path $keyPath -Force | Out-Null
-        Set-ItemProperty $keyPath "FriendlyName"    $FriendlyName
-        Set-ItemProperty $keyPath "Description"     $Description
-        Set-ItemProperty $keyPath "LoadBehavior"    3 -Type DWord
-        Set-ItemProperty $keyPath "CommandLineSafe" 0 -Type DWord
+        foreach ($ver in @("", "16.0\")) {
+            $keyPath = "HKCU:\SOFTWARE\Microsoft\Office\${ver}${app}\Addins\$ProgId"
+            New-Item -Path $keyPath -Force | Out-Null
+            Set-ItemProperty $keyPath "FriendlyName"    $FriendlyName
+            Set-ItemProperty $keyPath "Description"     $Description
+            Set-ItemProperty $keyPath "LoadBehavior"    3 -Type DWord
+            Set-ItemProperty $keyPath "CommandLineSafe" 0 -Type DWord
+        }
     }
     Write-Host "Mukti registered with Office"
 }
@@ -42,10 +46,12 @@ if ($Uninstall) {
     if (Test-Path $clsidRoot)  { Remove-Item $clsidRoot  -Recurse -Force }
     if (Test-Path $progIdRoot) { Remove-Item $progIdRoot -Recurse -Force }
 
-    # Remove Office Addin keys
+    # Remove Office Addin keys from both paths
     foreach ($app in $OfficeApps) {
-        $keyPath = "HKCU:\SOFTWARE\Microsoft\Office\$app\Addins\$ProgId"
-        if (Test-Path $keyPath) { Remove-Item $keyPath -Recurse -Force }
+        foreach ($ver in @("", "16.0\")) {
+            $keyPath = "HKCU:\SOFTWARE\Microsoft\Office\${ver}${app}\Addins\$ProgId"
+            if (Test-Path $keyPath) { Remove-Item $keyPath -Recurse -Force }
+        }
     }
     Write-Host "Mukti unregistered from Office"
 }

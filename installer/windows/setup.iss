@@ -51,6 +51,10 @@ Source: "{#BuildOutput}\\*.json"; DestDir: "{app}"; Flags: ignoreversion skipifs
 ; The .NET comhost reads this sidecar to map CLSIDs to managed types at runtime.
 ; dotnet publish does not copy it automatically — the csproj CopyClsidMapToPublish target does.
 Source: "{#BuildOutput}\\*.clsidmap"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
+; Override the auto-generated runtimeconfig with the framework-dependent version.
+; dotnet publish --self-contained generates "includedFrameworks" which the .NET comhost
+; cannot initialize during COM DllGetClassObject. "frameworks" (system runtime) works.
+Source: "Mukti.WindowsAddin.runtimeconfig.json"; DestDir: "{app}"; Flags: ignoreversion
 Source: "register-addin.ps1"; DestDir: "{app}"; Flags: ignoreversion
 Source: "fix-mukti-registration.ps1"; DestDir: "{app}"; Flags: ignoreversion
 
