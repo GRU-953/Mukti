@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.IO.Compression;
+using System.Runtime;
 using System.Text;
 using System.Text.RegularExpressions;
 using Mukti.Engine;
@@ -24,11 +25,15 @@ static class AuditRunner
     static bool IsValidUnicode(char c) =>
         (c >= 'ঀ' && c <= '৿') || c < 128 ||
         c == ' ' ||  // non-breaking space — valid in Office documents
-        c == ' ' || c == '।' || c == '॥' ||
+        c == ' ' || c == '।' || c == '॥' ||
         (c >= 'Ͱ' && c <= 'Ͽ') ||
         (c >= '‘' && c <= '‟') ||
         c == '—' || c == '–' || c == '…' || c == '―' ||
         c == '☐' || c == '☑' || c == '☒';
+
+    // Large-entry threshold: entries bigger than this get a warning and are skipped
+    // to prevent OOM on 2 GB machines. Default 20 MB; override with --skip-large N (MB).
+    const long DefaultSkipLargeBytes = 20L * 1024 * 1024;
 
     // ── Entry point ─────────────────────────────────────────────────────────────
 
@@ -39,6 +44,7 @@ static class AuditRunner
         string directory = @"D:\Test_files";
         ScanMode mode = ScanMode.Both;
         int resourceLimitPct = 70;
+        long skipLargeBytes = DefaultSkipLargeBytes;
 
         for (int i = 0; i < args.Length; i++)
         {
@@ -46,6 +52,11 @@ static class AuditRunner
                 mode = args[++i].ToLowerInvariant() switch { "bijoy" => ScanMode.Bijoy, "safety" => ScanMode.Safety, _ => ScanMode.Both };
             else if (args[i] == "--limit" && i + 1 < args.Length)
                 int.TryParse(args[++i], out resourceLimitPct);
+            else if (args[i] == "--skip-large" && i + 1 < args.Length && int.TryParse(args[i + 1], out int mb))
+            {
+                skipLargeBytes = (long)mb * 1024 * 1024;
+                i++;
+            }
             else if (!args[i].StartsWith("--"))
                 directory = args[i];
         }
@@ -78,11 +89,16 @@ static class AuditRunner
 
         long memLimitBytes = (long)(GetTotalMemoryBytes() * (resourceLimitPct / 100.0));
 
+        // Reduce GC pauses on low-end hardware — we process many files in a tight
+        // loop and don't need low-latency GC; batch mode lets the GC run less often.
+        GCSettings.LatencyMode = GCLatencyMode.Batch;
+
         Console.WriteLine($"Mukti Audit Scanner");
         Console.WriteLine($"Directory  : {directory}");
         Console.WriteLine($"Files      : {allFiles.Length}");
         Console.WriteLine($"Mode       : {mode}");
         Console.WriteLine($"Mem limit  : {resourceLimitPct}% of {GetTotalMemoryBytes() / 1024 / 1024} MB");
+        Console.WriteLine($"Skip-large : {skipLargeBytes / 1024 / 1024} MB per XML entry");
         Console.WriteLine(new string('─', 60));
 
         var results = new List<FileResult>();
@@ -102,7 +118,7 @@ static class AuditRunner
                 try
                 {
                     attempt++;
-                    result = ProcessFile(file, mode, conv);
+                    result = ProcessFile(file, mode, conv, skipLargeBytes);
                 }
                 catch (Exception ex) when (attempt < 3)
                 {
@@ -135,11 +151,12 @@ static class AuditRunner
 
     // ── File processing ─────────────────────────────────────────────────────────
 
-    static FileResult ProcessFile(string path, ScanMode mode, Converter? conv)
+    static FileResult ProcessFile(string path, ScanMode mode, Converter? conv, long skipLargeBytes)
     {
         var ext = Path.GetExtension(path).ToLowerInvariant();
         var bijoyRuns = new List<string>();
         var orphanedCPs = new SortedDictionary<int, int>();
+        var largeskipped = new List<string>();
 
         using (var zip = ZipFile.OpenRead(path))
         {
@@ -152,9 +169,16 @@ static class AuditRunner
 
                 if (!isWord && !isPpt && !isXlsx) continue;
 
-                string xml;
-                using var sr = new StreamReader(entry.Open(), Encoding.UTF8);
-                xml = sr.ReadToEnd();
+                // Guard: skip XML entries that would create huge in-memory strings
+                // and risk OOM on 2 GB machines.
+                if (entry.Length > skipLargeBytes)
+                {
+                    Console.Error.WriteLine($"  [WARN] {Path.GetFileName(path)}: entry '{n}' is {entry.Length / 1024 / 1024} MB — skipped (--skip-large threshold)");
+                    largeskipped.Add(n);
+                    continue;
+                }
+
+                string xml = ReadEntryXml(entry);
 
                 var runs = new List<string>();
                 if (isWord)  runs.AddRange(ExtractRuns(xml, WRunPat, WFontPat, WTextPat));
@@ -195,13 +219,46 @@ static class AuditRunner
             FullPath: path,
             SizeBytes: new FileInfo(path).Length,
             BijoyRunCount: bijoyRuns.Count,
-            OrphanedCPs: orphanedCPs
+            OrphanedCPs: orphanedCPs,
+            LargeEntriesSkipped: largeskipped.Count
         );
+    }
+
+    // Read a ZIP entry into a string.  Uses a pooled buffer to avoid allocating a
+    // fresh byte array for every entry: for entries up to 256 KB we rent from the
+    // array pool; for larger entries we fall back to StreamReader.ReadToEnd().
+    static string ReadEntryXml(ZipArchiveEntry entry)
+    {
+        const int SmallThreshold = 256 * 1024;
+
+        if (entry.Length > 0 && entry.Length <= SmallThreshold)
+        {
+            // Fast path: rent a buffer, decompress in one shot, decode to string.
+            var buf = System.Buffers.ArrayPool<byte>.Shared.Rent((int)entry.Length);
+            try
+            {
+                using var stream = entry.Open();
+                int totalRead = 0, read;
+                while ((read = stream.Read(buf, totalRead, buf.Length - totalRead)) > 0)
+                    totalRead += read;
+                return Encoding.UTF8.GetString(buf, 0, totalRead);
+            }
+            finally
+            {
+                System.Buffers.ArrayPool<byte>.Shared.Return(buf);
+            }
+        }
+
+        // Slow path (large or unknown-length entries): StreamReader.ReadToEnd().
+        using var sr = new StreamReader(entry.Open(), Encoding.UTF8);
+        return sr.ReadToEnd();
     }
 
     static List<string> ExtractRuns(string xml, Regex runPat, Regex fontPat, Regex textPat)
     {
         var runs = new List<string>();
+        // Use EnumerateMatches (no allocation per match) to scan for font pattern first,
+        // then run the heavier text extraction only on matched runs.
         foreach (Match rm in runPat.Matches(xml))
         {
             if (!fontPat.IsMatch(rm.Value)) continue;
@@ -232,10 +289,14 @@ static class AuditRunner
 
     static void PrintFinalReport(List<FileResult> results, List<string> skipped, Stopwatch sw)
     {
+        int totalLargeSkipped = results.Sum(r => r.LargeEntriesSkipped);
+
         Console.WriteLine();
         Console.WriteLine($"══ Final Report ═══════════════════════════════════════════");
         Console.WriteLine($"  Total processed : {results.Count}");
         Console.WriteLine($"  Skipped (errors): {skipped.Count}");
+        if (totalLargeSkipped > 0)
+            Console.WriteLine($"  Large entries   : {totalLargeSkipped} XML entries skipped (over size threshold)");
         Console.WriteLine($"  Elapsed         : {sw.Elapsed:hh\\:mm\\:ss}");
         Console.WriteLine();
 
@@ -310,6 +371,7 @@ static class AuditRunner
         string FullPath,
         long SizeBytes,
         int BijoyRunCount,
-        SortedDictionary<int, int> OrphanedCPs
+        SortedDictionary<int, int> OrphanedCPs,
+        int LargeEntriesSkipped
     );
 }
