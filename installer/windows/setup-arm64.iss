@@ -71,7 +71,7 @@ end;
 
 function InitializeSetup(): Boolean;
 var
-  dummyCard: Cardinal;
+  dummyErrCode: Integer;
 begin
   Result := True;
 
@@ -87,7 +87,7 @@ begin
       'After installing .NET 8, run this setup again.',
       mbConfirmation, MB_YESNO) = IDYES then
     begin
-      ShellExec('open', 'https://dotnet.microsoft.com/en-us/download/dotnet/8.0/runtime', '', '', SW_SHOWNORMAL, ewNoWait, dummyCard);
+      ShellExec('open', 'https://dotnet.microsoft.com/en-us/download/dotnet/8.0/runtime', '', '', SW_SHOWNORMAL, ewNoWait, dummyErrCode);
     end;
     Result := False;
     exit;
