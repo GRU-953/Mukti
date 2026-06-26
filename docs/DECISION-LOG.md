@@ -44,13 +44,15 @@ Engineering decisions that would be non-obvious to a future contributor.
 
 ---
 
-## D-0005 — No code signing in release workflow (temporary)
+## D-0005 — Mukti ships unsigned, by design (code signing abandoned)
 
-**Decision:** The release workflow ships unsigned installers directly. SignPath integration is deferred.
+**Decision:** Mukti's installers are distributed unsigned on both Windows and macOS. Code signing is not pursued — not deferred, abandoned.
 
-**Why:** SignPath Foundation's free open-source certificate requires a connector URL configuration that was not ready when v2.0.4 shipped. The workflow was simplified to remove the signing step rather than block the release. Users on Windows will see a SmartScreen warning on first run.
+**Why:** Authenticode (Windows) and Apple Developer (macOS) signing both add ongoing cost and process overhead with no benefit that matters for this project. Mukti is free, fully offline, and open-source: the complete source is public and reproducible from the GitHub Actions workflow, which is a stronger trust signal for this audience than a paid certificate. The earlier SignPath Foundation route added a third-party dependency and connector configuration that wasn't worth the maintenance burden, so it was dropped entirely.
 
-**Path forward:** Apply at https://about.signpath.io/product/open-source. See `docs/SIGNPATH-APPLICATION.md` for the full application details. Once approved, restore the `signpath/github-action-submit-signing-request@v1` step in `release.yml`.
+**Impact:** Windows users see a one-time SmartScreen prompt ("Windows protected your PC" → More info → Run anyway). macOS users right-click → Open to bypass Gatekeeper on first launch. Both are documented in the README install steps. No signing secrets, connectors, or external accounts are part of the build.
+
+**Consequence for the release workflow:** `release.yml` builds and publishes installers directly with no signing step, and none should be re-added.
 
 ---
 

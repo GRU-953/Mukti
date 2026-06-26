@@ -46,10 +46,10 @@ Read before adding any of these. Each was explicitly considered and rejected.
 ## U-011 — Selection-only conversion (highlighted text)
 **Built in v2.0.1.** "Scan Selection" button added to both Windows (WPF) and Mac (Blazor) UIs. Windows uses `_app.Selection.Range`; Mac uses `ctx.document.getSelection()` for Word and `ctx.workbook.getSelectedRange()` for Excel. PPT selection falls back to full-slide scan.
 
-## U-012 — macOS code signing
-**Not built.** The Mac .pkg is unsigned.
-**Why:** Apple Developer Program costs USD 99/year. Project has no budget. Users right-click > Open to bypass Gatekeeper.
-**Path forward:** Apply to open-source code signing sponsor.
+## U-012 — Code signing (Windows + macOS)
+**Abandoned by design.** Both installers ship unsigned and will stay that way. See decision D-0005.
+**Why:** Authenticode and Apple Developer signing add cost and process overhead with no benefit for a free, offline, open-source tool whose source and build are fully public. The SignPath Foundation route was dropped entirely.
+**User impact:** Windows — SmartScreen "More info → Run anyway"; macOS — right-click → Open to bypass Gatekeeper. Both documented in the README.
 
 ## U-013 — Separate .NET runtime download
 **Status: Resolved.** The installer uses dotnet publish --self-contained so the runtime is bundled. No separate .NET download required.

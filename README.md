@@ -50,9 +50,9 @@ You do not need any extra software or website. Mukti works directly from the Mic
 
 <br/>
 
-> **লক্ষ্য করুন (Note — Windows):** ইনস্টলার চালানোর সময় Windows একটি সতর্কবার্তা দেখাতে পারে — "Windows protected your PC"। এটি স্বাভাবিক। "More info" ক্লিক করুন, তারপর "Run anyway" ক্লিক করুন। সফটওয়্যারটি সম্পূর্ণ নিরাপদ এবং ওপেন-সোর্স; ইনস্টলারটি এখনো কোড-সাইন করা হয়নি বলেই এই বার্তা আসে।
+> **লক্ষ্য করুন (Note — Windows):** ইনস্টলার চালানোর সময় Windows একটি সতর্কবার্তা দেখাতে পারে — "Windows protected your PC"। এটি স্বাভাবিক। "More info" ক্লিক করুন, তারপর "Run anyway" ক্লিক করুন। মুক্তি একটি বিনামূল্যের ওপেন-সোর্স সফটওয়্যার যা পেইড কোড-সাইনিং সার্টিফিকেট ছাড়াই বিতরণ করা হয়; এর সম্পূর্ণ সোর্স কোড উন্মুক্ত এবং এটি সম্পূর্ণ নিরাপদ ও অফলাইন।
 >
-> Windows users will see a SmartScreen warning ("Windows protected your PC"). Click "More info" then "Run anyway". This is expected because the installer is not yet code-signed — the software is safe and open-source.
+> Windows users will see a SmartScreen warning ("Windows protected your PC"). Click "More info" then "Run anyway". Mukti is free, open-source software distributed without a paid code-signing certificate — its full source code is public, and it runs entirely offline.
 
 ---
 
