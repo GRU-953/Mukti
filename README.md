@@ -9,16 +9,16 @@ Convert Bijoy/SutonnyMJ Bengali text to Unicode — directly inside Microsoft Wo
 ## ⚡ Download & Install
 
 ### Windows (Word, Excel, PowerPoint)
-1. Download **Mukti-Setup-2.0.4.exe** from [GitHub Releases](https://github.com/GRU-953/Mukti/releases)
+1. Download **Mukti-Setup-2.0.5.exe** from [GitHub Releases](https://github.com/GRU-953/Mukti/releases)
 2. Double-click the installer — Mukti registers itself automatically
 3. Open Word (or Excel/PowerPoint) — the **Mukti** tab appears in the ribbon
 
 ### Windows ARM64 (Preview)
-1. Download **Mukti-Setup-2.0.4-arm64.exe** from [GitHub Releases](https://github.com/GRU-953/Mukti/releases)
+1. Download **Mukti-Setup-2.0.5-arm64.exe** from [GitHub Releases](https://github.com/GRU-953/Mukti/releases)
 2. Install the binaries — no COM registration happens automatically
 3. **Note:** ARM64-native Office is not yet available from Microsoft. Office on Windows ARM64 currently runs as x64 under emulation. Use the standard x64 installer above for daily use. The ARM64 build is a preview for when ARM64-native Office ships.
 ### Mac (Word, Excel, PowerPoint)
-1. Download **Mukti-2.0.4.pkg** from [GitHub Releases](https://github.com/GRU-953/Mukti/releases)
+1. Download **Mukti-2.0.5.pkg** from [GitHub Releases](https://github.com/GRU-953/Mukti/releases)
 2. Right-click the .pkg → **Open** (this bypasses the Gatekeeper warning — you only need to do this once)
 3. Follow the installer steps
 4. Open Word — the **Mukti** button appears in the Home tab

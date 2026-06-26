@@ -1,4 +1,4 @@
-@page "/"
+﻿@page "/"
 @using Mukti.Engine
 @inject IJSRuntime JS
 @inject HttpClient Http
@@ -192,7 +192,7 @@
 
     async Task CheckForUpdateAsync()
     {
-        const string current = "2.0.4";
+        const string current = "2.0.5";
         try
         {
             Http.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "Mukti-Mac");
