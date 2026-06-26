@@ -77,6 +77,12 @@ public class Connect : IDTExtensibility2, IRibbonExtensibility, ICustomTaskPaneC
         return _taskPaneControl?.IsEnglish == true ? "Bengali" : "বাংলা";
     }
 
+    public System.Drawing.Bitmap GetRibbonImage(IRibbonControl control)
+    {
+        using var stream = GetType().Assembly.GetManifestResourceStream("Mukti.WindowsAddin.Resources.icon32.png")!;
+        return new System.Drawing.Bitmap(stream);
+    }
+
     public void ToggleTaskPane(IRibbonControl control, bool isPressed)
     {
         if (_taskPane != null)

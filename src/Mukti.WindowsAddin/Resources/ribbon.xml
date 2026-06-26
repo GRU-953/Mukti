@@ -12,7 +12,7 @@
             getPressed="GetTaskPaneVisible"
             onAction="ToggleTaskPane"
             tag="showTaskPane"
-            imageMso="FontColorMoreColorsWordDialog" />
+            getImage="GetRibbonImage" />
         </group>
       </tab>
     </tabs>
