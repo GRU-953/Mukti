@@ -219,6 +219,9 @@ public class OfficeIntegration
                 }
                 catch
                 {
+                    // Workbook enumeration failed (e.g. protected workbook); fall back to the
+                    // active sheet only. ConversionSnapshot has no ErrorCount field, so this
+                    // failure is silent — adding one would be a larger change (U-005 pattern).
                     foreach (dynamic cell in _app.ActiveSheet.UsedRange.Cells)
                         ScanExcelCell(cell, snap, ref idx);
                 }
@@ -244,7 +247,16 @@ public class OfficeIntegration
                 return;
             }
 
-            string text = (string)cell.Text;
+            string text;
+            try
+            {
+                var raw = cell.Value2;
+                text = raw is string s ? s : cell.Text as string ?? string.Empty;
+            }
+            catch
+            {
+                text = cell.Text as string ?? string.Empty;
+            }
             if (string.IsNullOrEmpty(text)) return;
             string fontName = (string)cell.Font.Name;
             ProcessRun(text, fontName, snap, idx++, 0);
