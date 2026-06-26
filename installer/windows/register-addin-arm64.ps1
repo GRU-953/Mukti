@@ -1,6 +1,6 @@
 param([switch]$Install, [switch]$Uninstall, [string]$AppPath = "")
 
-$ProgId      = "Mukti.MuktiAddin"
+$ProgId      = "Mukti.Connect"
 $FriendlyName = "Mukti"
 $Description  = "Convert Bijoy/SutonnyMJ Bengali text to Unicode"
 $OfficeApps   = @("Word", "Excel", "PowerPoint")

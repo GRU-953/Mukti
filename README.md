@@ -69,14 +69,17 @@ You do not need any extra software or website. Mukti works directly from the Mic
 3. যদি "Windows protected your PC" বার্তা দেখায় — "More info" ক্লিক করুন, তারপর "Run anyway" ক্লিক করুন।
    *(If SmartScreen appears — click "More info", then "Run anyway".)*
 
-4. Windows অনুমতি (administrator) চাইলে **"Yes"** ক্লিক করুন — মুক্তি Office-এর সাথে যুক্ত হওয়ার জন্য এটি প্রয়োজন।
-   *(When Windows asks for administrator permission (a UAC prompt), click "Yes" — Mukti needs it to register with Office.)*
+4. ইনস্টলার শুধু আপনার জন্য ইনস্টল করে — কোনো administrator অনুমতির প্রয়োজন নেই।
+   *(The installer sets Mukti up just for you — no administrator permission is needed.)*
 
 5. ইনস্টলার সম্পূর্ণ হলে Microsoft Word, Excel বা PowerPoint খুলুন।
    *(Once installation is complete, open Microsoft Word, Excel, or PowerPoint.)*
 
 6. রিবনে **Mukti** নামে একটি নতুন ট্যাব দেখতে পাবেন।
    *(A new "Mukti" tab will appear in the ribbon.)*
+
+> **আগে পুরোনো সংস্করণ ইনস্টল করে থাকলে (Upgrading from an older version?):** v2.0.9 বা তার আগের সংস্করণ "সকল ব্যবহারকারীর জন্য" ইনস্টল করা ছিল। নতুনটি ইনস্টলের আগে **Windows Settings → Apps** থেকে পুরোনো "Mukti" আনইনস্টল করুন। ইনস্টলার নিজেও মনে করিয়ে দেবে।
+> *(If you installed v2.0.9 or earlier, it was an all-users install. Uninstall the old "Mukti" from Windows Settings → Apps before installing this version — the installer will also remind you.)*
 
 ---
 

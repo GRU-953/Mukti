@@ -13,7 +13,13 @@ AppPublisher={#AppPublisher}
 AppPublisherURL={#AppURL}
 AppSupportURL={#AppURL}
 AppUpdatesURL={#AppURL}
-DefaultDirName={autopf}\\Mukti
+; Per-user install (no admin elevation). A .NET COM add-in registers itself and
+; its Office Addins keys under HKEY_CURRENT_USER. If the installer elevated to
+; admin, "current user" would be the ADMIN account and the logged-in user's Word/
+; Excel/PowerPoint would never see the add-in. Installing per-user keeps every
+; registration in the real user's hive, which is where Office looks. It also
+; removes the UAC prompt — friendlier for non-technical users.
+DefaultDirName={localappdata}\\Mukti
 DefaultGroupName={#AppName}
 AllowNoIcons=yes
 OutputDir=output
@@ -23,8 +29,10 @@ Compression=lzma2/ultra64
 SolidCompression=yes
 MinVersion=10.0.17763
 ArchitecturesAllowed=x64compatible
+; Install in 64-bit mode so regsvr32 and registry access use the 64-bit view,
+; matching the x64 add-in and 64-bit Office.
 ArchitecturesInstallIn64BitMode=x64compatible
-PrivilegesRequired=admin
+PrivilegesRequired=lowest
 CloseApplications=yes
 CloseApplicationsFilter=*.exe
 
@@ -41,17 +49,21 @@ Source: "..\\..\\data\\bijoy-sutonnymj.json"; DestDir: "{app}\\data"; Flags: ign
 Source: "{#BuildOutput}\\*.dll"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 Source: "{#BuildOutput}\\*.json"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 Source: "register-addin.ps1"; DestDir: "{app}"; Flags: ignoreversion
+Source: "fix-mukti-registration.ps1"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
+Name: "{group}\\Repair Mukti (if it does not appear in Office)"; Filename: "powershell.exe"; Parameters: "-ExecutionPolicy Bypass -File ""{app}\\fix-mukti-registration.ps1"""; IconFilename: "{app}\\Mukti.WindowsAddin.dll"
 Name: "{group}\\Uninstall Mukti"; Filename: "{uninstallexe}"
 
 [Run]
-Filename: "regsvr32"; Parameters: "/s ""{app}\\Mukti.WindowsAddin.comhost.dll"""; Flags: runhidden waituntilterminated; StatusMsg: "Registering Mukti with Windows..."
-Filename: "powershell.exe"; Parameters: "-ExecutionPolicy Bypass -File ""{app}\\register-addin.ps1"" -Install -AppPath ""{app}"""; Flags: runhidden waituntilterminated; StatusMsg: "Registering Mukti with Microsoft Office..."
+; {sys} resolves to the 64-bit System32 here (ArchitecturesInstallIn64BitMode),
+; so the 64-bit comhost registers in the user's 64-bit HKCU\Software\Classes.
+Filename: "{sys}\\regsvr32.exe"; Parameters: "/s ""{app}\\Mukti.WindowsAddin.comhost.dll"""; Flags: runhidden waituntilterminated; StatusMsg: "Registering Mukti with Windows..."
+Filename: "powershell.exe"; Parameters: "-ExecutionPolicy Bypass -WindowStyle Hidden -File ""{app}\\register-addin.ps1"" -Install -AppPath ""{app}"""; Flags: runhidden waituntilterminated; StatusMsg: "Registering Mukti with Microsoft Office..."
 
 [UninstallRun]
-Filename: "regsvr32"; Parameters: "/s /u ""{app}\\Mukti.WindowsAddin.comhost.dll"""; Flags: runhidden waituntilterminated; RunOnceId: "UnregCOM"
-Filename: "powershell.exe"; Parameters: "-ExecutionPolicy Bypass -File ""{app}\\register-addin.ps1"" -Uninstall"; Flags: runhidden waituntilterminated; RunOnceId: "UnregAddin"
+Filename: "{sys}\\regsvr32.exe"; Parameters: "/s /u ""{app}\\Mukti.WindowsAddin.comhost.dll"""; Flags: runhidden waituntilterminated; RunOnceId: "UnregCOM"
+Filename: "powershell.exe"; Parameters: "-ExecutionPolicy Bypass -WindowStyle Hidden -File ""{app}\\register-addin.ps1"" -Uninstall"; Flags: runhidden waituntilterminated; RunOnceId: "UnregAddin"
 
 [Code]
 function InitializeSetup(): Boolean;
@@ -60,6 +72,27 @@ var
   officeFound: Boolean;
 begin
   Result := True;
+
+  // Block the per-machine -> per-user migration trap. Versions up to 2.0.9 installed
+  // for ALL USERS (admin) and recorded their uninstaller in HKLM. This per-user
+  // installer (PrivilegesRequired=lowest) cannot see or remove that older copy, so
+  // installing over it would leave two copies and a stale machine-wide COM
+  // registration that can still shadow this one. Detect the old install and stop
+  // with a clear instruction rather than silently producing a broken state.
+  if RegKeyExists(HKLM, 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{F4E71C21-9B7A-4C3E-8D22-8F91A235C4B1}_is1') or
+     RegKeyExists(HKLM32, 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{F4E71C21-9B7A-4C3E-8D22-8F91A235C4B1}_is1') then
+  begin
+    MsgBox(
+      'An older version of Mukti is installed for all users on this computer.' + #13#10 +
+      'It must be removed first (it was installed with administrator rights).' + #13#10 + #13#10 +
+      'Please open  Windows Settings > Apps > Installed apps,  find "Mukti",' + #13#10 +
+      'choose Uninstall, then run this installer again.' + #13#10 + #13#10 +
+      'This new version installs just for you and needs no administrator permission.',
+      mbError, MB_OK);
+    Result := False;
+    exit;
+  end;
+
   // Detect any supported Office installation:
   //  - Click-to-Run  (Microsoft 365, Office 2019, Office 2021)
   //  - MSI 64-bit    (traditional volume/retail installs)
