@@ -21,6 +21,11 @@ using System.Text.RegularExpressions;
 namespace Mukti.Engine;
 
 /// <summary>
+/// Script classification result returned by <see cref="Converter.DetectScript"/>.
+/// </summary>
+public enum ScriptType { Bijoy, UnicodeBn, Latin, Other }
+
+/// <summary>
 /// Converts Bijoy/SutonnyMJ-encoded Bengali text to NFC Unicode.
 /// </summary>
 public sealed partial class Converter
@@ -147,6 +152,56 @@ public sealed partial class Converter
     // -----------------------------------------------------------------------
     // Private helpers
     // -----------------------------------------------------------------------
+
+    // -----------------------------------------------------------------------
+    // Script detection (content-based, stateless)
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Heuristically detects the script encoding of <paramref name="text"/> by
+    /// counting characters that fall into each script's codepoint ranges.
+    /// </summary>
+    /// <param name="text">Input text to classify.</param>
+    /// <returns>
+    /// <see cref="ScriptType.Bijoy"/>    — text uses Bijoy/Windows-1252 encoding;<br/>
+    /// <see cref="ScriptType.UnicodeBn"/> — text contains Unicode Bengali characters;<br/>
+    /// <see cref="ScriptType.Latin"/>    — text is plain Latin/ASCII;<br/>
+    /// <see cref="ScriptType.Other"/>    — no classifiable characters found.
+    /// </returns>
+    public static ScriptType DetectScript(string text)
+    {
+        if (string.IsNullOrEmpty(text)) return ScriptType.Other;
+
+        int bn = 0, bj = 0, la = 0;
+
+        foreach (var c in text)
+        {
+            int cp = (int)c;
+
+            if (cp >= 0x0980 && cp <= 0x09FF)
+            {
+                bn++;
+            }
+            else if ((cp >= 0x00A0 && cp <= 0x00FF) ||
+                     (cp >= 0x0152 && cp <= 0x0178) ||
+                     (cp >= 0x2013 && cp <= 0x2122) ||
+                     cp == 0x0192 || cp == 0x02C6 || cp == 0x02DC ||
+                     cp == 0x0160 || cp == 0x0161)
+            {
+                bj++;
+            }
+            else if (char.IsLetter(c) && cp < 128)
+            {
+                la++;
+            }
+        }
+
+        int total = bn + bj + la;
+        if (total == 0) return ScriptType.Other;
+        if (bj >= 5 && bn == 0 && (la == 0 || bj * 10 >= la)) return ScriptType.Bijoy;
+        if (bn > 0) return ScriptType.UnicodeBn;
+        return ScriptType.Latin;
+    }
 
     /// <summary>
     /// Greedy longest-match substitution of Bijoy source glyphs to Unicode.

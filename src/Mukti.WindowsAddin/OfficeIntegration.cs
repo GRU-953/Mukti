@@ -30,6 +30,7 @@ public class ConversionSnapshot
     public List<string> UnsupportedFonts { get; set; } = new();
     public string AppType { get; set; } = "";
     public int FormulaSkippedCount { get; set; }  // U-005
+    public int AlreadyUnicodeCount { get; set; }
 }
 
 public class OfficeIntegration
@@ -345,6 +346,14 @@ public class OfficeIntegration
             case FontClass.Unsupported:
                 if (!snap.UnsupportedFonts.Contains(fontName))
                     snap.UnsupportedFonts.Add(fontName);
+                break;
+            case FontClass.Unicode:
+                if (Converter.DetectScript(text) == ScriptType.UnicodeBn)
+                    snap.AlreadyUnicodeCount++;
+                break;
+            case FontClass.NonBengali:
+                if (Converter.DetectScript(text) == ScriptType.UnicodeBn)
+                    snap.AlreadyUnicodeCount++;
                 break;
         }
     }

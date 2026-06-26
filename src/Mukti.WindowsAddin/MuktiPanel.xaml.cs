@@ -153,6 +153,8 @@ public partial class MuktiPanel : System.Windows.Controls.UserControl
             ShowWarning(_isEnglish
                 ? string.Join(" | ", warnings)
                 : string.Join(" | ", warnings));
+        if (result.AlreadyUnicodeCount > 0)
+            ShowWarning($"{result.AlreadyUnicodeCount} run{(result.AlreadyUnicodeCount == 1 ? "" : "s")} already in Unicode Bengali — skipped.");
     }
 
     private async void BtnScan_Click(object sender, RoutedEventArgs e)
@@ -275,7 +277,7 @@ public partial class MuktiPanel : System.Windows.Controls.UserControl
 
     private async void CheckForUpdateAsync()
     {
-        const string currentVersion = "2.0.14";
+        const string currentVersion = "2.0.15";
         try
         {
             using var client = new System.Net.Http.HttpClient();
