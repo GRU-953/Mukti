@@ -54,6 +54,9 @@ public sealed partial class FontRegistry
         "sutonnymj",
         "sutonnymj bold",
         "sutonnymj italic",
+        "sutonnymj regular",
+        "sutonnymj-regular",
+        "sutonnymjbold",
         "sutonny mj",
         "sutonnycmj",
         "sutonnyemj",
@@ -71,6 +74,11 @@ public sealed partial class FontRegistry
         "jugantormj",
         "samakalmj",
         "jaijaidinmj",
+        // Siyam Rupali ANSI: the "ANSI" build uses the Bijoy/Ekushey legacy byte
+        // layout (empirically confirmed — "Kw¤úDUvi" -> "কম্পিউটার", "evsjv" -> "বাংলা").
+        // NOTE: plain "siyam rupali" (no ANSI) is a Unicode font and must NOT be
+        // listed here — only the exact ANSI variant is legacy-encoded.
+        "siyam rupali ansi",
     };
 
     // -----------------------------------------------------------------------
@@ -142,9 +150,19 @@ public sealed partial class FontRegistry
         return new FontClassification(fontName, FontClass.NonBengali);
     }
 
-    /// <summary>Trim, lowercase, and collapse internal whitespace to a single space.</summary>
-    private static string Normalize(string name) =>
-        WhitespaceRegex().Replace(name.Trim().ToLowerInvariant(), " ");
+    /// <summary>
+    /// Trim, lowercase, and collapse internal whitespace to a single space.
+    /// A comma in an OOXML font attribute always denotes a style/fallback suffix
+    /// ("SutonnyMJ,Bold", "Calibri, sans-serif") — never part of a real family
+    /// name — so everything from the first comma onward is dropped before matching.
+    /// </summary>
+    private static string Normalize(string name)
+    {
+        var s = name.Trim().ToLowerInvariant();
+        var comma = s.IndexOf(',');
+        if (comma >= 0) s = s.Substring(0, comma);
+        return WhitespaceRegex().Replace(s.Trim(), " ");
+    }
 
     // -----------------------------------------------------------------------
     // Public read-only accessors for the curated lists (mirrors FontRegistry

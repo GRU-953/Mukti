@@ -18,6 +18,16 @@ window.muktiOffice = {
         catch (e) { return 'en-US'; }
     },
 
+    // Mirror Mukti.Engine.FontRegistry.Normalize so the Mac font gate matches the
+    // Windows path exactly: drop everything from the first comma (style/fallback
+    // decoration like "SutonnyMJ,Bold"), trim, lowercase, collapse internal whitespace.
+    normalizeFontName: function (raw) {
+        var s = raw || '';
+        var comma = s.indexOf(',');
+        if (comma >= 0) s = s.substring(0, comma);
+        return s.trim().toLowerCase().replace(/\s+/g, ' ');
+    },
+
     // ── Word — full document ──────────────────────────────────────────────
 
     scanWordDocument: function (knownBijoyFonts, bengaliMarkers) {
@@ -43,7 +53,7 @@ window.muktiOffice = {
                             var text = range.text;
                             if (!text || !text.trim()) return;
                             var rawFont = range.font.name || '';
-                            var fontName = rawFont.trim().toLowerCase();
+                            var fontName = window.muktiOffice.normalizeFontName(rawFont);
                             if (knownBijoyFonts.indexOf(fontName) >= 0) {
                                 results.push({ text: text, fontName: rawFont, paraIndex: baseParaIndex, runIndex: ri });
                             } else if (!warnedFonts[fontName]) {
@@ -335,7 +345,7 @@ window.muktiOffice = {
         return ctx.sync().then(function () {
             cellsToLoad.forEach(function (item) {
                 var rawFont = item.cell.format.font.name || '';
-                var fontName = rawFont.trim().toLowerCase();
+                var fontName = window.muktiOffice.normalizeFontName(rawFont);
                 if (knownBijoyFonts.indexOf(fontName) >= 0) {
                     results.push({ text: item.text, fontName: rawFont, paraIndex: item.row, runIndex: item.col, sheetIndex: item.sheetIndex });
                 } else if (!warnedFonts[fontName]) {
@@ -449,7 +459,7 @@ window.muktiOffice = {
                                                         var text = run.text;
                                                         if (!text || !text.trim()) return;
                                                         var rawFont = run.font.name || '';
-                                                        var fontName = rawFont.trim().toLowerCase();
+                                                        var fontName = window.muktiOffice.normalizeFontName(rawFont);
                                                         if (knownBijoyFonts.indexOf(fontName) >= 0) {
                                                             results.push({ text: text, fontName: rawFont, paraIndex: si * 10000 + shi * 100 + pi, runIndex: ri });
                                                         } else if (!warnedFonts[fontName]) {
@@ -487,7 +497,7 @@ window.muktiOffice = {
                                                             var text = run.text;
                                                             if (!text || !text.trim()) return;
                                                             var rawFont = run.font.name || '';
-                                                            var fontName = rawFont.trim().toLowerCase();
+                                                            var fontName = window.muktiOffice.normalizeFontName(rawFont);
                                                             if (knownBijoyFonts.indexOf(fontName) >= 0) {
                                                                 results.push({ text: text, fontName: rawFont, paraIndex: si * 10000 + 9900 + pi, runIndex: ri });
                                                             }

@@ -51,3 +51,23 @@ Engineering decisions that would be non-obvious to a future contributor.
 **Why:** SignPath Foundation's free open-source certificate requires a connector URL configuration that was not ready when v2.0.4 shipped. The workflow was simplified to remove the signing step rather than block the release. Users on Windows will see a SmartScreen warning on first run.
 
 **Path forward:** Apply at https://about.signpath.io/product/open-source. See `docs/SIGNPATH-APPLICATION.md` for the full application details. Once approved, restore the `signpath/github-action-submit-signing-request@v1` step in `release.yml`.
+
+---
+
+## D-0006 — Bijoy detection is an exact-match allowlist, never an "MJ-suffix" heuristic
+
+**Decision:** A font is converted only if its (comma-stripped, normalised) name is on the curated Bijoy allowlist in `FontRegistry`. The "...MJ" suffix is never treated as proof that a font is legacy-Bijoy.
+
+**Why:** An empirical pass over the 757-document test library (`D:\Test_files`) showed the MJ suffix is unreliable. Fonts whose names end in "MJ" but whose runs contain **already-Unicode Bengali** text:
+- `TangonMotaMJ` — runs like `এ এন্টারপ্রাইজের ব্যাকওয়ার্ড লিংকেজ…` (U+0980–U+09FF)
+- `ArhialkhanMJ` — `য়ীরা`
+- `SonkhoMJ` — `৬`
+- `NikoshMJ`, `SutonnyOMJ` — documented Unicode fonts from the prior codebase
+
+Converting any of these would corrupt valid Unicode. So MJ-suffix fuzzy matching is permanently rejected; only verified names are added.
+
+**Siyam Rupali ANSI is the opposite case.** Its runs are legacy ASCII+high-byte mojibake (`Avwg`, `evsjv`, `Kw¤úDUvi`). Test-converting them through the engine produced correct Bengali (`আমি`, `বাংলা`, `কম্পিউটার`), proving the "ANSI" build uses the Bijoy/Ekushey byte layout. It was added to the allowlist as the exact string `siyam rupali ansi` — **plain `siyam rupali` (Unicode) is deliberately excluded.**
+
+**Defence in depth:** Even on a Bijoy-listed font, `Converter.Convert` is a no-op when `IsBijoyText` finds no ASCII source glyphs, so an already-Unicode run under a Bijoy-named font is never mangled. Both the Windows (`OfficeIntegration`) and Mac (`office-interop.js`) paths convert only `FontClass.Bijoy` runs; English and Unicode-Bengali fonts are left untouched.
+
+**How:** `Normalize` drops everything from the first comma (style/fallback decoration like `SutonnyMJ,Bold` or `Calibri, sans-serif`). Variant spellings (`sutonnymjbold`, `sutonnymj-regular`) are explicit list entries, not inferred. The standalone `tools/AuditScanner` matches the same family set so the audit reflects exactly what the add-in converts.
