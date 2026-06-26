@@ -1,5 +1,5 @@
 #define AppName "Mukti"
-#define AppVersion "2.0.10"
+#define AppVersion "2.0.11"
 #define AppPublisher "GRU-953"
 #define AppURL "https://github.com/GRU-953/Mukti"
 #define AppGuid "F4E71C21-9B7A-4C3E-8D22-8F91A235C4B1"
@@ -48,6 +48,9 @@ Source: "{#BuildOutput}\\libs\\Extensibility.dll"; DestDir: "{app}\\libs"; Flags
 Source: "..\\..\\data\\bijoy-sutonnymj.json"; DestDir: "{app}\\data"; Flags: ignoreversion
 Source: "{#BuildOutput}\\*.dll"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 Source: "{#BuildOutput}\\*.json"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
+; The .NET comhost reads this sidecar to map CLSIDs to managed types at runtime.
+; dotnet publish does not copy it automatically — the csproj CopyClsidMapToPublish target does.
+Source: "{#BuildOutput}\\*.clsidmap"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 Source: "register-addin.ps1"; DestDir: "{app}"; Flags: ignoreversion
 Source: "fix-mukti-registration.ps1"; DestDir: "{app}"; Flags: ignoreversion
 
@@ -56,13 +59,12 @@ Name: "{group}\\Repair Mukti (if it does not appear in Office)"; Filename: "powe
 Name: "{group}\\Uninstall Mukti"; Filename: "{uninstallexe}"
 
 [Run]
-; {sys} resolves to the 64-bit System32 here (ArchitecturesInstallIn64BitMode),
-; so the 64-bit comhost registers in the user's 64-bit HKCU\Software\Classes.
-Filename: "{sys}\\regsvr32.exe"; Parameters: "/s ""{app}\\Mukti.WindowsAddin.comhost.dll"""; Flags: runhidden waituntilterminated; StatusMsg: "Registering Mukti with Windows..."
+; register-addin.ps1 writes both the HKCU COM registration (CLSID/InprocServer32/ProgId)
+; and the Office Addins keys directly. regsvr32 is not used because it attempts HKLM
+; writes first and returns exit code 5 (access denied) in a non-elevated process.
 Filename: "powershell.exe"; Parameters: "-ExecutionPolicy Bypass -WindowStyle Hidden -File ""{app}\\register-addin.ps1"" -Install -AppPath ""{app}"""; Flags: runhidden waituntilterminated; StatusMsg: "Registering Mukti with Microsoft Office..."
 
 [UninstallRun]
-Filename: "{sys}\\regsvr32.exe"; Parameters: "/s /u ""{app}\\Mukti.WindowsAddin.comhost.dll"""; Flags: runhidden waituntilterminated; RunOnceId: "UnregCOM"
 Filename: "powershell.exe"; Parameters: "-ExecutionPolicy Bypass -WindowStyle Hidden -File ""{app}\\register-addin.ps1"" -Uninstall"; Flags: runhidden waituntilterminated; RunOnceId: "UnregAddin"
 
 [Code]

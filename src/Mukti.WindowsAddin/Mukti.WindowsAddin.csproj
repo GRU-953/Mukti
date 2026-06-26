@@ -13,8 +13,8 @@
     <AssemblyName>Mukti.WindowsAddin</AssemblyName>
     <RootNamespace>Mukti.WindowsAddin</RootNamespace>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-    <AssemblyVersion>2.0.10.0</AssemblyVersion>
-    <FileVersion>2.0.10.0</FileVersion>
+    <AssemblyVersion>2.0.11.0</AssemblyVersion>
+    <FileVersion>2.0.11.0</FileVersion>
     <Product>Mukti</Product>
     <Company>GRU-953</Company>
     <Copyright>MIT License</Copyright>
@@ -43,4 +43,13 @@
     <EmbeddedResource Include="Resources\icon32.png" />
     <EmbeddedResource Include="Resources\icon256.png" />
   </ItemGroup>
+  <!-- Copy the comhost clsidmap sidecar into the publish directory.
+       dotnet publish does not do this automatically; the comhost reads it at
+       runtime to map CLSIDs to managed types. Sidecar name = comhost dll name
+       minus the final .dll extension plus .clsidmap. -->
+  <Target Name="CopyClsidMapToPublish" AfterTargets="Publish"
+          Condition="'$(PublishDir)' != '' And Exists('$(IntermediateOutputPath)$(AssemblyName).clsidmap')">
+    <Copy SourceFiles="$(IntermediateOutputPath)$(AssemblyName).clsidmap"
+          DestinationFiles="$(PublishDir)$(AssemblyName).comhost.clsidmap" />
+  </Target>
 </Project>

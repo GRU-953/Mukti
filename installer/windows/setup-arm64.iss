@@ -1,5 +1,5 @@
 #define AppName "Mukti"
-#define AppVersion "2.0.10"
+#define AppVersion "2.0.11"
 #define AppPublisher "GRU-953"
 #define AppURL "https://github.com/GRU-953/Mukti"
 #define AppGuid "A7B3C9D1-2E4F-5A6B-7C8D-9E0F1A2B3C4D"
@@ -38,6 +38,7 @@ Source: "{#BuildOutput}\Extensibility.dll"; DestDir: "{app}"; Flags: ignoreversi
 Source: "..\..\data\bijoy-sutonnymj.json"; DestDir: "{app}\data"; Flags: ignoreversion
 Source: "{#BuildOutput}\*.dll"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 Source: "{#BuildOutput}\*.json"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
+Source: "{#BuildOutput}\*.clsidmap"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 Source: "register-addin-arm64.ps1"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
