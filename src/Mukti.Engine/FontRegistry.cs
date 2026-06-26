@@ -79,6 +79,54 @@ public sealed partial class FontRegistry
         // NOTE: plain "siyam rupali" (no ANSI) is a Unicode font and must NOT be
         // listed here — only the exact ANSI variant is legacy-encoded.
         "siyam rupali ansi",
+        // Proshika Multimedia fonts (confirmed Bijoy encoding)
+        "proshika mn",
+        "proshikamn",
+        "proshika mn regular",
+        "proshika mtb",
+        "proshikamtb",
+        "proshika mt bold",
+        "proshika",
+        // Rupali fonts (confirmed Bijoy encoding, newspaper/publication)
+        "rupali",
+        "rupali mj",
+        "rupali-mj",
+        "rupali bold",
+        // Boishakhi/Baisakhi fonts (confirmed Bijoy encoding)
+        "boishakhi",
+        "boishakhi mj",
+        "baisakhi",
+        "baisakhi mj",
+        // Bashundhara fonts (confirmed Bijoy encoding, major media)
+        "bashundhara",
+        "bashundhara mj",
+        "bashundharamj",
+        "bashumdhara",
+        // Additional Ananda Computers river-named Bijoy fonts
+        "shitalakshyamj",
+        "shitalakkhyamj",
+        "bhairakmj",
+        "surmamj",
+        "kushiyaramj",
+        "dhaleshwarimj",
+        "atraimj",
+        "barendamj",
+        "rupshamj",
+        "ichamatimj",
+        "haldamj",
+        "brahmaputramj",
+        "teestamj",
+        "kobadakmj",
+        "mahanandamj",
+        "burigangamj",
+        // Other common Bijoy-family fonts (documented Bijoy encoding)
+        "muktimj",
+        "abasan mj",
+        "abasanmj",
+        "mitramj",
+        "mitra mj",
+        "shanta mj",
+        "shantamj",
     };
 
     // -----------------------------------------------------------------------
@@ -110,6 +158,7 @@ public sealed partial class FontRegistry
         "bengali",
         "lipi",
         "bijoy",
+        "ansi",
     };
 
     private static readonly HashSet<string> _bijoySet =

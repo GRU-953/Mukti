@@ -165,4 +165,85 @@ public sealed class FontRegistryTests
     {
         Assert.NotEmpty(_registry.BengaliMarkers);
     }
+
+    // -----------------------------------------------------------------------
+    // Newly added font names — spot-check at least 8 entries per group
+    // -----------------------------------------------------------------------
+
+    [Theory]
+    // Proshika Multimedia
+    [InlineData("proshika mn")]
+    [InlineData("Proshika MN")]
+    [InlineData("proshikamn")]
+    [InlineData("proshika mt bold")]
+    // Rupali
+    [InlineData("rupali")]
+    [InlineData("Rupali")]
+    [InlineData("rupali mj")]
+    [InlineData("rupali bold")]
+    // Boishakhi/Baisakhi
+    [InlineData("boishakhi")]
+    [InlineData("baisakhi")]
+    [InlineData("boishakhi mj")]
+    [InlineData("baisakhi mj")]
+    // Bashundhara
+    [InlineData("bashundhara")]
+    [InlineData("Bashundhara MJ")]
+    [InlineData("bashundharamj")]
+    [InlineData("bashumdhara")]
+    // Additional Ananda Computers river-named fonts
+    [InlineData("shitalakshyamj")]
+    [InlineData("bhairakmj")]
+    [InlineData("surmamj")]
+    [InlineData("kushiyaramj")]
+    [InlineData("dhaleshwarimj")]
+    [InlineData("brahmaputramj")]
+    [InlineData("teestamj")]
+    [InlineData("burigangamj")]
+    // Other Bijoy-family
+    [InlineData("muktimj")]
+    [InlineData("abasan mj")]
+    [InlineData("mitramj")]
+    [InlineData("shanta mj")]
+    public void Classify_NewlyAddedBijoyFont_ReturnsBijoy(string fontName)
+    {
+        var result = _registry.Classify(fontName);
+        Assert.Equal(FontClass.Bijoy, result.Class);
+        Assert.Null(result.Reason);
+    }
+
+    // -----------------------------------------------------------------------
+    // Regression guards — existing entries must still classify correctly
+    // -----------------------------------------------------------------------
+
+    [Fact]
+    public void Classify_Nikosh_IsUnicode()
+    {
+        // Regression guard: "nikosh" must NOT be Bijoy or Unsupported
+        var result = _registry.Classify("nikosh");
+        Assert.Equal(FontClass.Unicode, result.Class);
+    }
+
+    [Fact]
+    public void Classify_SiyamRupaliPlain_IsNonBengali()
+    {
+        // Plain "siyam rupali" (no ANSI) is a Unicode font but does not
+        // appear on KnownUnicode list — classifies as NonBengali (no marker hit).
+        var result = _registry.Classify("siyam rupali");
+        Assert.Equal(FontClass.NonBengali, result.Class);
+    }
+
+    // -----------------------------------------------------------------------
+    // "ansi" marker — unknown ANSI-suffixed Bengali fonts -> Unsupported
+    // -----------------------------------------------------------------------
+
+    [Fact]
+    public void Classify_UnknownAnsiSuffixedFont_ReturnsUnsupported()
+    {
+        // "something ansi" is not on any known list but contains the "ansi"
+        // marker, so it should surface as Unsupported rather than NonBengali.
+        var result = _registry.Classify("something ansi");
+        Assert.Equal(FontClass.Unsupported, result.Class);
+        Assert.NotNull(result.Reason);
+    }
 }

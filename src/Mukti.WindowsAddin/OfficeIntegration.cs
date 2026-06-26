@@ -328,6 +328,7 @@ public class OfficeIntegration
         switch (classification.Class)
         {
             case FontClass.Bijoy:
+            {
                 var converted = _converter.Convert(text);
                 if (converted != text)
                 {
@@ -343,6 +344,7 @@ public class OfficeIntegration
                     });
                 }
                 break;
+            }
             case FontClass.Unsupported:
                 if (!snap.UnsupportedFonts.Contains(fontName))
                     snap.UnsupportedFonts.Add(fontName);
@@ -352,9 +354,27 @@ public class OfficeIntegration
                     snap.AlreadyUnicodeCount++;
                 break;
             case FontClass.NonBengali:
-                if (Converter.DetectScript(text) == ScriptType.UnicodeBn)
+            {
+                var script = Converter.DetectScript(text);
+                if (script == ScriptType.UnicodeBn)
                     snap.AlreadyUnicodeCount++;
+                else if (script == ScriptType.Bijoy)
+                {
+                    var converted = _converter.Convert(text);
+                    if (converted != text)
+                        snap.Items.Add(new RunItem
+                        {
+                            Original     = text,
+                            Converted    = converted,
+                            FontName     = fontName,
+                            ParagraphIndex = paraIdx,
+                            RunIndex     = runIdx,
+                            AppType      = snap.AppType,
+                            SnapshotText = text,
+                        });
+                }
                 break;
+            }
         }
     }
 

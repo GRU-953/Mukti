@@ -146,6 +146,7 @@
                 return;
             }
 
+            int alreadyUnicodeCount = 0;
             if (scanResult?.Runs == null || scanResult.Runs.Count == 0)
             {
                 _status = _isEnglish ? "No Bijoy text found." : "à¦•à§‹à¦¨à§‹ à¦¬à¦¿à¦œà¦¯à¦¼ à¦²à§‡à¦–à¦¾ à¦ªà¦¾à¦“à¦¯à¦¼à¦¾ à¦¯à¦¾à¦¯à¦¼à¦¨à¦¿à¥¤";
@@ -157,6 +158,8 @@
                 // snapshot, so Apply still converts every run.
                 int previewCap = (_lowMemory || _hardwareCores <= 1) ? 200 : int.MaxValue;
                 foreach (var run in scanResult.Runs) {
+                    if (Converter.DetectScript(run.Text) == ScriptType.UnicodeBn)
+                        alreadyUnicodeCount++;
                     var converted = _converter.Convert(run.Text);
                     if (converted != run.Text) {
                         _snapshot.Add(new ScanRun { Original = run.Text, Converted = converted, FontName = run.FontName, ParaIndex = run.ParaIndex, RunIndex = run.RunIndex, SheetIndex = run.SheetIndex });
@@ -182,6 +185,10 @@
                     : $"{scanResult.FormulaSkippedCount}à¦Ÿà¦¿ à¦¸à§‚à¦¤à§à¦° à¦¸à§‡à¦² à¦¬à¦¾à¦¦ à¦¦à§‡à¦“à¦¯à¦¼à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡");
             if (scanResult?.Warnings != null && scanResult.Warnings.Count > 0)
                 warningParts.Add((_isEnglish ? "Unknown fonts: " : "à¦…à¦œà¦¾à¦¨à¦¾ à¦«à¦¨à§à¦Ÿ: ") + string.Join(", ", scanResult.Warnings));
+            if (alreadyUnicodeCount > 0)
+                warningParts.Add(_isEnglish
+                    ? $"{alreadyUnicodeCount} run{(alreadyUnicodeCount == 1 ? "" : "s")} already in Unicode Bengali — skipped."
+                    : $"{alreadyUnicodeCount}টি রান ইতিমধ্যে ইউনিকোড বাংলায় রয়েছে — এড়িয়ে যাওয়া হয়েছে।");
             if (warningParts.Count > 0)
                 _warning = string.Join(" | ", warningParts);
 
