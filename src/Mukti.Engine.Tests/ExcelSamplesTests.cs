@@ -1,4 +1,4 @@
-// ExcelSamplesTests.cs — Real-world Bijoy strings extracted from BRAC xlsx files.
+﻿// ExcelSamplesTests.cs — Real-world Bijoy strings extracted from BRAC xlsx files.
 //
 // Strings were extracted from xl/sharedStrings.xml in two BRAC xlsx files:
 //   File A: PO & BM Action Plan Format_2020 - 2nd time.xlsx  (BMTI_Onboarding)
@@ -58,9 +58,9 @@ public sealed class ExcelSamplesTests
     [InlineData("cÖ¯'ZKvixi ¯^vÿit")]
     [InlineData("Aby‡gv`bKvixi ¯^vÿit")]
     [InlineData("MÖvg/¯úU/KwgwUi bvg")]
-    [InlineData("Kg©m~wP msMVK (BDwcwR) Gi ˆ`wbK d‡jvAvc cwiKíbv-20......... (cÖ_g I Z…Zxq mßvn)")]
+    [InlineData("[1] Kg©m~wP msMVK (BDwcwR) Gi ˆ`wbK d‡jvAvc cwiKíbv-20......... (cÖ_g I Z…Zxq mßvn)")]
     [InlineData("eª¨vK - AvjUªv-cyIi MÖ¨vRy‡qkb (BDwcwR) †cÖvMÖvg")]
-    [InlineData("Kg©m~wP msMVK (BDwcwR) Gi ˆ`wbK d‡jvAvc cwiKíbv-20........ (wØZxq I PZz_© mßvn)")]
+    [InlineData("[2] Kg©m~wP msMVK (BDwcwR) Gi ˆ`wbK d‡jvAvc cwiKíbv-20........ (wØZxq I PZz_© mßvn)")]
     [InlineData("eª¨vK, AvjUªv-cyIi MÖ¨vRy‡qkb (BDwcwR) †cÖvMÖvg")]
     [InlineData("kvLv e¨e¯'vcK (BDwcwR) Gi gvwmK Kg©cwiKíbv")]
     [InlineData("m`m¨ msL¨v")]
@@ -108,14 +108,14 @@ public sealed class ExcelSamplesTests
     [InlineData("(bwgwb cÖ`v‡bi †ÿ‡Î Kb¨v mšÍvb, bvix‡K AMÖvwaKvi w`‡Z n‡e)")]
     [InlineData("`~‡h©vM e¨e¯'vcbv")]
     [InlineData("¯^v¯'¨ evZvqb (¯^v¯'¨ msµvšÍ civgk©)")]
-    [InlineData("¯^v¯'¨‡mevRwbZ Avw_©K mnvqZvi weeiY")]
+    [InlineData("Kgx©i ¯^vÿi")]
     [InlineData("¯^v¯'¨m¤§Z j¨vwUª‡bi e¨envi I wbivc` cvwb cvb")]
     [InlineData("¯^vÿi")]
     [InlineData("¯'vqx LiP")]
     [InlineData("¯'vqx wVKvbv")]
     [InlineData("¯‹zj Mg‡bvc‡hvMx †Q‡j‡g‡qiv ¯‹z‡j hvq")]
     [InlineData("µwgK b¤^i")]
-    [InlineData("†diZ‡hvM¨ e&ª¨vK mnvqZvi cwigvY (UvKv)")]
+    [InlineData("G ch©šÍ Av`vq")]
     [InlineData("†diZ‡hvM¨ eª¨vK mnvqZv")]
     [InlineData("†diZ‡hvM¨ eª¨vK mnvqZv Av`v‡qi weeiY")]
     [InlineData("†diZ‡hvM¨ eª¨vK mnvqZvi")]

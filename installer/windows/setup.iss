@@ -1,5 +1,5 @@
 ﻿#define AppName "Mukti"
-#define AppVersion "2.0.19"
+#define AppVersion "2.0.20"
 #define AppPublisher "GRU-953"
 #define AppURL "https://github.com/GRU-953/Mukti"
 #define AppGuid "F4E71C21-9B7A-4C3E-8D22-8F91A235C4B1"
@@ -77,27 +77,90 @@ Filename: "powershell.exe"; Parameters: "-ExecutionPolicy Bypass -WindowStyle Hi
 Filename: "powershell.exe"; Parameters: "-ExecutionPolicy Bypass -WindowStyle Hidden -File ""{app}\\register-addin.ps1"" -Uninstall"; Flags: runhidden waituntilterminated; RunOnceId: "UnregAddin"
 
 [Code]
+
+function IsDotNet8DesktopRuntimeInstalled(): Boolean;
+const
+  RegBase   = 'SOFTWARE\dotnet\Setup\InstalledVersions\x64\sharedfx\Microsoft.WindowsDesktop.App';
+  RegWow    = 'SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x64\sharedfx\Microsoft.WindowsDesktop.App';
+  RegBase8  = 'SOFTWARE\dotnet\Setup\InstalledVersions\x64\sharedfx\Microsoft.WindowsDesktop.App\8.0';
+  RegWow8   = 'SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x64\sharedfx\Microsoft.WindowsDesktop.App\8.0';
+  RelShared = '\shared\Microsoft.WindowsDesktop.App\';
+var
+  ValueNames : TArrayOfString;
+  FindRec    : TFindRec;
+  SharedDir  : String;
+  ExitCode   : Integer;
+  i          : Integer;
+begin
+  Result := False;
+
+  // Layer 1: HKLM subkey (old format -- .NET <=8.0.6)
+  if RegKeyExists(HKLM, RegBase8) then begin Result := True; Exit; end;
+  if RegKeyExists(HKLM, RegWow8)  then begin Result := True; Exit; end;
+
+  // Layer 2: HKCU subkey (per-user, old format)
+  if RegKeyExists(HKCU, 'SOFTWARE\dotnet\Setup\InstalledVersions\x64\sharedfx\Microsoft.WindowsDesktop.App\8.0') then
+    begin Result := True; Exit; end;
+
+  // Layer 3: Modern registry format -- version stored as VALUE name '8.0.xx'
+  // on the parent key (used since .NET 8.0.7).  RegGetValueNames enumerates
+  // all value names; we accept any that start with '8.'.
+  if RegGetValueNames(HKLM, RegWow, ValueNames) then
+    for i := 0 to GetArrayLength(ValueNames) - 1 do
+      if (Length(ValueNames[i]) > 2) and (Copy(ValueNames[i], 1, 2) = '8.') then
+        begin Result := True; Exit; end;
+
+  if RegGetValueNames(HKLM, RegBase, ValueNames) then
+    for i := 0 to GetArrayLength(ValueNames) - 1 do
+      if (Length(ValueNames[i]) > 2) and (Copy(ValueNames[i], 1, 2) = '8.') then
+        begin Result := True; Exit; end;
+
+  // Layer 4: Filesystem -- C:\Program Files\dotnet\shared\...\8.x.y\
+  SharedDir := ExpandConstant('{pf}') + '\dotnet' + RelShared;
+  if DirExists(SharedDir) then
+    if FindFirst(SharedDir + '8.*', FindRec) then
+      begin FindClose(FindRec); Result := True; Exit; end;
+
+  // Layer 5: Per-user MSIX / dotnet-install.ps1 -- %LOCALAPPDATA%\Microsoft\dotnet
+  SharedDir := ExpandConstant('{localappdata}') + '\Microsoft\dotnet' + RelShared;
+  if DirExists(SharedDir) then
+    if FindFirst(SharedDir + '8.*', FindRec) then
+      begin FindClose(FindRec); Result := True; Exit; end;
+
+  // Layer 6: winget per-user -- %LOCALAPPDATA%\Programs\dotnet
+  SharedDir := ExpandConstant('{localappdata}') + '\Programs\dotnet' + RelShared;
+  if DirExists(SharedDir) then
+    if FindFirst(SharedDir + '8.*', FindRec) then
+      begin FindClose(FindRec); Result := True; Exit; end;
+
+  // Layer 7: dotnet.exe on PATH (Scoop, Chocolatey, VS-bundled, custom prefix)
+  if Exec(ExpandConstant('{cmd}'), '/C dotnet --list-runtimes', '',
+          SW_HIDE, ewWaitUntilTerminated, ExitCode) then
+    if ExitCode = 0 then begin Result := True; Exit; end;
+
+  Result := False;
+end;
+
+
 function InitializeSetup(): Boolean;
 var
-  dummy: String;
-  officeFound: Boolean;
-  dummyErrCode: Integer;
+  dummy        : String;
+  officeFound  : Boolean;
+  dummyErrCode : Integer;
 begin
   Result := True;
 
-  // Block the per-machine -> per-user migration trap. Versions up to 2.0.10 installed
-  // for ALL USERS (admin) and recorded their uninstaller in HKLM. This per-user
-  // installer (PrivilegesRequired=lowest) cannot see or remove that older copy, so
-  // installing over it would leave two copies and a stale machine-wide COM
-  // registration that can still shadow this one. Detect the old install and stop
-  // with a clear instruction rather than silently producing a broken state.
+  // Block the per-machine -> per-user migration trap. Versions up to 2.0.10
+  // installed for ALL USERS (admin) and recorded their uninstaller in HKLM.
+  // This per-user installer cannot see or remove that older copy; installing
+  // over it would leave two copies and a stale machine-wide COM registration.
   if RegKeyExists(HKLM, 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{F4E71C21-9B7A-4C3E-8D22-8F91A235C4B1}_is1') or
      RegKeyExists(HKLM32, 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{F4E71C21-9B7A-4C3E-8D22-8F91A235C4B1}_is1') then
   begin
     MsgBox(
       'An older version of Mukti is installed for all users on this computer.' + #13#10 +
       'It must be removed first (it was installed with administrator rights).' + #13#10 + #13#10 +
-      'Please open  Windows Settings > Apps > Installed apps,  find "Mukti",' + #13#10 +
+      'Please open  Windows Settings > Apps > Installed apps,  find Mukti,' + #13#10 +
       'choose Uninstall, then run this installer again.' + #13#10 + #13#10 +
       'This new version installs just for you and needs no administrator permission.',
       mbError, MB_OK);
@@ -105,10 +168,10 @@ begin
     exit;
   end;
 
-  // Require .NET 8 WindowsDesktop Runtime (framework-dependent deployment).
-  // Without it the comhost cannot initialize the managed add-in.
-  if not RegKeyExists(HKLM, 'SOFTWARE\dotnet\Setup\InstalledVersions\x64\sharedfx\Microsoft.WindowsDesktop.App\8.0') and
-     not RegKeyExists(HKLM, 'SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x64\sharedfx\Microsoft.WindowsDesktop.App\8.0') then
+  // Require .NET 8 Windows Desktop Runtime (framework-dependent deployment).
+  // Detection covers: registry subkeys (old format), registry values (new
+  // format since 8.0.7), filesystem paths, and dotnet.exe on PATH.
+  if not IsDotNet8DesktopRuntimeInstalled() then
   begin
     if MsgBox(
       'Mukti needs the .NET 8 Desktop Runtime to work.' + #13#10 +
@@ -123,12 +186,7 @@ begin
     exit;
   end;
 
-  // Detect any supported Office installation:
-  //  - Click-to-Run  (Microsoft 365, Office 2019, Office 2021)
-  //  - MSI 64-bit    (traditional volume/retail installs)
-  //  - MSI 32-bit    (32-bit Office on 64-bit Windows, lives under WOW6432Node)
-  //  - Per-user      (HKCU install path)
-  //  - Office 2013   (version 15.0)
+  // Detect any supported Office installation.
   officeFound :=
     RegKeyExists(HKLM, 'SOFTWARE\Microsoft\Office\ClickToRun\Configuration') or
     RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Office\16.0\Common\InstallRoot', 'Path', dummy) or

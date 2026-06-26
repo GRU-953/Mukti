@@ -26,6 +26,19 @@ jobs:
         run: |
           dotnet restore Mukti.sln
           dotnet publish src/Mukti.WindowsAddin/Mukti.WindowsAddin.csproj --configuration Release --runtime win-x64 --no-self-contained --output src/Mukti.WindowsAddin/bin/Release/net8.0-windows/win-x64/publish
+      - name: Verify DLL version matches tag
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"           # e.g. "v2.0.19"
+          $expected = $tag.TrimStart('v') + ".0"    # e.g. "2.0.19.0"
+          $dll = "src/Mukti.WindowsAddin/bin/Release/net8.0-windows/win-x64/publish/Mukti.WindowsAddin.dll"
+          $actual = [System.Diagnostics.FileVersionInfo]::GetVersionInfo($dll).FileVersion
+          Write-Host "Tag: $tag  Expected: $expected  Actual: $actual"
+          if ($actual -ne $expected) {
+            Write-Error "DLL version mismatch: expected $expected, got $actual"
+            exit 1
+          }
+          Write-Host "Version OK: $actual"
       - name: Build Inno Setup installer
         run: iscc installer\windows\setup.iss
       - name: Upload unsigned installer
@@ -85,6 +98,19 @@ jobs:
         run: |
           dotnet restore Mukti.sln
           dotnet publish src/Mukti.WindowsAddin/Mukti.WindowsAddin.csproj --configuration Release --runtime win-arm64 --no-self-contained --output src/Mukti.WindowsAddin/bin/Release/net8.0-windows/win-arm64/publish
+      - name: Verify DLL version matches tag
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"           # e.g. "v2.0.19"
+          $expected = $tag.TrimStart('v') + ".0"    # e.g. "2.0.19.0"
+          $dll = "src/Mukti.WindowsAddin/bin/Release/net8.0-windows/win-arm64/publish/Mukti.WindowsAddin.dll"
+          $actual = [System.Diagnostics.FileVersionInfo]::GetVersionInfo($dll).FileVersion
+          Write-Host "Tag: $tag  Expected: $expected  Actual: $actual"
+          if ($actual -ne $expected) {
+            Write-Error "DLL version mismatch: expected $expected, got $actual"
+            exit 1
+          }
+          Write-Host "Version OK: $actual"
       - name: Build Inno Setup installer (ARM64)
         run: iscc installer\windows\setup-arm64.iss
       - name: Upload unsigned installer
