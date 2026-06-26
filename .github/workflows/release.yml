@@ -47,7 +47,9 @@ jobs:
           dotnet restore Mukti.sln
           dotnet publish src/Mukti.WindowsAddin/Mukti.WindowsAddin.csproj --configuration Release --runtime win-arm64 --no-self-contained --output src/Mukti.WindowsAddin/bin/Release/net8.0-windows/win-arm64/publish
       - name: Package ARM64 binaries
-        run: Compress-Archive -Path src/Mukti.WindowsAddin/bin/Release/net8.0-windows/win-arm64/publish/* -DestinationPath installer/windows/output/Mukti-${{ github.ref_name }}-arm64-binaries.zip -Force
+        run: |
+          New-Item -ItemType Directory -Force installer/windows/output | Out-Null
+          Compress-Archive -Path src/Mukti.WindowsAddin/bin/Release/net8.0-windows/win-arm64/publish/* -DestinationPath installer/windows/output/Mukti-${{ github.ref_name }}-arm64-binaries.zip -Force
         shell: pwsh
       - name: Upload ARM64 artifact
         uses: actions/upload-artifact@v4

@@ -23,6 +23,7 @@ static class AuditRunner
     // Unicode Bengali block + safe punctuation
     static bool IsValidUnicode(char c) =>
         (c >= 'ঀ' && c <= '৿') || c < 128 ||
+        c == ' ' ||  // non-breaking space — valid in Office documents
         c == ' ' || c == '।' || c == '॥' ||
         (c >= 'Ͱ' && c <= 'Ͽ') ||
         (c >= '‘' && c <= '‟') ||
@@ -59,7 +60,7 @@ static class AuditRunner
         string dataPath = Path.Combine(repoRoot, "data", "bijoy-sutonnymj.json");
 
         Converter? conv = null;
-        if (mode != ScanMode.Safety)
+        if (mode != ScanMode.Bijoy)
         {
             if (!File.Exists(dataPath))
             {
