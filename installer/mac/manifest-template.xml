@@ -3,7 +3,7 @@
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:type="TaskPaneApp">
   <Id>F4E71C21-9B7A-4C3E-8D22-8F91A235C4B2</Id>
-  <Version>2.0.5.0</Version>
+  <Version>2.0.6.0</Version>
   <ProviderName>GRU-953</ProviderName>
   <DefaultLocale>bn</DefaultLocale>
   <DisplayName DefaultValue="Mukti"/>
