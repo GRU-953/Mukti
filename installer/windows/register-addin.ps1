@@ -11,6 +11,31 @@ if ($Install) {
     if ($AppPath -eq "") { $AppPath = $PSScriptRoot }
     $comhostDll = Join-Path $AppPath "Mukti.WindowsAddin.comhost.dll"
 
+    # Microsoft 365 Click-to-Run runs Office in a virtual file system that does not
+    # expose C:\Windows\System32\downlevel to COM DLLs hosted inside Office processes.
+    # The .NET comhost imports api-ms-win-crt-*.dll (UCRT stubs). Copy them from the
+    # system if they are not already present in the install directory.
+    $ucrtDlls = @(
+        "api-ms-win-crt-convert-l1-1-0.dll",
+        "api-ms-win-crt-filesystem-l1-1-0.dll",
+        "api-ms-win-crt-heap-l1-1-0.dll",
+        "api-ms-win-crt-locale-l1-1-0.dll",
+        "api-ms-win-crt-runtime-l1-1-0.dll",
+        "api-ms-win-crt-stdio-l1-1-0.dll",
+        "api-ms-win-crt-string-l1-1-0.dll",
+        "api-ms-win-crt-time-l1-1-0.dll"
+    )
+    foreach ($dll in $ucrtDlls) {
+        if (Test-Path (Join-Path $AppPath $dll)) { continue }
+        foreach ($sysDir in @("$env:SystemRoot\System32\downlevel", "$env:SystemRoot\System32")) {
+            $src = Join-Path $sysDir $dll
+            if (Test-Path $src) {
+                Copy-Item $src $AppPath -Force -EA SilentlyContinue
+                break
+            }
+        }
+    }
+
     # Write COM registration directly to HKCU (regsvr32 tries HKLM first and fails non-elevated)
     $clsidRoot = "HKCU:\SOFTWARE\Classes\CLSID\$Clsid"
     New-Item -Path "$clsidRoot"                    -Force | Out-Null

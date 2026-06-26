@@ -39,6 +39,7 @@ Source: "..\..\data\bijoy-sutonnymj.json"; DestDir: "{app}\data"; Flags: ignorev
 Source: "{#BuildOutput}\*.dll"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 Source: "{#BuildOutput}\*.json"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 Source: "{#BuildOutput}\*.clsidmap"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
+Source: "{#BuildOutput}\api-ms-win-crt-*.dll"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 Source: "register-addin-arm64.ps1"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]

@@ -52,4 +52,28 @@
     <Copy SourceFiles="$(IntermediateOutputPath)$(AssemblyName).clsidmap"
           DestinationFiles="$(PublishDir)$(AssemblyName).comhost.clsidmap" />
   </Target>
+
+  <!-- Copy UCRT stub DLLs into the publish directory.
+       Microsoft 365 Click-to-Run runs Office in a virtual file system that does
+       not expose C:\Windows\System32\downlevel to hosted DLLs. The .NET comhost
+       imports these stubs (api-ms-win-crt-*.dll), which forward to ucrtbase.dll.
+       Without them in the same directory the comhost fails to load inside Word/
+       Excel/PowerPoint with ERROR_MOD_NOT_FOUND. -->
+  <Target Name="CopyUCRTStubs" AfterTargets="Publish"
+          Condition="'$(PublishDir)' != '' And '$(RuntimeIdentifier)' == 'win-x64'">
+    <PropertyGroup>
+      <_UCRTDownlevel>$(SystemRoot)\System32\downlevel</_UCRTDownlevel>
+      <_UCRTSystem32>$(SystemRoot)\System32</_UCRTSystem32>
+    </PropertyGroup>
+    <ItemGroup>
+      <_UCRTDlls Condition="Exists('$(_UCRTDownlevel)\api-ms-win-crt-stdio-l1-1-0.dll')"
+                 Include="$(_UCRTDownlevel)\api-ms-win-crt-*.dll" />
+      <_UCRTDlls Condition="'@(_UCRTDlls)' == '' And Exists('$(_UCRTSystem32)\api-ms-win-crt-stdio-l1-1-0.dll')"
+                 Include="$(_UCRTSystem32)\api-ms-win-crt-*.dll" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_UCRTDlls)" DestinationFolder="$(PublishDir)"
+          SkipUnchangedFiles="true" Condition="'@(_UCRTDlls)' != ''" />
+    <Message Text="Copied UCRT stubs to publish dir" Importance="high"
+             Condition="'@(_UCRTDlls)' != ''" />
+  </Target>
 </Project>

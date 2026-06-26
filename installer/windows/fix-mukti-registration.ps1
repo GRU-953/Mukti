@@ -1,23 +1,22 @@
 # fix-mukti-registration.ps1
 # Repairs Mukti when it was installed but does not appear in Word/Excel/PowerPoint.
 #
-# Cause: an older Mukti installer elevated to administrator and registered the
-# add-in in the administrator account's registry, not yours. This script
-# re-registers Mukti in YOUR account. Run it as yourself — do NOT "Run as
-# administrator" (that would recreate the original problem).
+# Run this as yourself — do NOT "Run as administrator" (that would write registry
+# keys into the administrator account, not yours, and Word still wouldn't see them).
 #
 # How to run: right-click this file -> "Run with PowerShell".
 
 $ErrorActionPreference = 'Stop'
-$ProgId = 'Mukti.Connect'
-$apps   = @('Word', 'Excel', 'PowerPoint')
+$ProgId  = 'Mukti.Connect'
+$Clsid   = '{F4E71C21-9B7A-4C3E-8D22-8F91A235C4B1}'
+$apps    = @('Word', 'Excel', 'PowerPoint')
 
 Write-Host 'Repairing Mukti registration for the current user...' -ForegroundColor Cyan
 
-# 1) Locate the installed COM host DLL (per-user or older per-machine location).
+# 1) Locate the installed COM host DLL
 $candidates = @(
     (Join-Path $env:LOCALAPPDATA 'Mukti\Mukti.WindowsAddin.comhost.dll'),
-    (Join-Path $env:ProgramFiles 'Mukti\Mukti.WindowsAddin.comhost.dll'),
+    (Join-Path $env:ProgramFiles  'Mukti\Mukti.WindowsAddin.comhost.dll'),
     (Join-Path ${env:ProgramFiles(x86)} 'Mukti\Mukti.WindowsAddin.comhost.dll')
 ) | Where-Object { $_ -and (Test-Path $_) }
 
@@ -26,46 +25,61 @@ if (-not $candidates) {
     Read-Host 'Press Enter to close'
     exit 1
 }
-
-# Always use the 64-bit regsvr32 for the x64 add-in. If this happens to run in a
-# 32-bit PowerShell on 64-bit Windows, System32 is redirected to SysWOW64, so use
-# the Sysnative alias to reach the real 64-bit regsvr32.
-if ([Environment]::Is64BitOperatingSystem -and -not [Environment]::Is64BitProcess) {
-    $regsvr = "$env:SystemRoot\Sysnative\regsvr32.exe"
-} else {
-    $regsvr = "$env:SystemRoot\System32\regsvr32.exe"
-}
-
-# If a stale all-users copy is left in Program Files, unregister it first so it
-# cannot shadow the per-user registration we are about to create.
-$prefer = ($candidates | Where-Object { $_ -like "$env:LOCALAPPDATA*" } | Select-Object -First 1)
-if ($prefer) {
-    foreach ($stale in ($candidates | Where-Object { $_ -ne $prefer })) {
-        Write-Host "Unregistering stale copy: $stale"
-        & $regsvr /s /u "$stale"
-    }
-    $dll = $prefer
-} else {
-    $dll = $candidates[0]
-}
+$dll     = $candidates[0]
+$AppPath = Split-Path $dll
 Write-Host "Using: $dll"
 
-# 2) Register the COM class in this user's hive (no admin needed).
-& $regsvr /s "$dll"
-Write-Host 'COM class registered for current user.'
+# 2) Copy UCRT stub DLLs to the install directory if missing.
+#    Microsoft 365 Click-to-Run's virtual file system does not expose
+#    C:\Windows\System32\downlevel to COM DLLs hosted inside Office processes.
+#    The .NET comhost imports api-ms-win-crt-*.dll from its own directory.
+$ucrtDlls = @(
+    'api-ms-win-crt-convert-l1-1-0.dll',
+    'api-ms-win-crt-filesystem-l1-1-0.dll',
+    'api-ms-win-crt-heap-l1-1-0.dll',
+    'api-ms-win-crt-locale-l1-1-0.dll',
+    'api-ms-win-crt-runtime-l1-1-0.dll',
+    'api-ms-win-crt-stdio-l1-1-0.dll',
+    'api-ms-win-crt-string-l1-1-0.dll',
+    'api-ms-win-crt-time-l1-1-0.dll'
+)
+foreach ($ucrt in $ucrtDlls) {
+    if (Test-Path (Join-Path $AppPath $ucrt)) { continue }
+    foreach ($sysDir in @("$env:SystemRoot\System32\downlevel", "$env:SystemRoot\System32")) {
+        $src = Join-Path $sysDir $ucrt
+        if (Test-Path $src) {
+            Copy-Item $src $AppPath -Force -EA SilentlyContinue
+            Write-Host "  Copied UCRT stub: $ucrt"
+            break
+        }
+    }
+}
 
-# 3) Tell Office to load the add-in, for this user.
+# 3) Write COM registration directly to HKCU (regsvr32 tries HKLM first and fails without elevation)
+$clsidRoot = "HKCU:\SOFTWARE\Classes\CLSID\$Clsid"
+New-Item -Path "$clsidRoot\InprocServer32" -Force | Out-Null
+Set-ItemProperty "$clsidRoot\InprocServer32" '(Default)'      $dll
+Set-ItemProperty "$clsidRoot\InprocServer32" 'ThreadingModel' 'Both'
+
+$progIdRoot = "HKCU:\SOFTWARE\Classes\$ProgId"
+New-Item -Path "$progIdRoot\CLSID" -Force | Out-Null
+Set-ItemProperty "$progIdRoot\CLSID" '(Default)' $Clsid
+Write-Host 'COM class registered in HKCU.'
+
+# 4) Write Office add-in keys for this user (both versionless and 16.0 paths)
 foreach ($app in $apps) {
-    $key = "HKCU:\SOFTWARE\Microsoft\Office\$app\Addins\$ProgId"
-    if (-not (Test-Path $key)) { New-Item -Path $key -Force | Out-Null }
-    Set-ItemProperty -Path $key -Name 'FriendlyName'    -Value 'Mukti'
-    Set-ItemProperty -Path $key -Name 'Description'     -Value 'Convert Bijoy/SutonnyMJ Bengali text to Unicode'
-    Set-ItemProperty -Path $key -Name 'LoadBehavior'    -Value 3 -Type DWord
-    Set-ItemProperty -Path $key -Name 'CommandLineSafe' -Value 0 -Type DWord
+    foreach ($ver in @('', '16.0\')) {
+        $key = "HKCU:\SOFTWARE\Microsoft\Office\${ver}${app}\Addins\$ProgId"
+        New-Item -Path $key -Force | Out-Null
+        Set-ItemProperty $key 'FriendlyName'    'Mukti'
+        Set-ItemProperty $key 'Description'     'Convert Bijoy/SutonnyMJ Bengali text to Unicode'
+        Set-ItemProperty $key 'LoadBehavior'    3 -Type DWord
+        Set-ItemProperty $key 'CommandLineSafe' 0 -Type DWord
+    }
     Write-Host "Registered for $app."
 }
 
 Write-Host ''
 Write-Host 'Done. Close Word/Excel/PowerPoint completely and reopen them.' -ForegroundColor Green
-Write-Host 'You should now see the Mukti tab on the ribbon.' -ForegroundColor Green
+Write-Host 'You should see the Mukti tab on the ribbon.'                   -ForegroundColor Green
 Read-Host 'Press Enter to close'

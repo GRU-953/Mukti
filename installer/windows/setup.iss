@@ -55,6 +55,11 @@ Source: "{#BuildOutput}\\*.clsidmap"; DestDir: "{app}"; Flags: ignoreversion ski
 ; dotnet publish --self-contained generates "includedFrameworks" which the .NET comhost
 ; cannot initialize during COM DllGetClassObject. "frameworks" (system runtime) works.
 Source: "Mukti.WindowsAddin.runtimeconfig.json"; DestDir: "{app}"; Flags: ignoreversion
+; UCRT stub DLLs: Microsoft 365 Click-to-Run's virtual file system does not expose
+; C:\Windows\System32\downlevel to hosted COM DLLs. Without these stubs in the same
+; directory, the .NET comhost fails to load inside Word/Excel/PowerPoint.
+; The csproj CopyUCRTStubs target copies them from the build machine during publish.
+Source: "{#BuildOutput}\\api-ms-win-crt-*.dll"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 Source: "register-addin.ps1"; DestDir: "{app}"; Flags: ignoreversion
 Source: "fix-mukti-registration.ps1"; DestDir: "{app}"; Flags: ignoreversion
 
