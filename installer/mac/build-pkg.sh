@@ -3,7 +3,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
-VERSION="2.0.7"
+VERSION="2.0.8"
 INSTALL_PATH="/Library/Application Support/Mukti"
 SERVER_PORT="43017"
 OUTPUT_DIR="$SCRIPT_DIR/output"

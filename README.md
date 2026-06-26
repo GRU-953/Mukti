@@ -10,8 +10,8 @@
 
 <br/>
 
-[![Windows ডাউনলোড করুন](https://img.shields.io/badge/Windows-%E0%A6%A1%E0%A6%BE%E0%A6%89%E0%A6%A8%E0%A6%B2%E0%A7%8B%E0%A6%A1-26336E?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/GRU-953/Mukti/releases/download/v2.0.7/Mukti-Setup-2.0.7.exe)
-[![Mac ডাউনলোড করুন](https://img.shields.io/badge/Mac-%E0%A6%A1%E0%A6%BE%E0%A6%89%E0%A6%A8%E0%A6%B2%E0%A7%8B%E0%A6%A1-14A88A?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/GRU-953/Mukti/releases/download/v2.0.7/Mukti-2.0.7.pkg)
+[![Windows ডাউনলোড করুন](https://img.shields.io/badge/Windows-%E0%A6%A1%E0%A6%BE%E0%A6%89%E0%A6%A8%E0%A6%B2%E0%A7%8B%E0%A6%A1-26336E?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/GRU-953/Mukti/releases/download/v2.0.8/Mukti-Setup-2.0.8.exe)
+[![Mac ডাউনলোড করুন](https://img.shields.io/badge/Mac-%E0%A6%A1%E0%A6%BE%E0%A6%89%E0%A6%A8%E0%A6%B2%E0%A7%8B%E0%A6%A1-14A88A?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/GRU-953/Mukti/releases/download/v2.0.8/Mukti-2.0.8.pkg)
 [![MIT লাইসেন্স](https://img.shields.io/badge/License-MIT-E0990F?style=for-the-badge)](LICENSE)
 
 </div>
@@ -36,14 +36,14 @@ You do not need any extra software or website. Mukti works directly from the Mic
 
 ### Windows
 
-<a href="https://github.com/GRU-953/Mukti/releases/download/v2.0.7/Mukti-Setup-2.0.7.exe">
-  <img src="https://img.shields.io/badge/Mukti--Setup--2.0.7.exe-%E0%A6%A1%E0%A6%BE%E0%A6%89%E0%A6%A8%E0%A6%B2%E0%A7%8B%E0%A6%A1%20%E0%A6%95%E0%A6%B0%E0%A7%81%E0%A6%A8-26336E?style=for-the-badge&logo=windows&logoColor=white" alt="Windows ডাউনলোড" />
+<a href="https://github.com/GRU-953/Mukti/releases/download/v2.0.8/Mukti-Setup-2.0.8.exe">
+  <img src="https://img.shields.io/badge/Mukti--Setup--2.0.8.exe-%E0%A6%A1%E0%A6%BE%E0%A6%89%E0%A6%A8%E0%A6%B2%E0%A7%8B%E0%A6%A1%20%E0%A6%95%E0%A6%B0%E0%A7%81%E0%A6%A8-26336E?style=for-the-badge&logo=windows&logoColor=white" alt="Windows ডাউনলোড" />
 </a>
 
 ### Mac
 
-<a href="https://github.com/GRU-953/Mukti/releases/download/v2.0.7/Mukti-2.0.7.pkg">
-  <img src="https://img.shields.io/badge/Mukti--2.0.7.pkg-%E0%A6%A1%E0%A6%BE%E0%A6%89%E0%A6%A8%E0%A6%B2%E0%A7%8B%E0%A6%A1%20%E0%A6%95%E0%A6%B0%E0%A7%81%E0%A6%A8-14A88A?style=for-the-badge&logo=apple&logoColor=white" alt="Mac ডাউনলোড" />
+<a href="https://github.com/GRU-953/Mukti/releases/download/v2.0.8/Mukti-2.0.8.pkg">
+  <img src="https://img.shields.io/badge/Mukti--2.0.8.pkg-%E0%A6%A1%E0%A6%BE%E0%A6%89%E0%A6%A8%E0%A6%B2%E0%A7%8B%E0%A6%A1%20%E0%A6%95%E0%A6%B0%E0%A7%81%E0%A6%A8-14A88A?style=for-the-badge&logo=apple&logoColor=white" alt="Mac ডাউনলোড" />
 </a>
 
 </div>
@@ -60,8 +60,8 @@ You do not need any extra software or website. Mukti works directly from the Mic
 
 ### Windows
 
-1. উপরের লিঙ্ক থেকে **Mukti-Setup-2.0.7.exe** ডাউনলোড করুন।
-   *(Download Mukti-Setup-2.0.7.exe from the link above.)*
+1. উপরের লিঙ্ক থেকে **Mukti-Setup-2.0.8.exe** ডাউনলোড করুন।
+   *(Download Mukti-Setup-2.0.8.exe from the link above.)*
 
 2. ফাইলটিতে ডাবল-ক্লিক করুন।
    *(Double-click the downloaded file.)*
@@ -82,8 +82,8 @@ You do not need any extra software or website. Mukti works directly from the Mic
 
 ### Mac
 
-1. উপরের লিঙ্ক থেকে **Mukti-2.0.7.pkg** ডাউনলোড করুন।
-   *(Download Mukti-2.0.7.pkg from the link above.)*
+1. উপরের লিঙ্ক থেকে **Mukti-2.0.8.pkg** ডাউনলোড করুন।
+   *(Download Mukti-2.0.8.pkg from the link above.)*
 
 2. ডাউনলোড করা ফাইলটিতে ডাবল-ক্লিক করুন এবং ইনস্টলারের নির্দেশনা অনুসরণ করুন।
    *(Double-click the downloaded file and follow the installer steps.)*
@@ -151,7 +151,7 @@ Your document content never leaves your device. Fully offline. No account or int
 &nbsp;
 [![GitHub Stars](https://img.shields.io/github/stars/GRU-953/Mukti?style=flat-square&color=14A88A)](https://github.com/GRU-953/Mukti/stargazers)
 &nbsp;
-[![Version](https://img.shields.io/badge/version-v2.0.7-E15B3C?style=flat-square)](https://github.com/GRU-953/Mukti/releases/tag/v2.0.7)
+[![Version](https://img.shields.io/badge/version-v2.0.8-E15B3C?style=flat-square)](https://github.com/GRU-953/Mukti/releases/tag/v2.0.8)
 
 *মুক্তি মানে স্বাধীনতা। Mukti means freedom.*
 
