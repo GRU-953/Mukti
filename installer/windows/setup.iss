@@ -78,13 +78,14 @@ Filename: "powershell.exe"; Parameters: "-ExecutionPolicy Bypass -WindowStyle Hi
 
 [Code]
 
-function IsDotNet8DesktopRuntimeInstalled(): Boolean;
 const
   RegBase   = 'SOFTWARE\dotnet\Setup\InstalledVersions\x64\sharedfx\Microsoft.WindowsDesktop.App';
   RegWow    = 'SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x64\sharedfx\Microsoft.WindowsDesktop.App';
   RegBase8  = 'SOFTWARE\dotnet\Setup\InstalledVersions\x64\sharedfx\Microsoft.WindowsDesktop.App\8.0';
   RegWow8   = 'SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x64\sharedfx\Microsoft.WindowsDesktop.App\8.0';
   RelShared = '\shared\Microsoft.WindowsDesktop.App\';
+
+function IsDotNet8DesktopRuntimeInstalled(): Boolean;
 var
   ValueNames : TArrayOfString;
   FindRec    : TFindRec;
