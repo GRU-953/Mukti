@@ -41,5 +41,6 @@
     <EmbeddedResource Include="Resources\ribbon.xml" />
     <EmbeddedResource Include="Resources\icon16.png" />
     <EmbeddedResource Include="Resources\icon32.png" />
+    <EmbeddedResource Include="Resources\icon256.png" />
   </ItemGroup>
 </Project>

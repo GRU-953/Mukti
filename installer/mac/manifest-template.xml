@@ -9,7 +9,7 @@
   <DisplayName DefaultValue="Mukti"/>
   <Description DefaultValue="Convert Bijoy/SutonnyMJ Bengali text to Unicode"/>
   <IconUrl DefaultValue="http://localhost:__PORT__/icon32.png"/>
-  <HighResolutionIconUrl DefaultValue="http://localhost:__PORT__/icon32.png"/>
+  <HighResolutionIconUrl DefaultValue="http://localhost:__PORT__/icon256.png"/>
   <SupportUrl DefaultValue="https://github.com/GRU-953/Mukti"/>
   <AppDomains><AppDomain>http://localhost:__PORT__</AppDomain></AppDomains>
   <Hosts>
