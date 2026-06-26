@@ -25,7 +25,7 @@ jobs:
       - name: Restore and publish (x64)
         run: |
           dotnet restore Mukti.sln
-          dotnet publish src/Mukti.WindowsAddin/Mukti.WindowsAddin.csproj --configuration Release --runtime win-x64 --self-contained true --output src/Mukti.WindowsAddin/bin/Release/net8.0-windows/win-x64/publish
+          dotnet publish src/Mukti.WindowsAddin/Mukti.WindowsAddin.csproj --configuration Release --runtime win-x64 --no-self-contained --output src/Mukti.WindowsAddin/bin/Release/net8.0-windows/win-x64/publish
       - name: Build Inno Setup installer
         run: iscc installer\windows\setup.iss
       - name: Upload installer artifact

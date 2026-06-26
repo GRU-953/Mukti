@@ -99,6 +99,24 @@ begin
     exit;
   end;
 
+  // Require .NET 8 WindowsDesktop Runtime (framework-dependent deployment).
+  // Without it the comhost cannot initialize the managed add-in.
+  if not RegKeyExists(HKLM, 'SOFTWARE\dotnet\Setup\InstalledVersions\x64\sharedfx\Microsoft.WindowsDesktop.App\8.0') and
+     not RegKeyExists(HKLM, 'SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x64\sharedfx\Microsoft.WindowsDesktop.App\8.0') then
+  begin
+    if MsgBox(
+      '.NET 8 Desktop Runtime is not installed.' + #13#10 +
+      'Mukti requires it to run. Please download and install it from:' + #13#10 + #13#10 +
+      'https://dotnet.microsoft.com/download/dotnet/8.0' + #13#10 + #13#10 +
+      'Install ".NET 8 Desktop Runtime (x64)" then run this installer again.' + #13#10 + #13#10 +
+      'Continue anyway (for testing only)?',
+      mbConfirmation, MB_YESNO) = IDNO then
+    begin
+      Result := False;
+      exit;
+    end;
+  end;
+
   // Detect any supported Office installation:
   //  - Click-to-Run  (Microsoft 365, Office 2019, Office 2021)
   //  - MSI 64-bit    (traditional volume/retail installs)
